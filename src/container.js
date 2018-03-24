@@ -22,7 +22,8 @@ const defaultOptions = {
 	acceptGroups: [defaultGroupName],
 	orientation: 'vertical', // vertical | horizontal
 	getChildPayload: () => { return undefined; },
-	animationDuration: 180
+	animationDuration: 180,
+	autoScrollEnabled: true,
 };
 
 function setAnimation(element, add, animationDuration) {
@@ -646,6 +647,7 @@ const options = {
 	nonDragAreaSelector: 'some selector',
 	dragBeginDelay: 0,
 	animationDuration: 180,
+	autoScrollEnabled: true,
 	getChildPayload: (index) => null,
 };
 

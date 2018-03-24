@@ -87,7 +87,7 @@ export default ({ element, layout, options }) => {
 	const scrollParentBeginEnd = scrollableParent ? layout.getBeginEndOfDOMRect(scrollableParent.getBoundingClientRect()) : null;
 	let animator = requestFrame(element, layout);
 	return ({ draggableInfo, dragResult, reset }) => {
-		if (scrollableParent) {
+		if (options.autoScrollEnabled && scrollableParent) {
 			if (reset) {
 				animator.stop();
 				return null;

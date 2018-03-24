@@ -84,7 +84,7 @@ export default ({ element, layout, options }) => {
 	let lastPos = null;
 	const axis = options.orientation === 'vertical' ? 'Y' : 'X';
 	let scrollableParent = getScrollableParent(element, axis);
-	const scrollParentBeginEnd = layout.getBeginEndOfDOMRect(scrollableParent.getBoundingClientRect());
+	const scrollParentBeginEnd = scrollableParent ? layout.getBeginEndOfDOMRect(scrollableParent.getBoundingClientRect()) : null;
 	let animator = requestFrame(element, layout);
 	return ({ draggableInfo, dragResult, reset }) => {
 		if (scrollableParent) {

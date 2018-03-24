@@ -1,14 +1,23 @@
 {
   "name": "smooth-dnd",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.3",
+  "description": "Drag and Drop library",
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production"
+    "build": "webpack --mode development"
   },
-  "author": "",
+  "keywords": [
+    "sortable",
+    "drag and drop",
+    "dnd"
+  ],
+  "author": "Kutlu Sahin",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kutlugsahin/smooth-dnd.git"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",

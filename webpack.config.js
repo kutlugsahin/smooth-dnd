@@ -6,7 +6,9 @@ module.exports = {
 	entry: './index.js',
 	output: {
 		path: path.resolve(dirname, 'dist'), 
-		filename: 'index.js'
+		filename: 'index.js',
+		library: 'SmoothDND',
+		libraryTarget: "umd",
 	},
 	module: {
 		rules: [

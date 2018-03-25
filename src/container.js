@@ -563,7 +563,7 @@ function Container(element) {
 		}
 
 		function shouldAnimateDrop() {
-			return props.options.shouldAnimateDrop ? props.shouldAnimateDrop({
+			return props.options.shouldAnimateDrop ? props.options.shouldAnimateDrop({
 				sourceContainerProps: lastDraggableInfo.container.getOptions(),
 				payload: lastDraggableInfo.payload
 			}) : true;

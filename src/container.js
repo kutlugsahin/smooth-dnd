@@ -79,9 +79,7 @@ function wrapChildren(element, orientation, animationDuration) {
 		let wrapper = child;
 		if (!hasClass(child, wrapperClass)) {
 			wrapper = wrapChild(child, orientation, animationDuration);
-		}
-
-		wrapper.style.transitionDuration = animationDuration + 'ms';
+		}		
 		wrapper[containersInDraggable] = [];
 		wrapper[translationValue] = 0;
 		return wrapper;
@@ -143,12 +141,6 @@ function resetDraggables({ element, draggables, layout, options }) {
 			element[stretcherElementInstance].parentNode.removeChild(element[stretcherElementInstance]);
 			element[stretcherElementInstance] = null;
 		}
-
-		setTimeout(() => {
-			draggables.forEach(p => {
-				setAnimation(p, true, options.animationDuration);
-			});
-		}, 50);
 	};
 }
 
@@ -580,6 +572,7 @@ function Container(element) {
 
 			container.layout.invalidateRects();
 			registerToParentContainer(container, relevantContainers);
+			draggables.forEach(p => setAnimation(p, true, options.animationDuration));
 		}
 
 		props.layout.setScrollListener(function() {

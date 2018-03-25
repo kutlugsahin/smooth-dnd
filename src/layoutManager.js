@@ -171,7 +171,11 @@ export default function layoutManager(containerElement, orientation, _animationD
 
 	function setTranslation(element, translation) {
 		if (getTranslation(element) !== translation) {
-			propMapper.set(element.style, 'translate', translation);
+			if (!translation) {
+				element.style.removeProperty('transform');
+			} else {
+				propMapper.set(element.style, 'translate', translation);
+			}
 			element[translationValue] = translation;
 
 			if (element[containersInDraggable]) {
@@ -190,7 +194,11 @@ export default function layoutManager(containerElement, orientation, _animationD
 
 	function setVisibility(element, isVisible) {
 		if (element[visibilityValue] === undefined || element[visibilityValue] !== isVisible) {
-			element.style.visibility = isVisible ? 'inherit' : 'hidden';
+			if (isVisible) {
+				element.style.removeProperty('visibility');
+			} else {
+				element.style.visibility = 'hidden';
+			}
 			element[visibilityValue] = isVisible;
 		}
 	}

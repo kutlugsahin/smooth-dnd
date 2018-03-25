@@ -40,7 +40,7 @@
 }
 
 .smooth-dnd-ghost.animated{
-  transition: all ease-out;
+  transition: all ease-in-out;
 }
 
 /* .smooth-dnd-no-user-select{

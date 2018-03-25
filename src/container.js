@@ -557,6 +557,17 @@ function Container(element) {
 			}
 		}
 
+		function shouldAnimateDrop() {
+			return props.options.shouldAnimateDrop ? props.shouldAnimateDrop({
+				sourceContainerProps: lastDraggableInfo.container.getOptions(),
+				payload: lastDraggableInfo.payload
+			}) : true;
+		}
+
+		function shouldAcceptDrop() {
+			return 
+		}
+
 		function prepareDrag(container, relevantContainers) {
 			const element = container.element;
 			const draggables = props.draggables;
@@ -624,6 +635,7 @@ function Container(element) {
 				processLastDraggableInfo();
 			},
 			getOptions: () => props.options,
+			shouldAnimateDrop,
 		};
 	};
 }
@@ -642,6 +654,7 @@ const options = {
 	animationDuration: 180,
 	autoScrollEnabled: true,
 	getChildPayload: (index) => null,
+	shouldAnimateDrop: (params) => true
 };
 
 // exported part of container

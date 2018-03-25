@@ -24,7 +24,7 @@ const css = {
 		'box-sizing': 'border-box',
 	},
 	[`.${constants.ghostClass}.animated`]: {
-		'transition': 'all ease-out'
+		'transition': 'all ease-in-out'
 	},
 	[`.${constants.disbaleTouchActions} *`]: {
 		'touch-actions': 'none',

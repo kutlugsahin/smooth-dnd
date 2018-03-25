@@ -24,6 +24,8 @@ const defaultOptions = {
 	getChildPayload: () => { return undefined; },
 	animationDuration: 180,
 	autoScrollEnabled: true,
+	shouldAcceptDrop: null,
+	shouldAnimateDrop: null
 };
 
 function setAnimation(element, add, animationDuration) {
@@ -49,7 +51,10 @@ function initOptions(props = defaultOptions) {
 }
 
 function isDragRelevant({ element, options }) {
-	return function(sourceContainer) {
+	return function(sourceContainer, payload) {
+		if (options.shouldAcceptDrop) {
+			return options.shouldAcceptDrop(sourceContainer.getOptions(), payload)
+		}
 		const sourceOptions = sourceContainer.getOptions();
 		if (options.behaviour === 'copy') return false;
 
@@ -568,19 +573,22 @@ function Container(element) {
 			return 
 		}
 
-		function prepareDrag(container, relevantContainers) {
-			const element = container.element;
-			const draggables = props.draggables;
-			const options = container.getOptions();
+		function setDraggables(draggables, element, options) {
 			const newDraggables = wrapChildren(element, options.orientation, options.animationDuration);
 			for (let i = 0; i < newDraggables.length; i++) {
 				draggables[i] = newDraggables[i];
 			}
-			
+
 			for (let i = 0; i < draggables.length - newDraggables.length; i++) {
 				draggables.pop();
 			}
+		}
 
+		function prepareDrag(container, relevantContainers) {
+			const element = container.element;
+			const draggables = props.draggables;
+			const options = container.getOptions();
+			setDraggables(draggables, element, options);
 			container.layout.invalidateRects();
 			registerToParentContainer(container, relevantContainers);
 			draggables.forEach(p => setAnimation(p, true, options.animationDuration));
@@ -636,6 +644,9 @@ function Container(element) {
 			},
 			getOptions: () => props.options,
 			shouldAnimateDrop,
+			setDraggables: () => {
+				setDraggables(props.draggables, element, props.options);
+			}
 		};
 	};
 }

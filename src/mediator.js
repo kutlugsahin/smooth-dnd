@@ -12,6 +12,7 @@ let ghostInfo = null;
 let draggableInfo = null;
 let containers = [];
 let isDragging = false;
+let removedElement = null;
 
 // Utils.addClass(document.body, 'clearfix');
 
@@ -269,11 +270,8 @@ function getPointerEvent(e) {
 function initiateDrag(position) {
 	isDragging = true;
 	const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
-	dragListeningContainers = containers.filter(p => p.isDragRelevant(container));
-	dragListeningContainers.forEach(p => Utils.addClass(p.element, constants.noUserSelectClass));
-	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
-
-	// first move after grabbing  draggable
+	container.setDraggables();
+	
 	draggableInfo = getDraggableInfo(grabbedElement);
 	ghostInfo = getGhostElement(grabbedElement, { x: position.clientX, y: position.clientY }, draggableInfo.container);
 	draggableInfo.position = {
@@ -282,7 +280,12 @@ function initiateDrag(position) {
 	};
 
 	document.body.appendChild(ghostInfo.ghost);
-	dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));
+
+
+	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
+	dragListeningContainers.forEach(p => Utils.addClass(p.element, constants.noUserSelectClass));
+	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
+	dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));	
 }
 
 function onMouseMove(event) {
@@ -298,9 +301,8 @@ function onMouseMove(event) {
 		draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
 		draggableInfo.clientWidth = ghostInfo.clientWidth;
 		draggableInfo.clientHeight = ghostInfo.clientHeight;
+		dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));
 	}
-
-	dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));
 }
 
 function Mediator() {

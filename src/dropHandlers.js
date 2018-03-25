@@ -9,15 +9,16 @@ import {
 export function domDropHandler({ element, draggables, layout, options }) {
 	return (dropResult, onDrop) => {
 		const { removedIndex, addedIndex, droppedElement } = dropResult;
+		let removedWrapper = null;
 		if (removedIndex !== null) {
-			removeChildAt(element, removedIndex);
+			removedWrapper = removeChildAt(element, removedIndex);
 			draggables.splice(removedIndex, 1);
 		}
 
 		if (addedIndex !== null) {
 			const wrapper = document.createElement('div');
 			wrapper.className = `${wrapperClass} ${options.orientation} ${animationClass} `;
-			wrapper.appendChild(droppedElement.cloneNode(true));
+			wrapper.appendChild(removedWrapper.firstChild || droppedElement);
 			wrapper[containersInDraggable] = [];
 			addChildAt(element, wrapper, addedIndex);
 			if (addedIndex >= draggables.length) {

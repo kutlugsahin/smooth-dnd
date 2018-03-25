@@ -85,19 +85,6 @@ export default function layoutManager(containerElement, orientation, _animationD
 	function invalidateContainerRectangles(containerElement) {
 		values.rect = Utils.getContainerRect(containerElement);
 		values.visibleRect = Utils.getVisibleRect(containerElement, values.rect);
-
-		// if (visibleRect) {
-		//   visibleRect.parentNode.removeChild(visibleRect);
-		// }
-		// visibleRect = document.createElement('div');
-		// visibleRect.style.position = 'fixed';
-		// visibleRect.style.border = '1px solid red';
-		// visibleRect.style.top = values.visibleRect.top + 'px';
-		// visibleRect.style.left = values.visibleRect.left + 'px';
-		// visibleRect.style.width = values.visibleRect.right - values.visibleRect.left + 'px';
-		// visibleRect.style.height = values.visibleRect.bottom - values.visibleRect.top + 'px';
-		// document.body.appendChild(visibleRect);
-
 	}
 
 	function invalidateContainerScale(containerElement) {
@@ -209,10 +196,11 @@ export default function layoutManager(containerElement, orientation, _animationD
 
 	function isInVisibleRect(x, y) {
 		const { left, top, right, bottom } = values.visibleRect;
+		const containerRect = values.rect;
 		if (orientation === 'vertical') {
-			return x > left && x < right && y > top && y < bottom;
+			return x > containerRect.left && x < containerRect.right && y > top && y < bottom;
 		} else {
-			return x > left && x < right  && y > top && y < bottom;
+			return x > left && x < right && y > containerRect.top && y < containerRect.bottom;
 		}
 	}
 

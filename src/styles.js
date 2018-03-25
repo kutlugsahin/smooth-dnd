@@ -12,10 +12,16 @@ const css = {
 	},
 	[`.${constants.containerClass}.horizontal .${constants.wrapperClass}`]: {
 		'height': '100%',
-		'display': 'inline-block'
+		'display': 'inline-block',
+		'vertical-align': 'top',
+		'white-space': 'normal'
+	},
+	[`.${constants.containerClass}.vertical .${constants.wrapperClass}`]: {
+		'display': 'block',
+		 'overflow': 'hidden'
 	},
 	[`.${constants.wrapperClass}`]: {
-		'overflow': 'hidden'
+		 // 'overflow': 'hidden'
 	},
 	[`.${constants.wrapperClass}.animated`]: {
 		'transition': 'transform ease'

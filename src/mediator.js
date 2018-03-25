@@ -251,7 +251,7 @@ function onMouseUp() {
 			document.body.style.touchAction = null;
 			(dragListeningContainers || []).forEach(p => {
 				Utils.removeClass(p.element, constants.noUserSelectClass);
-				p.handleDrop(draggableInfo);
+				 p.handleDrop(draggableInfo);
 			});
 
 			dragListeningContainers = null;

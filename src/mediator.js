@@ -57,28 +57,30 @@ function getGhostElement(element, { x, y }, container) {
 	const { left, top, right, bottom } = element.getBoundingClientRect();	
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
-	const div = document.createElement('div');
-	div.style.position = 'fixed';
-	div.style.pointerEvents = 'none';
-	div.style.left = left + 'px';
-	div.style.top = top + 'px';
-	div.style.width = right - left + 'px';
-	div.style.height = bottom - top + 'px';
-	div.style.overflow = 'hidden';
-	div.className = constants.ghostClass;
+	const ghost = document.createElement('div');
+	ghost.style.position = 'fixed';
+	ghost.style.pointerEvents = 'none';
+	ghost.style.left = left + 'px';
+	ghost.style.top = top + 'px';
+	ghost.style.width = right - left + 'px';
+	ghost.style.height = bottom - top + 'px';
+	ghost.style.overflow = 'visible';
+	ghost.className = constants.ghostClass;
 	const clone = element.cloneNode(true);
-	if (container.getOptions().dragClass) {
-		Utils.addClass(clone.childNodes[0], container.getOptions().dragClass);
-	}
+	setTimeout(() => {
+		if (container.getOptions().dragClass) {
+			Utils.addClass(clone.childNodes[0], container.getOptions().dragClass);
+		}
+	});
 	clone.style.width = ((right - left) / scaleX) + 'px';
 	clone.style.height = ((bottom - top) / scaleY) + 'px';
 	clone.style.transform = `scale3d(${scaleX || 1}, ${scaleY || 1}, 1)`;
 	clone.style.transformOrigin = '0 0 0';
 	clone.style.margin = '0px';
-	div.appendChild(clone);
+	ghost.appendChild(clone);
 
 	return {
-		ghost: div,
+		ghost: ghost,
 		centerDelta: { x: midX - x, y: midY - y },
 		positionDelta: { left: left - x, top: top - y },
 		clientWidth: right - left,
@@ -108,8 +110,11 @@ function handleDropAnimation(callback) {
 		callback();
 	}
 
-	function animateGhostToPosition({ top, left }, duration) {
+	function animateGhostToPosition({ top, left }, duration, dropClass) {
 		Utils.addClass(ghostInfo.ghost, 'animated');
+		if (dropClass) {
+			Utils.addClass(ghostInfo.ghost.firstChild.firstChild, dropClass);
+		}
 		ghostInfo.ghost.style.transitionDuration = duration + 'ms';
 		ghostInfo.ghost.style.left = left + 'px';
 		ghostInfo.ghost.style.top = top + 'px';
@@ -122,7 +127,7 @@ function handleDropAnimation(callback) {
 		const container = containers.filter(p => p.element === draggableInfo.targetElement)[0];
 		if (container.shouldAnimateDrop()) {
 			const dragResult = container.getDragResult();
-			animateGhostToPosition(dragResult.shadowBeginEnd.rect, Math.max(150, container.getOptions().animationDuration / 2));
+			animateGhostToPosition(dragResult.shadowBeginEnd.rect, Math.max(150, container.getOptions().animationDuration / 2), container.getOptions().dropClass);
 		} else {
 			endDrop();
 		}
@@ -140,7 +145,7 @@ function handleDropAnimation(callback) {
 				}
 			});
 			const prevDraggableEnd = removedIndex > 0 ? layout.getBeginEnd(container.draggables[removedIndex - 1]).end : layout.getBeginEndOfContainer().begin;
-			animateGhostToPosition(layout.getTopLeftOfElementBegin(prevDraggableEnd), container.getOptions().animationDuration);
+			animateGhostToPosition(layout.getTopLeftOfElementBegin(prevDraggableEnd), container.getOptions().animationDuration, container.getOptions().dropClass);
 		} else {
 			Utils.addClass(ghostInfo.ghost, 'animated');
 			ghostInfo.ghost.style.transitionDuration = container.getOptions().animationDuration + 'ms';

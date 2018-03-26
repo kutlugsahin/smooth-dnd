@@ -151,16 +151,20 @@ export const hasClass = (element, cls) => {
 }
 
 export const addClass = (element, cls) => {
-  const classes = element.className.split(' ').filter(p => p);
-  if (classes.indexOf(cls) === -1) {
-    classes.push(cls);
-    element.className = classes.join(' ');
+  if (element) {
+    const classes = element.className.split(' ').filter(p => p);
+    if (classes.indexOf(cls) === -1) {
+      classes.push(cls);
+      element.className = classes.join(' ');
+    }
   }
 }
 
 export const removeClass = (element, cls) => {
-  const classes = element.className.split(' ').filter(p => p && p !== cls);
-  element.className = classes.join(' ');
+  if (element) {
+    const classes = element.className.split(' ').filter(p => p && p !== cls);
+    element.className = classes.join(' ');
+  }
 }
 
 export const debounce = (fn, delay, immediate) => {

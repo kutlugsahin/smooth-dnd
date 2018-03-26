@@ -27,6 +27,7 @@ const css = {
 		'transition': 'transform ease'
 	},
 	[`.${constants.ghostClass} *`]: {
+		//'perspective': '800px',
 		'box-sizing': 'border-box',
 	},
 	[`.${constants.ghostClass}.animated`]: {

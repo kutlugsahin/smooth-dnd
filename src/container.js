@@ -345,7 +345,7 @@ function handleInsertionSizeChange({ element, draggables, layout, options }) {
 					const containerBeginEnd = layout.getBeginEndOfContainer();
 					const hasScrollBar = layout.getScrollSize(element) > layout.getSize(element);
 					const containerEnd = hasScrollBar ? (containerBeginEnd.begin + layout.getScrollSize(element) - layout.getScrollValue(element)) : containerBeginEnd.end;
-					const lastDraggableEnd = layout.getBeginEnd(draggables[draggables.length - 1]).end - draggables[draggables.length - 1][translationValue];
+					const lastDraggableEnd = draggables.length > 0 ? layout.getBeginEnd(draggables[draggables.length - 1]).end - draggables[draggables.length - 1][translationValue] : containerBeginEnd.begin;
 					if (lastDraggableEnd + elementSize > containerEnd) {
 						strectherElement = document.createElement('div');
 						strectherElement.className = stretcherElementClass + ' ' + options.orientation;

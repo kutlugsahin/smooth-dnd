@@ -24,7 +24,7 @@ function listenEvents() {
 
 function addGrabListeners() {
 	grabEvents.forEach(e => {
-		window.document.addEventListener(e, onMouseDown, {passive: false});
+		window.document.addEventListener(e, onMouseDown, { passive: false });
 	});
 }
 
@@ -54,7 +54,7 @@ function removeReleaseListeners() {
 
 function getGhostElement(element, { x, y }, container) {
 	const { scaleX = 1, scaleY = 1 } = container.getScale();
-	const { left, top, right, bottom } = element.getBoundingClientRect();	
+	const { left, top, right, bottom } = element.getBoundingClientRect();
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
 	const ghost = document.createElement('div');
@@ -235,7 +235,7 @@ function onMouseDown(event) {
 
 			if (startDrag) {
 				event.preventDefault();
-				handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {	
+				handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
 					setTimeout(() => {
 						window.getSelection().empty();
 					}, 0);
@@ -256,7 +256,7 @@ function onMouseUp() {
 			document.body.style.touchAction = null;
 			(dragListeningContainers || []).forEach(p => {
 				Utils.removeClass(p.element, constants.noUserSelectClass);
-				 p.handleDrop(draggableInfo);
+				p.handleDrop(draggableInfo);
 			});
 
 			dragListeningContainers = null;
@@ -269,14 +269,40 @@ function onMouseUp() {
 }
 
 function getPointerEvent(e) {
-	return e.touches ? e.touches[0] : e;	
+	return e.touches ? e.touches[0] : e;
 }
+
+function dragHandler(dragListeningContainers) {
+	let containers = dragListeningContainers;
+	return function(draggableInfo) {
+		// let containerInPos = null;
+		// for (var i = 0; i < containers.length; i++) {
+		// 	const container = containers[i];
+		// 	const { pos } = container.handleDrag(draggableInfo);
+		// 	if (pos !== null) {
+		// 		// we are inside a container filter containersToTraverse to that container and its childs
+		// 		containerInPos = container;
+		// 		break;
+		// 	}
+		// }
+
+		// if (containerInPos === null) {
+		// 	containers = dragListeningContainers;
+		// } else {
+		// 	containers = [containerInPos, ...containerInPos.getChildContainers()]
+		// }
+
+		containers.forEach(p => p.handleDrag(draggableInfo));
+	}
+}
+
+let handleDrag = null;
 
 function initiateDrag(position) {
 	isDragging = true;
 	const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
 	container.setDraggables();
-	
+
 	draggableInfo = getDraggableInfo(grabbedElement);
 	ghostInfo = getGhostElement(grabbedElement, { x: position.clientX, y: position.clientY }, draggableInfo.container);
 	draggableInfo.position = {
@@ -288,9 +314,10 @@ function initiateDrag(position) {
 
 
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
+	handleDrag = dragHandler(dragListeningContainers);
 	dragListeningContainers.forEach(p => Utils.addClass(p.element, constants.noUserSelectClass));
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
-	dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));	
+	handleDrag(draggableInfo);
 }
 
 function onMouseMove(event) {
@@ -306,7 +333,7 @@ function onMouseMove(event) {
 		draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
 		draggableInfo.clientWidth = ghostInfo.clientWidth;
 		draggableInfo.clientHeight = ghostInfo.clientHeight;
-		dragListeningContainers.forEach(p => p.handleDrag(draggableInfo));
+		handleDrag(draggableInfo);
 	}
 }
 

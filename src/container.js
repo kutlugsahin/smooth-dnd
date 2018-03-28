@@ -672,7 +672,6 @@ export default function(element, options) {
 	element[containerInstance] = container;
 	Mediator.register(container);
 	return {
-		setOptions: containerIniter,
 		dispose: function() {
 			Mediator.unregister(container);
 			container.layout.dispose();

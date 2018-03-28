@@ -195,7 +195,13 @@ export default function layoutManager(containerElement, orientation, _animationD
 	}
 
 	function isInVisibleRect(x, y) {
-		const { left, top, right, bottom } = values.visibleRect;
+		let { left, top, right, bottom } = values.visibleRect;
+
+		// if there is no wrapper in rect size will be 0 and wont accept any drop
+		// so make sure at least there is 30px difference
+		if (bottom - top < 2) {
+			bottom = top + 30;
+		}
 		const containerRect = values.rect;
 		if (orientation === 'vertical') {
 			return x > containerRect.left && x < containerRect.right && y > top && y < bottom;

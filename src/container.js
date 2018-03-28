@@ -19,7 +19,6 @@ import Mediator from './mediator';
 const defaultOptions = {
 	groupName: null,
 	behaviour: 'move', // move | copy
-	acceptGroups: [defaultGroupName],
 	orientation: 'vertical', // vertical | horizontal
 	getChildPayload: () => { return undefined; },
 	animationDuration: 180,
@@ -43,11 +42,7 @@ function getContainer(element) {
 }
 
 function initOptions(props = defaultOptions) {
-	const result = Object.assign({}, defaultOptions, props);
-	if (result.groupName && !props.acceptGroups) {
-		result.acceptGroups = [props.groupName];
-	}
-	return result;
+	return Object.assign({}, defaultOptions, props);
 }
 
 function isDragRelevant({ element, options }) {
@@ -65,7 +60,6 @@ function isDragRelevant({ element, options }) {
 
 		if (sourceContainer.element === element) return true;
 		if (sourceOptions.groupName && sourceOptions.groupName === options.groupName) return true;
-		if (options.acceptGroups.indexOf(sourceOptions.groupName) > -1) return true;
 
 		return false;
 	};
@@ -490,6 +484,21 @@ function handleFirstInsertShadowAdjustment() {
 	};
 }
 
+function fireDragEnterLeaveEvents({ options }) {
+	let wasDragIn = false;
+	return ({ dragResult: { pos } }) => {
+		const isDragIn = !!pos;
+		if (isDragIn !== wasDragIn) {
+			wasDragIn = isDragIn;
+			if (isDragIn) {
+				options.onDragEnter && options.onDragEnter();
+			} else {
+				options.onDragLeave && options.onDragLeave();				
+			}
+		}
+	}
+}
+
 function getDragHandler(params) {
 	return compose(params)(
 		getRemovedItem,
@@ -504,7 +513,8 @@ function getDragHandler(params) {
 		handleInsertionSizeChange,
 		calculateTranslations,
 		getShadowBeginEnd,
-		handleFirstInsertShadowAdjustment
+		handleFirstInsertShadowAdjustment,
+		fireDragEnterLeaveEvents
 	);
 }
 
@@ -562,17 +572,6 @@ function Container(element) {
 			}
 		}
 
-		function shouldAnimateDrop() {
-			return props.options.shouldAnimateDrop ? props.options.shouldAnimateDrop({
-				sourceContainerProps: lastDraggableInfo.container.getOptions(),
-				payload: lastDraggableInfo.payload
-			}) : true;
-		}
-
-		function shouldAcceptDrop() {
-			return 
-		}
-
 		function setDraggables(draggables, element, options) {
 			const newDraggables = wrapChildren(element, options.orientation, options.animationDuration);
 			for (let i = 0; i < newDraggables.length; i++) {
@@ -618,7 +617,6 @@ function Container(element) {
 			handleDrag: function(draggableInfo) {
 				lastDraggableInfo = draggableInfo;
 				dragResult = dragHandler(draggableInfo);
-				// console.log(dragResult);
 				handleScrollOnDrag({ draggableInfo, dragResult });
 				return dragResult;
 			},
@@ -644,7 +642,6 @@ function Container(element) {
 				processLastDraggableInfo();
 			},
 			getOptions: () => props.options,
-			shouldAnimateDrop,
 			setDraggables: () => {
 				setDraggables(props.draggables, element, props.options);
 			}
@@ -653,20 +650,21 @@ function Container(element) {
 }
 
 const options = {
-	onDragStart: (itemIndex) => { },
-	onDragMove: () => { },
-	onDrop: () => { },
 	behaviour: 'move',
 	groupName: 'bla bla', // if not defined => container will not interfere with other containers
-	acceptGroups: [],
 	orientation: 'vertical',
 	dragHandleSelector: null,
 	nonDragAreaSelector: 'some selector',
 	dragBeginDelay: 0,
 	animationDuration: 180,
 	autoScrollEnabled: true,
+	onDragStart: (index, payload) => { },
+	onDrop: ({ removedIndex, addedIndex, payload, element }) => { },
 	getChildPayload: (index) => null,
-	shouldAnimateDrop: (params) => true
+	shouldAnimateDrop: (params) => true,
+	shouldAcceptDrop: (sourceContainerOptions, payload) => true,
+	onDragEnter: () => { },
+	onDragLeave: () => {},
 };
 
 // exported part of container

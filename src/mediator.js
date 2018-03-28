@@ -123,6 +123,13 @@ function handleDropAnimation(callback) {
 		}, duration + 10);
 	}
 
+	function shouldAnimateDrop(options) {
+		return options.shouldAnimateDrop ? options.shouldAnimateDrop({
+			sourceContainerProps: draggableInfo.container.getOptions(),
+			payload: draggableInfo.payload
+		}) : true;
+	}
+
 	if (draggableInfo.targetElement) {
 		const container = containers.filter(p => p.element === draggableInfo.targetElement)[0];
 		if (container.shouldAnimateDrop()) {
@@ -312,6 +319,9 @@ function initiateDrag(position) {
 
 	document.body.appendChild(ghostInfo.ghost);
 
+	if (container.getOptions().onDragStart) {
+		container.getOptions.onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
+	}
 
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
 	handleDrag = dragHandler(dragListeningContainers);

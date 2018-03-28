@@ -12,7 +12,6 @@ $ npm i smooth-dnd
 ```
 
 ## Usage
----
 
 #### HTML
 
@@ -33,7 +32,6 @@ var container = SmoothDnD(containerElement, options);
 ```
 
 ## API
----
 
 ### SmoothDnD
 

@@ -2,7 +2,8 @@
 
 A lightweight Drag and Drop, sortable library for javascript. There is no external dependencies. It uses css transitions for animations so it's hardware accelerated whenever possible.
 
-### Demo page: <a href="#">https://kutlugsahin.github.io/smooth-dnd-demo/</a>
+>Show, don't tell !
+>### Demo page: <a href="#">https://kutlugsahin.github.io/smooth-dnd-demo/</a>
 
 ### Installation
 
@@ -11,8 +12,7 @@ npm i smooth-dnd
 ```
 
 ## Usage
-
-
+---
 
 #### HTML
 
@@ -33,6 +33,7 @@ var container = SmoothDnD(containerElement, options);
 ```
 
 ## API
+---
 
 ### SmoothDnD
 

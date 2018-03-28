@@ -95,10 +95,10 @@ function getDraggableInfo(draggableElement) {
 		container,
 		element: draggableElement,
 		elementIndex: draggableIndex,
-		payload: container.getChildPayload(draggableIndex),
+		payload: container.getOptions().getChildPayload ? container.getOptions().getChildPayload(draggableIndex) : undefined,
 		targetElement: null,
 		position: { x: 0, y: 0 },
-		groupName: container.groupName
+		groupName: container.getOptions().groupName
 	};
 }
 

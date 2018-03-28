@@ -606,8 +606,6 @@ function Container(element) {
 			draggables: props.draggables,
 			isDragRelevant: isDragRelevant(props),
 			getScale: props.layout.getContainerScale,
-			getChildPayload: props.options.getChildPayload,
-			groupName: props.options.groupName,
 			layout: props.layout,
 			getChildContainers: () => childContainers,
 			onChildPositionCaptured,

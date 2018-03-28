@@ -47,7 +47,6 @@ var container = SmoothDnD(containerElement, options);
 - **container** : `object` : handle the the created container which contains **dispose** function.
   - **dispose** : `function` : function to be called to remove detach SmoothDND form the container. It should be called when removing the **containerElement** from the DOM.
 
-### shouldAnimateDrop
 
 ## Options
 

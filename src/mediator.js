@@ -171,7 +171,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 	let clb;
 	let timer = null;
 	const moveThreshold = 1;
-	const maxMoveInDelay = 8;
+	const maxMoveInDelay = 5;
 
 	function onMove(event) {
 		const { clientX: currentX, clientY: currentY } = getPointerEvent(event);

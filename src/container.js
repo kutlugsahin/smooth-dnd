@@ -86,6 +86,16 @@ function wrapChildren(element, orientation, animationDuration) {
 	return draggables;
 }
 
+function unwrapChildren(element) {
+	Array.prototype.map.call(element.children, child => {
+		let wrapper = child;
+		if (hasClass(child, wrapperClass)) {
+			element.insertBefore(wrapper, wrapChild.firstChild);
+			element.removeChild(wrapper);
+		}
+	});
+}
+
 function findDraggebleAtPos({ layout }) {
 	const find = (draggables, pos, startIndex, endIndex, withRespectToMiddlePoints = false) => {
 		if (endIndex < startIndex) {
@@ -598,7 +608,7 @@ function Container(element) {
 		});
 
 		function dispose(container) {
-			// additional dispose actions
+			unwrapChildren(container.element);
 		}
 
 		return {
@@ -656,13 +666,15 @@ const options = {
 	dragBeginDelay: 0,
 	animationDuration: 180,
 	autoScrollEnabled: true,
+	dragClass: null,
+	dropClass: null,
 	onDragStart: (index, payload) => { },
 	onDrop: ({ removedIndex, addedIndex, payload, element }) => { },
 	getChildPayload: (index) => null,
-	shouldAnimateDrop: (params) => true,
+	shouldAnimateDrop: (sourceContainerOptions, payload) => true,
 	shouldAcceptDrop: (sourceContainerOptions, payload) => true,
 	onDragEnter: () => { },
-	onDragLeave: () => {},
+	onDragLeave: () => { },
 };
 
 // exported part of container

@@ -620,6 +620,7 @@ function Container(element) {
 				dragResult = dragHandler(draggableInfo);
 				// console.log(dragResult);
 				handleScrollOnDrag({ draggableInfo, dragResult });
+				return dragResult;
 			},
 			handleDrop: function(draggableInfo) {
 				lastDraggableInfo = null;

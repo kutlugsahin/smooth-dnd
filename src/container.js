@@ -20,7 +20,7 @@ const defaultOptions = {
 	groupName: null,
 	behaviour: 'move', // move | copy
 	orientation: 'vertical', // vertical | horizontal
-	getChildPayload: () => { return undefined; },
+	getChildPayload: null,
 	animationDuration: 180,
 	autoScrollEnabled: true,
 	shouldAcceptDrop: null,

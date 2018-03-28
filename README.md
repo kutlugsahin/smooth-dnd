@@ -8,7 +8,7 @@ A lightweight Drag and Drop, sortable library for javascript. There is no extern
 ### Installation
 
 ```js
-npm i smooth-dnd
+$ npm i smooth-dnd
 ```
 
 ## Usage

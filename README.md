@@ -45,14 +45,14 @@ var container = SmoothDnD(containerElement, options);
 |animationDuration|number|`180`|Animation duration in milisecond. To be consistent this animation duration will be applied to both drop and reorder animations.|
 |autoScrollEnabled|boolean|`true`|First scrollable parent will scroll automatically if dragging item is close to boundaries.
 |dragClass|string|`undefined`|Class to be added to the ghost item being dragged. The class will be added after it's added to the DOM so any transition in the class will be applies as intended.
-|dropClass|`string`|`undefined`|Class to be added to the ghost item just before the drop animation begins.|
-|onDragStart|`function`|undefined|*See descriptions below*|
-|onDrop|`function`|undefined|*See descriptions below*|
-|getChildPayload|`function`|undefined|*See descriptions below*|
-|shouldAnimateDrop|`function`|undefined|*See descriptions below*|
-|shouldAcceptDrop|`function`|undefined|*See descriptions below*|
-|onDragEnter|`function`|undefined|*See descriptions below*|
-|onDragLeave|`function`|undefined|*See descriptions below*|
+|dropClass|string|`undefined`|Class to be added to the ghost item just before the drop animation begins.|
+|onDragStart|function|`undefined`|*See descriptions below*|
+|onDrop|function|`undefined`|*See descriptions below*|
+|getChildPayload|function|`undefined`|*See descriptions below*|
+|shouldAnimateDrop|function|`undefined`|*See descriptions below*|
+|shouldAcceptDrop|function|`undefined`|*See descriptions below*|
+|onDragEnter|function|`undefined`|*See descriptions below*|
+|onDragLeave|function|`undefined`|*See descriptions below*|
 
 ---
 

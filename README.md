@@ -1,4 +1,4 @@
- # smooth-dnd.js
+ # smooth-dnd
 
 A lightweight Drag and Drop, sortable library for javascript. There is no external dependencies. It uses css transitions for animations so it's hardware accelerated whenever possible.
 
@@ -31,6 +31,23 @@ var containerElement = document.getElementById('container');
 
 var container = SmoothDnD(containerElement, options);
 ```
+
+## API
+
+### SmoothDnD
+
+Global function to convert element to a Drag and Drop container.
+```js
+var container = SmoothDnD(containerElement, options);
+```
+#### Parameters
+- **containerElement** : `DOMElement` : The parent element that contains the elements to be dragged
+- **options** : `object` : Set of parameters described below.
+#### Returns
+- **container** : `object` : handle the the created container which contains **dispose** function.
+  - **dispose** : `function` : function to be called to remove detach SmoothDND form the container. It should be called when removing the **containerElement** from the DOM.
+
+### shouldAnimateDrop
 
 ## Options
 

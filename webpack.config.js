@@ -8,7 +8,7 @@ module.exports = {
 	output: {
 		path: path.resolve(dirname, 'dist'), 
 		filename: 'index.js',
-		library: 'SmoothDND',
+		library: 'SmoothDnD',
 		libraryTarget: "umd",
 	},
 	module: {

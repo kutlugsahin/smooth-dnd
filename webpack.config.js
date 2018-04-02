@@ -4,7 +4,7 @@ const dirname = __dirname// eslint-disable-line
 
 module.exports = {
 	entry: './index.js',
-	devtool: 'source-map',
+	// devtool: 'source-map',
 	output: {
 		path: path.resolve(dirname, 'dist'), 
 		filename: 'index.js',

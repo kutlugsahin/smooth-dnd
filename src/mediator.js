@@ -14,6 +14,10 @@ let containers = [];
 let isDragging = false;
 let removedElement = null;
 
+let handleDrag = null;
+let sourceContainer = null;
+let sourceContainerLockAxis = null;
+
 // Utils.addClass(document.body, 'clearfix');
 
 const isMobile = Utils.isMobile();
@@ -271,6 +275,9 @@ function onMouseUp() {
 			ghostInfo = null;
 			draggableInfo = null;
 			isDragging = false;
+			sourceContainer = null;
+			sourceContainerLockAxis = null;
+			handleDrag = null;
 		});
 	}
 }
@@ -303,12 +310,12 @@ function dragHandler(dragListeningContainers) {
 	}
 }
 
-let handleDrag = null;
-
 function initiateDrag(position) {
 	isDragging = true;
 	const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
 	container.setDraggables();
+	sourceContainer = container;
+	sourceContainerLockAxis = container.getOptions().lockAxis ? container.getOptions().lockAxis.toLowerCase() : null;
 
 	draggableInfo = getDraggableInfo(grabbedElement);
 	ghostInfo = getGhostElement(grabbedElement, { x: position.clientX, y: position.clientY }, draggableInfo.container);
@@ -337,10 +344,20 @@ function onMouseMove(event) {
 		initiateDrag(e);
 	} else {
 		// just update ghost position && draggableInfo position
-		ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
-		ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
-		draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
-		draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
+		if (sourceContainerLockAxis) {
+			if (sourceContainerLockAxis === 'y') {
+				ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
+				draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;				
+			} else if (sourceContainerLockAxis === 'x') {
+				ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
+				draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;				
+			}
+		} else {
+			ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
+			ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
+			draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
+			draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
+		}
 		draggableInfo.clientWidth = ghostInfo.clientWidth;
 		draggableInfo.clientHeight = ghostInfo.clientHeight;
 		handleDrag(draggableInfo);

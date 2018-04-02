@@ -601,6 +601,7 @@ function Container(element) {
 			container.layout.invalidateRects();
 			registerToParentContainer(container, relevantContainers);
 			draggables.forEach(p => setAnimation(p, true, options.animationDuration));
+			handleScrollOnDrag = dragscroller(props);
 		}
 
 		props.layout.setScrollListener(function() {
@@ -634,7 +635,6 @@ function Container(element) {
 				dragHandler = getDragHandler(props);
 				dropHandler(draggableInfo, dragResult);
 				handleScrollOnDrag({ reset: true });
-				handleScrollOnDrag = dragscroller(props);
 				parentContainer = null;
 				childContainers = [];
 			},
@@ -666,6 +666,7 @@ const options = {
 	dragBeginDelay: 0,
 	animationDuration: 180,
 	autoScrollEnabled: true,
+	lockAxis: true,
 	dragClass: null,
 	dropClass: null,
 	onDragStart: (index, payload) => { },

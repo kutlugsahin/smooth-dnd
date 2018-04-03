@@ -261,9 +261,9 @@ function onMouseUp() {
 	removeReleaseListeners();
 	if (draggableInfo) {
 		handleDropAnimation(() => {
-			document.body.style.touchAction = null;
+			Utils.removeClass(document.body, constants.disbaleTouchActions);
+			Utils.removeClass(document.body, constants.noUserSelectClass);
 			(dragListeningContainers || []).forEach(p => {
-				Utils.removeClass(p.element, constants.noUserSelectClass);
 				p.handleDrop(draggableInfo);
 			});
 
@@ -323,13 +323,15 @@ function initiateDrag(position) {
 
 	document.body.appendChild(ghostInfo.ghost);
 
+	Utils.addClass(document.body, constants.disbaleTouchActions);
+	Utils.addClass(document.body, constants.noUserSelectClass);
+
 	if (container.getOptions().onDragStart) {
 		container.getOptions.onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
 	}
 
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
 	handleDrag = dragHandler(dragListeningContainers);
-	dragListeningContainers.forEach(p => Utils.addClass(p.element, constants.noUserSelectClass));
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
 	handleDrag(draggableInfo);
 }

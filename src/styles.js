@@ -18,10 +18,10 @@ const css = {
 	},
 	[`.${constants.containerClass}.vertical .${constants.wrapperClass}`]: {
 		'display': 'block',
-		 'overflow': 'hidden'
+		'overflow': 'hidden'
 	},
 	[`.${constants.wrapperClass}`]: {
-		 // 'overflow': 'hidden'
+		// 'overflow': 'hidden'
 	},
 	[`.${constants.wrapperClass}.animated`]: {
 		'transition': 'transform ease'
@@ -36,6 +36,14 @@ const css = {
 	[`.${constants.disbaleTouchActions} *`]: {
 		'touch-actions': 'none',
 		'-ms-touch-actions': 'none'
+	},
+	[`.${constants.noUserSelectClass} *`]: {
+		'-webkit-touch-callout': 'none',
+		'-webkit-user-select': 'none',
+		'-khtml-user-select': 'none',
+		'-moz-user-select': 'none',
+		'-ms-user-select': 'none',
+		'user-select': 'none'
 	}
 };
 
@@ -48,7 +56,7 @@ function convertToCssString(css) {
 	}, '');
 }
 
-function addStyleToHead() {	
+function addStyleToHead() {
 	const head = document.head || document.getElementsByTagName('head')[0];
 	const style = document.createElement('style');
 	const cssString = convertToCssString(css);

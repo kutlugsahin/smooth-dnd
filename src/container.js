@@ -21,7 +21,7 @@ const defaultOptions = {
 	behaviour: 'move', // move | copy
 	orientation: 'vertical', // vertical | horizontal
 	getChildPayload: null,
-	animationDuration: 180,
+	animationDuration: 250,
 	autoScrollEnabled: true,
 	shouldAcceptDrop: null,
 	shouldAnimateDrop: null

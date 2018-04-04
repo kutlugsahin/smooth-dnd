@@ -178,7 +178,6 @@ function handleDrop({ element, draggables, layout, options }) {
 				droppedElement: draggableInfo.element.firstChild
 			};
 			dropHandler(dropHandlerParams, options.onDrop);
-			console.log(removedIndex, actualAddIndex, draggableInfo.payload, draggableInfo.element.firstChild);
 		}
 	};
 }

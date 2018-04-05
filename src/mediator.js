@@ -1,3 +1,4 @@
+import './polyfills';
 import * as Utils from './utils';
 import * as constants from './constants';
 import { addStyleToHead } from './styles';
@@ -246,7 +247,7 @@ function onMouseDown(event) {
 
 			if (startDrag) {
 				handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
-					window.getSelection().empty();
+					Utils.clearSelection();
 					initiateDrag(e);
 					addMoveListeners();
 					addReleaseListeners();
@@ -376,6 +377,7 @@ function Mediator() {
 }
 
 addStyleToHead();
+
 
 export default Mediator();
 

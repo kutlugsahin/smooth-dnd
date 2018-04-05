@@ -286,24 +286,8 @@ function getPointerEvent(e) {
 function dragHandler(dragListeningContainers) {
 	let containers = dragListeningContainers;
 	return function(draggableInfo) {
-		// let containerInPos = null;
-		// for (var i = 0; i < containers.length; i++) {
-		// 	const container = containers[i];
-		// 	const { pos } = container.handleDrag(draggableInfo);
-		// 	if (pos !== null) {
-		// 		// we are inside a container filter containersToTraverse to that container and its childs
-		// 		containerInPos = container;
-		// 		break;
-		// 	}
-		// }
-
-		// if (containerInPos === null) {
-		// 	containers = dragListeningContainers;
-		// } else {
-		// 	containers = [containerInPos, ...containerInPos.getChildContainers()]
-		// }
-
 		containers.forEach(p => p.handleDrag(draggableInfo));
+		handleScroll(containers, draggableInfo);
 	}
 }
 
@@ -320,6 +304,13 @@ function initiateDrag(position) {
 		x: position.clientX + ghostInfo.centerDelta.x,
 		y: position.clientY + ghostInfo.centerDelta.y
 	};
+	draggableInfo.mousePosition = {
+		x: position.clientX,
+		y: position.clientY
+	}
+
+	draggableInfo.clientWidth = ghostInfo.clientWidth;
+	draggableInfo.clientHeight = ghostInfo.clientHeight;
 
 	document.body.appendChild(ghostInfo.ghost);
 
@@ -347,20 +338,29 @@ function onMouseMove(event) {
 			if (sourceContainerLockAxis === 'y') {
 				ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
 				draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;				
+				draggableInfo.mousePosition.y = e.clientY;
 			} else if (sourceContainerLockAxis === 'x') {
 				ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
 				draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;				
+				draggableInfo.mousePosition.x = e.clientX;
 			}
 		} else {
 			ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
 			ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
 			draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
 			draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
+			draggableInfo.mousePosition.x = e.clientX;
+			draggableInfo.mousePosition.y = e.clientY;
 		}
-		draggableInfo.clientWidth = ghostInfo.clientWidth;
-		draggableInfo.clientHeight = ghostInfo.clientHeight;
+
 		handleDrag(draggableInfo);
 	}
+}
+
+function handleScroll(containers, draggableInfo) {
+	const sourceContainer = draggableInfo.container;
+	
+	// if source container axis is not locked
 }
 
 function Mediator() {

@@ -1,5 +1,17 @@
 import * as constants from './constants';
 
+const verticalWrapperClass = {
+	'display': 'block',
+	'overflow': 'hidden'
+}
+
+const horizontalWrapperClass = {
+	'height': '100%',
+	'display': 'inline-block',
+	'vertical-align': 'top',
+	'white-space': 'normal'
+}
+
 const css = {
 	[`.${constants.containerClass}`]: {
 		'position': 'relative',
@@ -10,19 +22,13 @@ const css = {
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
 	},
-	[`.${constants.containerClass}.horizontal .${constants.wrapperClass}`]: {
-		'height': '100%',
-		'display': 'inline-block',
-		'vertical-align': 'top',
-		'white-space': 'normal'
-	},
-	[`.${constants.containerClass}.vertical .${constants.wrapperClass}`]: {
-		'display': 'block',
-		'overflow': 'hidden'
-	},
+	[`.${constants.containerClass}.horizontal .${constants.wrapperClass}`]: horizontalWrapperClass,
+	[`.${constants.containerClass}.vertical .${constants.wrapperClass}`]: verticalWrapperClass,
 	[`.${constants.wrapperClass}`]: {
 		// 'overflow': 'hidden'
 	},
+	[`.${constants.wrapperClass}.horizontal`]: horizontalWrapperClass, 
+	[`.${constants.wrapperClass}.vertical`]: verticalWrapperClass, 
 	[`.${constants.wrapperClass}.animated`]: {
 		'transition': 'transform ease'
 	},

@@ -57,12 +57,13 @@ function removeReleaseListeners() {
 	});
 }
 
-function getGhostElement(element, { x, y }, container) {
+function getGhostElement(wrapperElement, { x, y }, container) {
 	const { scaleX = 1, scaleY = 1 } = container.getScale();
-	const { left, top, right, bottom } = element.getBoundingClientRect();
+	const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
 	const ghost = document.createElement('div');
+	ghost.style.boxSizing = 'border-box';
 	ghost.style.position = 'fixed';
 	ghost.style.pointerEvents = 'none';
 	ghost.style.left = left + 'px';
@@ -71,12 +72,14 @@ function getGhostElement(element, { x, y }, container) {
 	ghost.style.height = bottom - top + 'px';
 	ghost.style.overflow = 'visible';
 	ghost.className = constants.ghostClass;
-	const clone = element.cloneNode(true);
+	const clone = wrapperElement.cloneNode(true);
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
 			Utils.addClass(clone.childNodes[0], container.getOptions().dragClass);
 		}
 	});
+	Utils.addClass(clone, container.getOptions().orientation);
+	clone.style.overflow = 'visible';
 	clone.style.width = ((right - left) / scaleX) + 'px';
 	clone.style.height = ((bottom - top) / scaleY) + 'px';
 	clone.style.transform = `scale3d(${scaleX || 1}, ${scaleY || 1}, 1)`;
@@ -88,8 +91,8 @@ function getGhostElement(element, { x, y }, container) {
 		ghost: ghost,
 		centerDelta: { x: midX - x, y: midY - y },
 		positionDelta: { left: left - x, top: top - y },
-		clientWidth: right - left,
-		clientHeight: bottom - top
+		// clientWidth: right - left,
+		// clientHeight: bottom - top
 	};
 }
 
@@ -310,8 +313,8 @@ function initiateDrag(position) {
 		y: position.clientY
 	}
 
-	draggableInfo.clientWidth = ghostInfo.clientWidth;
-	draggableInfo.clientHeight = ghostInfo.clientHeight;
+	// draggableInfo.clientWidth = ghostInfo.clientWidth;
+	// draggableInfo.clientHeight = ghostInfo.clientHeight;
 
 	document.body.appendChild(ghostInfo.ghost);
 

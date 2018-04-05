@@ -48,7 +48,8 @@ const css = {
 };
 
 function convertToCssString(css) {
-	return Object.entries(css).reduce((styleString, [propName, propValue]) => {
+	return Object.keys(css).reduce((styleString, propName) => {
+		const propValue = css[propName];
 		if (typeof (propValue) === 'object') {
 			return `${styleString}${propName}{${convertToCssString(propValue)}}`;
 		}

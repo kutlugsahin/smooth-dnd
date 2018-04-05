@@ -322,7 +322,7 @@ function initiateDrag(position) {
 	Utils.addClass(document.body, constants.noUserSelectClass);
 
 	if (container.getOptions().onDragStart) {
-		container.getOptions.onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
+		container.getOptions().onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
 	}
 
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));

@@ -33,7 +33,7 @@ function setAnimation(element, add, animationDuration) {
 		element.style.transitionDuration = animationDuration + 'ms';
 	} else {
 		removeClass(element, animationClass);
-		element.style.transitionDuration = null;
+		element.style.removeProperty('transition-duration');
 	}
 }
 

@@ -65,19 +65,22 @@ function isDragRelevant({ element, options }) {
 	};
 }
 
-function wrapChild(child, orientation) {
+function wrapChild(child) {
+	if (SmoothDnD.wrapChild) {
+		return SmoothDnD.wrapChild(child);
+	}
 	const div = document.createElement('div');
-	div.className = `${wrapperClass} ${orientation} ${animationClass}`;
+	div.className = `${wrapperClass}`;
 	child.parentElement.insertBefore(div, child);
 	div.appendChild(child);
 	return div;
 }
 
-function wrapChildren(element, orientation, animationDuration) {
+function wrapChildren(element) {
 	const draggables = Array.prototype.map.call(element.children, child => {
 		let wrapper = child;
 		if (!hasClass(child, wrapperClass)) {
-			wrapper = wrapChild(child, orientation, animationDuration);
+			wrapper = wrapChild(child);
 		}		
 		wrapper[containersInDraggable] = [];
 		wrapper[translationValue] = 0;
@@ -165,7 +168,7 @@ function setTargetContainer(draggableInfo, element, set = true) {
 
 function handleDrop({ element, draggables, layout, options }) {
 	const draggablesReset = resetDraggables({ element, draggables, layout, options });
-	const dropHandler = (options.dropHandler || domDropHandler)(({ element, draggables, layout, options }));
+	const dropHandler = (SmoothDnD.dropHandler || domDropHandler)(({ element, draggables, layout, options }));
 	return function(draggableInfo, { addedIndex, removedIndex }) {
 		draggablesReset();
 		// if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
@@ -678,7 +681,7 @@ const options = {
 };
 
 // exported part of container
-export default function(element, options) {
+function SmoothDnD(element, options) {
 	const containerIniter = Container(element);
 	const container = containerIniter(options);
 	element[containerInstance] = container;
@@ -691,3 +694,5 @@ export default function(element, options) {
 		}
 	};
 }
+
+export default SmoothDnD;

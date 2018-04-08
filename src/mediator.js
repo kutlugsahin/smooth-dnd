@@ -75,7 +75,7 @@ function getGhostElement(wrapperElement, { x, y }, container) {
 	const clone = wrapperElement.cloneNode(true);
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
-			Utils.addClass(clone.childNodes[0], container.getOptions().dragClass);
+			Utils.addClass(clone.firstElementChild, container.getOptions().dragClass);
 		}
 	});
 	Utils.addClass(clone, container.getOptions().orientation);

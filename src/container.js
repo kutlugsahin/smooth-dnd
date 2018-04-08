@@ -77,24 +77,31 @@ function wrapChild(child) {
 }
 
 function wrapChildren(element) {
-	const draggables = Array.prototype.map.call(element.children, child => {
-		let wrapper = child;
-		if (!hasClass(child, wrapperClass)) {
-			wrapper = wrapChild(child);
-		}		
-		wrapper[containersInDraggable] = [];
-		wrapper[translationValue] = 0;
-		return wrapper;
+	const draggables = []
+	Array.prototype.map.call(element.children, child => {
+		if (child.nodeType === Node.ELEMENT_NODE) {
+			let wrapper = child;
+			if (!hasClass(child, wrapperClass)) {
+				wrapper = wrapChild(child);
+			}
+			wrapper[containersInDraggable] = [];
+			wrapper[translationValue] = 0;
+			draggables.push(wrapper);
+		} else {
+			element.removeChild(child);
+		}
 	});
 	return draggables;
 }
 
 function unwrapChildren(element) {
 	Array.prototype.map.call(element.children, child => {
-		let wrapper = child;
-		if (hasClass(child, wrapperClass)) {
-			element.insertBefore(wrapper, wrapChild.firstChild);
-			element.removeChild(wrapper);
+		if (child.nodeType === Node.ELEMENT_NODE) {
+			let wrapper = child;
+			if (hasClass(child, wrapperClass)) {
+				element.insertBefore(wrapper, wrapChild.firstChild);
+				element.removeChild(wrapper);
+			}
 		}
 	});
 }

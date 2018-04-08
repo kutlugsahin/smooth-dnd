@@ -121,7 +121,7 @@ function handleDropAnimation(callback) {
 	function animateGhostToPosition({ top, left }, duration, dropClass) {
 		Utils.addClass(ghostInfo.ghost, 'animated');
 		if (dropClass) {
-			Utils.addClass(ghostInfo.ghost.firstChild.firstChild, dropClass);
+			Utils.addClass(ghostInfo.ghost.firstElementChild.firstElementChild, dropClass);
 		}
 		ghostInfo.ghost.style.transitionDuration = duration + 'ms';
 		ghostInfo.ghost.style.left = left + 'px';

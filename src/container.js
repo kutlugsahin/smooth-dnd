@@ -99,7 +99,7 @@ function unwrapChildren(element) {
 		if (child.nodeType === Node.ELEMENT_NODE) {
 			let wrapper = child;
 			if (hasClass(child, wrapperClass)) {
-				element.insertBefore(wrapper, wrapChild.firstChild);
+				element.insertBefore(wrapper, wrapChild.firstElementChild);
 				element.removeChild(wrapper);
 			}
 		}
@@ -185,7 +185,7 @@ function handleDrop({ element, draggables, layout, options }) {
 				removedIndex,
 				addedIndex: actualAddIndex,
 				payload: draggableInfo.payload,
-				droppedElement: draggableInfo.element.firstChild
+				droppedElement: draggableInfo.element.firstElementChild
 			};
 			dropHandler(dropHandlerParams, options.onDrop);
 		}

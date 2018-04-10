@@ -17,7 +17,7 @@ export function domDropHandler({ element, draggables, layout, options }) {
 
 		if (addedIndex !== null) {
 			const wrapper = document.createElement('div');
-			wrapper.className = `${wrapperClass} ${options.orientation} ${animationClass} `;
+			wrapper.className = `${wrapperClass}`;
 			wrapper.appendChild(removedWrapper.firstElementChild || droppedElement);
 			wrapper[containersInDraggable] = [];
 			addChildAt(element, wrapper, addedIndex);

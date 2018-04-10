@@ -2,9 +2,11 @@
 
 A fast and lightweight drag&drop, sortable library for with many configuration options covering many d&d scenarios. There is no external dependencies. It uses css transitions for animations so it's hardware accelerated whenever possible.
 
-For **React** components and usage follow <a href="https://github.com/kutlugsahin/react-smooth-dnd/">link</a>  
+For **React** components and usage follow <a href="https://github.com/kutlugsahin/react-smooth-dnd/">link</a> 
 
-**Angular** and **Vue.js** wrappers are coming soon!
+For **Angular** components and usage follow <a href="https://github.com/kutlugsahin/ngx-smooth-dnd/">link</a>  
+
+**Vue.js** wrappers are coming soon!
 
 **Show, don't tell !**
 ### <a href="https://kutlugsahin.github.io/smooth-dnd-demo/">Demo page</a>

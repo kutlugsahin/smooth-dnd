@@ -620,12 +620,13 @@ function Container(element) {
 			processLastDraggableInfo();
 		});
 
-		function handleDragLeftDeferedTranslation(dragResult) {
+		function handleDragLeftDeferedTranslation() {
 			if (dragResult.dragLeft) {
 				dragResult.dragLeft = false;
 				setTimeout(() => {
-					processLastDraggableInfo();
-				}, 10);
+					if(dragResult)
+						calculateTranslations(props)({dragResult});
+				}, 20);
 			}
 		}
 
@@ -648,7 +649,7 @@ function Container(element) {
 				lastDraggableInfo = draggableInfo;
 				dragResult = dragHandler(draggableInfo);
 				handleScrollOnDrag({ draggableInfo, dragResult });
-				
+				handleDragLeftDeferedTranslation();				
 				return dragResult;
 			},
 			handleDrop: function(draggableInfo) {
@@ -656,6 +657,7 @@ function Container(element) {
 				onChildPositionCaptured(false);
 				dragHandler = getDragHandler(props);
 				dropHandler(draggableInfo, dragResult);
+				dragResult = null;
 				handleScrollOnDrag({ reset: true });
 				parentContainer = null;
 				childContainers = [];

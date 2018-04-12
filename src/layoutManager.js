@@ -157,7 +157,7 @@ export default function layoutManager(containerElement, orientation, _animationD
 	}
 
 	function setTranslation(element, translation) {
-		if (getTranslation(element) !== translation) {
+		//if (getTranslation(element) !== translation) {
 			if (!translation) {
 				element.style.removeProperty('transform');
 			} else {
@@ -172,7 +172,7 @@ export default function layoutManager(containerElement, orientation, _animationD
 					});
 				}, animationDuration + 20);
 			}
-		}
+		//}
 	}
 
 	function getTranslation(element) {

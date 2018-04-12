@@ -512,7 +512,10 @@ function fireDragEnterLeaveEvents({ options }) {
 			if (isDragIn) {
 				options.onDragEnter && options.onDragEnter();
 			} else {
-				options.onDragLeave && options.onDragLeave();				
+				options.onDragLeave && options.onDragLeave();
+				return {
+					dragLeft: true
+				}
 			}
 		}
 	}
@@ -617,6 +620,15 @@ function Container(element) {
 			processLastDraggableInfo();
 		});
 
+		function handleDragLeftDeferedTranslation(dragResult) {
+			if (dragResult.dragLeft) {
+				dragResult.dragLeft = false;
+				setTimeout(() => {
+					processLastDraggableInfo();
+				}, 10);
+			}
+		}
+
 		function dispose(container) {
 			unwrapChildren(container.element);
 		}
@@ -636,6 +648,7 @@ function Container(element) {
 				lastDraggableInfo = draggableInfo;
 				dragResult = dragHandler(draggableInfo);
 				handleScrollOnDrag({ draggableInfo, dragResult });
+				
 				return dragResult;
 			},
 			handleDrop: function(draggableInfo) {

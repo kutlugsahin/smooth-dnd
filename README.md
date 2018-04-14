@@ -6,7 +6,7 @@ For **React** components and usage follow <a href="https://github.com/kutlugsahi
 
 For **Angular** components and usage follow <a href="https://github.com/kutlugsahin/ngx-smooth-dnd/">link</a>  
 
-**Vue.js** wrappers are coming soon!
+For **Vue.js** components and usage follow <a href="https://github.com/kutlugsahin/vue-smooth-dnd/">link</a>  
 
 **Show, don't tell !**
 ### <a href="https://kutlugsahin.github.io/smooth-dnd-demo/">Demo page</a>

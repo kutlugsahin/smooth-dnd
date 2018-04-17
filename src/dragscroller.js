@@ -1,4 +1,4 @@
-import { isScrolling } from './utils';
+import { isScrolling, debounce } from './utils';
 
 const maxSpeed = 1500; // px/s
 const minSpeed = 20; // px/s
@@ -62,7 +62,7 @@ function requestFrame(element, layout) {
 }
 
 
-function getAutoScrollInfo(pos, elementSize, scrollableBeginEnd) {
+function getAutoScrollInfo(pos, scrollableBeginEnd) {
 	const { begin, end } = scrollableBeginEnd;
 	const moveDistance = 100;
 	if (end - pos < moveDistance) {
@@ -114,3 +114,67 @@ export default ({ element, layout, options }) => {
 		return null;
 	};
 };
+
+const createAnimator = (element, axis = 'y') => {
+	let isAnimating = false;
+	let request = null;
+	let startTime = null;
+	let direction = null;
+	let speed = null;
+
+	function _getScrollValue() {
+		const 
+		return () => {
+
+		}
+	}
+
+	function animate(_direction, _speed) {
+		direction = _direction;
+		speed = _speed;
+		isAnimating = true;
+		if (isAnimating) {
+			start();
+		}
+	}
+
+	function start() {
+		if (request === null) {
+			request = requestAnimationFrame((timestamp) => {
+				if (startTime === null) { startTime = timestamp; }
+				const timeDiff = timestamp - startTime;
+				startTime = timestamp;
+				let distanceDiff = (timeDiff / 1000) * speed;
+				distanceDiff = direction === 'begin' ? (0 - distanceDiff) : distanceDiff;
+				const scrollTo = axis === 'y' ? element + distanceDiff;
+				layout.setScrollValue(element, scrollTo);
+				// console.log(scrollTo);
+				request = null;
+				start();
+			});
+		}
+	}
+
+	function stop() {
+		if (isAnimating) {
+			cancelAnimationFrame(request);
+			isAnimating = false;
+			startTime = null;
+			request = null;
+		}
+	}
+
+	return {
+		animate,
+		stop
+	};
+}
+
+const handleDrag = (containers) => {
+	const scrollableElements = getScrollableElements(containers.map(p = > p.element));
+	return (draggableInfo, reset) => {
+		if (options.autoScrollEnabled && scrollableElements && scrollableElements.lenght) {
+			
+		}
+	}
+}

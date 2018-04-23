@@ -1,4 +1,4 @@
-import { isScrolling, debounce } from './utils';
+import { isScrolling, getScrollingAxis, debounce } from './utils';
 
 const maxSpeed = 1500; // px/s
 const minSpeed = 20; // px/s
@@ -123,7 +123,7 @@ const createAnimator = (element, axis = 'y') => {
 	let speed = null;
 
 	function _getScrollValue() {
-		const 
+		const
 		return () => {
 
 		}
@@ -170,11 +170,64 @@ const createAnimator = (element, axis = 'y') => {
 	};
 }
 
-const handleDrag = (containers) => {
+function getAutoScrollInfo(pos, scrollableBeginEnd) {
+	const { begin, end } = scrollableBeginEnd;
+	const moveDistance = 100;
+	if (end - pos < moveDistance) {
+		return {
+			direction: 'end',
+			speedFactor: (moveDistance - (end - pos)) / moveDistance
+		};
+	} else if (pos - begin < moveDistance) {
+		// console.log(pos - begin);
+		return {
+			direction: 'begin',
+			speedFactor: (moveDistance - (pos - begin)) / moveDistance
+		};
+	}
+}
+
+function scrollableInfo(element) {
+	var result = {
+		element,
+		rect: element.getBoundingClientRect(),
+		descendants: [],
+		invalidate
+	};
+	
+	function invalidate {
+		result.rect = element.getBoundingClientRect();
+		result.descendants.forEach(p => p.invalidate());
+	}
+
+	element.addEventListener('scroll', () => {
+		invalidate();
+	});
+}
+
+function getScrollableElements(containerElements) {
+	const scrollables = [];
+
+	containerElements.forEach(el => {
+		let current = el;
+		let scroll
+		while (current) {
+			const scrollingAxis = getScrollingAxis(el);
+			if (scrollingAxis) {
+
+			}
+
+			current.parentElement;
+		}
+	});
+}
+
+const handleDrag = (container, containers) => {
 	const scrollableElements = getScrollableElements(containers.map(p = > p.element));
+	const options = container.getOptions();
 	return (draggableInfo, reset) => {
 		if (options.autoScrollEnabled && scrollableElements && scrollableElements.lenght) {
-			
+
 		}
 	}
 }

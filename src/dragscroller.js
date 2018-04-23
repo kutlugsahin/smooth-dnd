@@ -72,6 +72,9 @@ function getAutoScrollInfo(position, scrollableInfo) {
 		end = scrollableInfo.rect.bottom;
 		pos = position.y;
 	}
+
+	if (pos > end || pos < begin) return null;
+
 	const moveDistance = 100;
 	if (end - pos < moveDistance) {
 		return {

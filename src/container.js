@@ -1,6 +1,5 @@
 import { hasClass, addClass, removeClass, getParent } from './utils';
 import { domDropHandler } from './dropHandlers';
-import dragscroller from './dragscroller';
 import {
 	defaultGroupName,
 	wrapperClass,
@@ -607,7 +606,6 @@ function Container(element) {
 		const props = getContainerProps(element, options);
 		let dragHandler = getDragHandler(props);
 		let dropHandler = handleDrop(props);
-		let handleScrollOnDrag = dragscroller(props);
 		let parentContainer = null;
 		let posIsInChildContainer = false;
 		let childContainers = [];
@@ -649,7 +647,6 @@ function Container(element) {
 			container.layout.invalidateRects();
 			registerToParentContainer(container, relevantContainers);
 			draggables.forEach(p => setAnimation(p, true, options.animationDuration));
-			handleScrollOnDrag = dragscroller(props);
 		}
 
 		props.layout.setScrollListener(function() {
@@ -684,7 +681,6 @@ function Container(element) {
 			handleDrag: function(draggableInfo) {
 				lastDraggableInfo = draggableInfo;
 				dragResult = dragHandler(draggableInfo);
-				handleScrollOnDrag({ draggableInfo, dragResult });
 				handleDragLeftDeferedTranslation();
 				return dragResult;
 			},
@@ -694,7 +690,6 @@ function Container(element) {
 				dragHandler = getDragHandler(props);
 				dropHandler(draggableInfo, dragResult);
 				dragResult = null;
-				handleScrollOnDrag({ reset: true });
 				parentContainer = null;
 				childContainers = [];
 			},

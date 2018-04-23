@@ -2,6 +2,7 @@ import './polyfills';
 import * as Utils from './utils';
 import * as constants from './constants';
 import { addStyleToHead } from './styles';
+import dragScroller from './dragscroller';
 
 const grabEvents = ['mousedown', 'touchstart'];
 const moveEvents = ['mousemove', 'touchmove'];
@@ -16,6 +17,7 @@ let isDragging = false;
 let removedElement = null;
 
 let handleDrag = null;
+let handleScroll = null;
 let sourceContainer = null;
 let sourceContainerLockAxis = null;
 
@@ -263,6 +265,7 @@ function onMouseDown(event) {
 function onMouseUp() {
 	removeMoveListeners();
 	removeReleaseListeners();
+	handleScroll({ reset: true });
 	if (draggableInfo) {
 		handleDropAnimation(() => {
 			Utils.removeClass(document.body, constants.disbaleTouchActions);
@@ -270,7 +273,7 @@ function onMouseUp() {
 			(dragListeningContainers || []).forEach(p => {
 				p.handleDrop(draggableInfo);
 			});
-
+			
 			dragListeningContainers = null;
 			grabbedElement = null;
 			ghostInfo = null;
@@ -291,7 +294,15 @@ function dragHandler(dragListeningContainers) {
 	let containers = dragListeningContainers;
 	return function(draggableInfo) {
 		containers.forEach(p => p.handleDrag(draggableInfo));
-		handleScroll(containers, draggableInfo);
+		handleScroll({draggableInfo});
+	}
+}
+
+function getScrollHandler(container, dragListeningContainers) {
+	if (container.getOptions().autoScrollEnabled) {
+		return dragScroller(dragListeningContainers);
+	} else {
+		return () => null;
 	}
 }
 
@@ -327,6 +338,7 @@ function initiateDrag(position) {
 
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
 	handleDrag = dragHandler(dragListeningContainers);
+	handleScroll = getScrollHandler(container, dragListeningContainers);
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
 	handleDrag(draggableInfo);
 }
@@ -359,12 +371,6 @@ function onMouseMove(event) {
 
 		handleDrag(draggableInfo);
 	}
-}
-
-function handleScroll(containers, draggableInfo) {
-	const sourceContainer = draggableInfo.container;
-	
-	// if source container axis is not locked
 }
 
 function Mediator() {

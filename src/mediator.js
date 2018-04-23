@@ -148,7 +148,7 @@ function handleDropAnimation(callback) {
 		}
 	} else {
 		const container = containers.filter(p => p === draggableInfo.container)[0];
-		if (container.getOptions().behaviour === 'move') {
+		if (container.getOptions().behaviour === 'move' && container.getDragResult()) {
 			const { removedIndex, elementSize } = container.getDragResult();
 			const layout = container.layout;
 			// drag ghost to back

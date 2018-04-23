@@ -46,6 +46,18 @@ export const getContainerRect = (element) => {
 
   return rect;
 }
+export const getScrollingAxis = (element) => {
+  const style = window.getComputedStyle(element);
+  const overflow = style['overflow'];
+  const general = overflow === 'auto' || overflow === 'scroll';
+  if (general) return 'xy';
+  const overFlowX = style[`overflow-x`];
+  const xScroll = overFlowX === 'auto' || overFlowX === 'scroll';
+  const overFlowY = style[`overflow-y`];
+  const yScroll = overFlowY === 'auto' || overFlowY === 'scroll';
+  
+  return `${xScroll ? 'x' : ''}${yScroll ? 'y' : ''}` || null;
+}
 
 export const getScrollingAxis = (element) => {
   const style = window.getComputedStyle(element);

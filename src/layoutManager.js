@@ -157,22 +157,20 @@ export default function layoutManager(containerElement, orientation, _animationD
 	}
 
 	function setTranslation(element, translation) {
-		//if (getTranslation(element) !== translation) {
-			if (!translation) {
-				element.style.removeProperty('transform');
-			} else {
-				propMapper.set(element.style, 'translate', translation);
-			}
-			element[translationValue] = translation;
+		if (!translation) {
+			element.style.removeProperty('transform');
+		} else {
+			propMapper.set(element.style, 'translate', translation);
+		}
+		element[translationValue] = translation;
 
-			if (element[containersInDraggable]) {
-				setTimeout(() => {
-					element[containersInDraggable].forEach(p => {
-						updateDescendantContainerRects(p);
-					});
-				}, animationDuration + 20);
-			}
-		//}
+		if (element[containersInDraggable]) {
+			setTimeout(() => {
+				element[containersInDraggable].forEach(p => {
+					updateDescendantContainerRects(p);
+				});
+			}, animationDuration + 20);
+		}
 	}
 
 	function getTranslation(element) {

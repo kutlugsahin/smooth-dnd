@@ -236,7 +236,7 @@ function getRemovedItem({ draggables, element, options }) {
 	let prevRemovedIndex = null;
 	return ({ draggableInfo, dragResult }) => {
 		let removedIndex = prevRemovedIndex;
-		if (prevRemovedIndex == null && draggableInfo.container.element === element && options.behaviour === 'move') {
+		if (prevRemovedIndex == null && draggableInfo.container.element === element && options.behaviour !== 'copy') {
 			removedIndex = prevRemovedIndex = draggableInfo.elementIndex;
 		}
 
@@ -309,6 +309,27 @@ function getDragInsertionIndex({ draggables, layout }) {
 			return draggables.length;
 		}
 	};
+}
+
+function getDragInsertionIndexForDropZone({ draggables, layout }) {
+	return ({ dragResult: { pos } }) => {
+		return pos !== null ? { addedIndex: 0 } : { addedIndex: null };
+	}
+}
+
+function getShadowBeginEndForDropZone({ draggables, layout }) {
+	let prevAddedIndex = null;
+	return ({ dragResult: { addedIndex } }) => {
+		if (addedIndex !== prevAddedIndex) {			
+			prevAddedIndex = addedIndex;
+			const { begin, end } = layout.getBeginEndOfContainer();
+			return {
+				shadowBeginEnd: {
+					rect: layout.getTopLeftOfElementBegin(begin, end)
+				}
+			}
+		}
+	}
 }
 
 function invalidateShadowBeginEndIfNeeded(params) {
@@ -522,22 +543,37 @@ function fireDragEnterLeaveEvents({ options }) {
 }
 
 function getDragHandler(params) {
-	return compose(params)(
-		getRemovedItem,
-		setRemovedItemVisibilty,
-		getPosition,
-		notifyParentOnPositionCapture,
-		getElementSize,
-		handleTargetContainer,
-		invalidateShadowBeginEndIfNeeded,
-		getNextAddedIndex,
-		resetShadowAdjustment,
-		handleInsertionSizeChange,
-		calculateTranslations,
-		getShadowBeginEnd,
-		handleFirstInsertShadowAdjustment,
-		fireDragEnterLeaveEvents
-	);
+	if (params.options.behaviour === 'drop-zone') {
+		// sorting is disabled in container, addedIndex will always be 0 if dropped in
+		return compose(params)(
+			getRemovedItem,
+			setRemovedItemVisibilty,
+			getPosition,
+			notifyParentOnPositionCapture,
+			getElementSize,
+			handleTargetContainer,
+			getDragInsertionIndexForDropZone,
+			getShadowBeginEndForDropZone,
+			fireDragEnterLeaveEvents
+		)
+	} else {
+		return compose(params)(
+			getRemovedItem,
+			setRemovedItemVisibilty,
+			getPosition,
+			notifyParentOnPositionCapture,
+			getElementSize,
+			handleTargetContainer,
+			invalidateShadowBeginEndIfNeeded,
+			getNextAddedIndex,
+			resetShadowAdjustment,
+			handleInsertionSizeChange,
+			calculateTranslations,
+			getShadowBeginEnd,
+			handleFirstInsertShadowAdjustment,
+			fireDragEnterLeaveEvents
+		);
+	}
 }
 
 function getDefaultDragResult() {
@@ -620,12 +656,13 @@ function Container(element) {
 			processLastDraggableInfo();
 		});
 
-		function handleDragLeftDeferedTranslation(dragResult) {
-			if (dragResult.dragLeft) {
+		function handleDragLeftDeferedTranslation() {
+			if (dragResult.dragLeft && props.options.behaviour !== 'drop-zone') {
 				dragResult.dragLeft = false;
 				setTimeout(() => {
-					processLastDraggableInfo();
-				}, 10);
+					if (dragResult)
+						calculateTranslations(props)({ dragResult });
+				}, 20);
 			}
 		}
 
@@ -648,7 +685,7 @@ function Container(element) {
 				lastDraggableInfo = draggableInfo;
 				dragResult = dragHandler(draggableInfo);
 				handleScrollOnDrag({ draggableInfo, dragResult });
-				
+				handleDragLeftDeferedTranslation();
 				return dragResult;
 			},
 			handleDrop: function(draggableInfo) {
@@ -656,6 +693,7 @@ function Container(element) {
 				onChildPositionCaptured(false);
 				dragHandler = getDragHandler(props);
 				dropHandler(draggableInfo, dragResult);
+				dragResult = null;
 				handleScrollOnDrag({ reset: true });
 				parentContainer = null;
 				childContainers = [];

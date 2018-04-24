@@ -59,35 +59,59 @@ const createAnimator = (element, axis = 'y') => {
 	};
 }
 
-function getAutoScrollInfo(position, scrollableInfo) {
-	let begin;
-	let end;
-	let pos;
+function isInScrollableRect(mousePosition, dragCenterPosition, scrollableInfo) {
 	if (scrollableInfo.axis === 'x') {
-		begin = scrollableInfo.rect.left;
-		end = scrollableInfo.rect.right;
-		pos = position.x;
+		if (mousePosition.x < scrollableInfo.rect.left ||
+			mousePosition.x > scrollableInfo.rect.right ||
+			dragCenterPosition.y < scrollableInfo.rect.top ||
+			dragCenterPosition.y > scrollableInfo.rect.bottom
+		) {
+			return false;
+		}
 	} else {
-		begin = scrollableInfo.rect.top;
-		end = scrollableInfo.rect.bottom;
-		pos = position.y;
+		if (mousePosition.y < scrollableInfo.rect.top ||
+			mousePosition.y > scrollableInfo.rect.bottom ||
+			dragCenterPosition.x < scrollableInfo.rect.left ||
+			dragCenterPosition.x > scrollableInfo.rect.right
+		) {
+			return false;
+		}
 	}
 
-	if (pos > end || pos < begin) return null;
+	return true;
+}
 
-	const moveDistance = 100;
-	if (end - pos < moveDistance) {
-		return {
-			direction: 'end',
-			speedFactor: (moveDistance - (end - pos)) / moveDistance
-		};
-	} else if (pos - begin < moveDistance) {
-		// console.log(pos - begin);
-		return {
-			direction: 'begin',
-			speedFactor: (moveDistance - (pos - begin)) / moveDistance
-		};
+function getAutoScrollInfo(mousePosition, dragCenterPosition, scrollableInfo) {
+	if (isInScrollableRect(mousePosition, dragCenterPosition, scrollableInfo)) {
+		let begin;
+		let end;
+		let pos;
+		if (scrollableInfo.axis === 'x') {
+			begin = scrollableInfo.rect.left;
+			end = scrollableInfo.rect.right;
+			pos = mousePosition.x;
+		} else {
+			begin = scrollableInfo.rect.top;
+			end = scrollableInfo.rect.bottom;
+			pos = mousePosition.y;
+		}
+
+
+		const moveDistance = 100;
+		if (end - pos < moveDistance) {
+			return {
+				direction: 'end',
+				speedFactor: (moveDistance - (end - pos)) / moveDistance
+			};
+		} else if (pos - begin < moveDistance) {
+			// console.log(pos - begin);
+			return {
+				direction: 'begin',
+				speedFactor: (moveDistance - (pos - begin)) / moveDistance
+			};
+		}
 	}
+	return null;
 }
 
 function scrollableInfo(element) {
@@ -155,7 +179,7 @@ export default (containers) => {
 			}
 
 			animators.forEach(animator => {
-				const scrollParams = getAutoScrollInfo(draggableInfo.mousePosition, animator);
+				const scrollParams = getAutoScrollInfo(draggableInfo.mousePosition, draggableInfo.position, animator);
 				if (scrollParams) {
 					animator.animate(scrollParams.direction, scrollParams.speedFactor * maxSpeed);
 				} else {

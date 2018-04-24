@@ -324,9 +324,6 @@ function initiateDrag(position) {
 		y: position.clientY
 	}
 
-	// draggableInfo.clientWidth = ghostInfo.clientWidth;
-	// draggableInfo.clientHeight = ghostInfo.clientHeight;
-
 	document.body.appendChild(ghostInfo.ghost);
 
 	Utils.addClass(document.body, constants.disbaleTouchActions);

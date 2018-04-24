@@ -1,3 +1,5 @@
+import Mediator from './mediator';
+import layoutManager from './layoutManager';
 import { hasClass, addClass, removeClass, getParent } from './utils';
 import { domDropHandler } from './dropHandlers';
 import {
@@ -11,9 +13,6 @@ import {
 	containerInstance,
 	containersInDraggable
 } from './constants';
-import layoutManager from './layoutManager';
-import Mediator from './mediator';
-// import './container.css';
 
 const defaultOptions = {
 	groupName: null,

@@ -60,20 +60,24 @@ const createAnimator = (element, axis = 'y') => {
 }
 
 function getAutoScrollInfo(position, scrollableInfo) {
+	const { left, right, top, bottom } = scrollableInfo.rect;
+	const { x, y } = position;
+	if (x < left || x > right || y < top || y > bottom) {
+		return null;
+	}
+
 	let begin;
 	let end;
 	let pos;
 	if (scrollableInfo.axis === 'x') {
-		begin = scrollableInfo.rect.left;
-		end = scrollableInfo.rect.right;
-		pos = position.x;
+		begin = left;
+		end = right;
+		pos = x;
 	} else {
-		begin = scrollableInfo.rect.top;
-		end = scrollableInfo.rect.bottom;
-		pos = position.y;
+		begin = top;
+		end = bottom;
+		pos = y;
 	}
-
-	if (pos > end || pos < begin) return null;
 
 	const moveDistance = 100;
 	if (end - pos < moveDistance) {
@@ -93,7 +97,7 @@ function getAutoScrollInfo(position, scrollableInfo) {
 function scrollableInfo(element) {
 	var result = {
 		element,
-		rect: element.getBoundingClientRect(),
+		rect: getVisibleRect(element, element.getBoundingClientRect()),
 		descendants: [],
 		invalidate,
 		axis: null
@@ -113,22 +117,22 @@ function scrollableInfo(element) {
 
 function getScrollableElements(containerElements) {
 	const scrollables = [];
-	let deepestScrollable = null;
+	let firstDescendentScrollable = null;
 	containerElements.forEach(el => {
 		let current = el;
-		deepestScrollable = null;
+		firstDescendentScrollable = null;
 		while (current) {
 			const scrollingAxis = getScrollingAxis(current);
 			if (scrollingAxis) {
 				if (!scrollables.some(p => p.element === current)) {
 					const info = scrollableInfo(current);
-					if (deepestScrollable) {
-						info.descendants.push(deepestScrollable);
+					if (firstDescendentScrollable) {
+						info.descendants.push(firstDescendentScrollable);
 					}
-					deepestScrollable = info;
+					firstDescendentScrollable = info;
 					if (scrollingAxis === 'xy') {
 						scrollables.push(Object.assign({}, info, { axis: 'x' }));
-						scrollables.push(Object.assign({}, info, { axis: 'y' }));
+						scrollables.push(Object.assign({}, info, { axis: 'y' }, { descendants: [] }));
 					} else {
 						scrollables.push(Object.assign({}, info, { axis: scrollingAxis }));
 					}
@@ -148,7 +152,7 @@ export default (containers) => {
 	const scrollablesInfo = getScrollableElements(containers.map(p => p.element));
 	const animators = scrollablesInfo.map(getScrollableAnimator);
 	return ({ draggableInfo, reset }) => {
-		if (animators && animators.length) {
+		if (animators.length) {
 			if (reset) {
 				animators.forEach(p => p.stop());
 				return null;

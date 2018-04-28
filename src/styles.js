@@ -1,8 +1,7 @@
 import * as constants from './constants';
 
 const verticalWrapperClass = {
-	'display': 'block',
-	'overflow': 'hidden'
+	 'overflow': 'hidden'
 }
 
 const horizontalWrapperClass = {
@@ -22,8 +21,8 @@ const css = {
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
 	},
-	[`.${constants.containerClass}.horizontal .${constants.wrapperClass}`]: horizontalWrapperClass,
-	[`.${constants.containerClass}.vertical .${constants.wrapperClass}`]: verticalWrapperClass,
+	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,
+	[`.${constants.containerClass}.vertical > .${constants.wrapperClass}`]: verticalWrapperClass,
 	[`.${constants.wrapperClass}`]: {
 		// 'overflow': 'hidden'
 	},

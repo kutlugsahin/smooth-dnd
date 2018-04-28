@@ -1,7 +1,8 @@
 import * as constants from './constants';
 
 const verticalWrapperClass = {
-	 'overflow': 'hidden'
+	'overflow': 'hidden',
+	'display': 'block'
 }
 
 const horizontalWrapperClass = {

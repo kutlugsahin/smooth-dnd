@@ -89,8 +89,8 @@ export default function layoutManager(containerElement, orientation, _animationD
 
 	function invalidateContainerScale(containerElement) {
 		const rect = containerElement.getBoundingClientRect();
-		values.scaleX = (rect.right - rect.left) / containerElement.offsetWidth;
-		values.scaleY = (rect.bottom - rect.top) / containerElement.offsetHeight;
+		values.scaleX = containerElement.offsetWidth ? ((rect.right - rect.left) / containerElement.offsetWidth) : 1;
+		values.scaleY = containerElement.offsetHeight ? ((rect.bottom - rect.top) / containerElement.offsetHeight) : 1;
 	}
 
 	function getContainerRectangles() {

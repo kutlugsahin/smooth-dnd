@@ -236,19 +236,22 @@ export const addChildAt = (parent, child, index) => {
 };
 
 export const isMobile = () => {
-  if (
-    global.navigator.userAgent.match(/Android/i) ||
-    global.navigator.userAgent.match(/webOS/i) ||
-    global.navigator.userAgent.match(/iPhone/i) ||
-    global.navigator.userAgent.match(/iPad/i) ||
-    global.navigator.userAgent.match(/iPod/i) ||
-    global.navigator.userAgent.match(/BlackBerry/i) ||
-    global.navigator.userAgent.match(/Windows Phone/i)
-  ) {
-    return true;
-  } else {
-    return false;
+  if (typeof window !== 'undefined') {
+    if (
+      global.navigator.userAgent.match(/Android/i) ||
+      global.navigator.userAgent.match(/webOS/i) ||
+      global.navigator.userAgent.match(/iPhone/i) ||
+      global.navigator.userAgent.match(/iPad/i) ||
+      global.navigator.userAgent.match(/iPod/i) ||
+      global.navigator.userAgent.match(/BlackBerry/i) ||
+      global.navigator.userAgent.match(/Windows Phone/i)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
+  return false;
 };
 
 export const clearSelection = () => {

@@ -64,17 +64,19 @@ function convertToCssString(css) {
 }
 
 function addStyleToHead() {
-	const head = document.head || document.getElementsByTagName('head')[0];
-	const style = document.createElement('style');
-	const cssString = convertToCssString(css);
-	style.type = 'text/css';
-	if (style.styleSheet) {
-		style.styleSheet.cssText = cssString;
-	} else {
-		style.appendChild(document.createTextNode(cssString));
-	}
+	if (typeof (window) !== 'undefined') {
+		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		const style = global.document.createElement("style");
+		const cssString = convertToCssString(css);
+		style.type = 'text/css';
+		if (style.styleSheet) {
+			style.styleSheet.cssText = cssString;
+		} else {
+			style.appendChild(global.document.createTextNode(cssString));
+		}
 
-	head.appendChild(style);
+		head.appendChild(style);
+	}
 }
 
 export {

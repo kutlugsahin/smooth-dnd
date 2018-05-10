@@ -67,7 +67,7 @@ function wrapChild(child) {
 	if (SmoothDnD.wrapChild) {
 		return SmoothDnD.wrapChild(child);
 	}
-	const div = document.createElement('div');
+	const div = global.document.createElement('div');
 	div.className = `${wrapperClass}`;
 	child.parentElement.insertBefore(div, child);
 	div.appendChild(child);
@@ -379,7 +379,7 @@ function handleInsertionSizeChange({ element, draggables, layout, options }) {
 					const containerEnd = hasScrollBar ? (containerBeginEnd.begin + layout.getScrollSize(element) - layout.getScrollValue(element)) : containerBeginEnd.end;
 					const lastDraggableEnd = draggables.length > 0 ? layout.getBeginEnd(draggables[draggables.length - 1]).end - draggables[draggables.length - 1][translationValue] : containerBeginEnd.begin;
 					if (lastDraggableEnd + elementSize > containerEnd) {
-						strectherElement = document.createElement('div');
+						strectherElement = global.document.createElement('div');
 						strectherElement.className = stretcherElementClass + ' ' + options.orientation;
 						const stretcherSize = (elementSize + lastDraggableEnd) - containerEnd;
 						layout.setSize(strectherElement.style, `${stretcherSize}px`);

@@ -10,6 +10,7 @@ module.exports = {
 		filename: 'index.js',
 		library: 'SmoothDnD',
 		libraryTarget: "umd",
+		globalObject: 'this',
 	},
 	module: {
 		rules: [

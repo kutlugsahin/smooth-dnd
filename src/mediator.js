@@ -26,36 +26,38 @@ let sourceContainerLockAxis = null;
 const isMobile = Utils.isMobile();
 
 function listenEvents() {
-	addGrabListeners();
+	if (typeof (window) !== 'undefined') {
+		addGrabListeners();
+	}
 }
 
 function addGrabListeners() {
 	grabEvents.forEach(e => {
-		window.document.addEventListener(e, onMouseDown, { passive: false });
+		global.document.addEventListener(e, onMouseDown, { passive: false });
 	});
 }
 
 function addMoveListeners() {
 	moveEvents.forEach(e => {
-		window.document.addEventListener(e, onMouseMove, { passive: false });
+		global.document.addEventListener(e, onMouseMove, { passive: false });
 	});
 }
 
 function removeMoveListeners() {
 	moveEvents.forEach(e => {
-		window.document.removeEventListener(e, onMouseMove, { passive: false });
+		global.document.removeEventListener(e, onMouseMove, { passive: false });
 	});
 }
 
 function addReleaseListeners() {
 	releaseEvents.forEach(e => {
-		window.document.addEventListener(e, onMouseUp, { passive: false });
+		global.document.addEventListener(e, onMouseUp, { passive: false });
 	});
 }
 
 function removeReleaseListeners() {
 	releaseEvents.forEach(e => {
-		window.document.removeEventListener(e, onMouseUp, { passive: false });
+		global.document.removeEventListener(e, onMouseUp, { passive: false });
 	});
 }
 
@@ -64,7 +66,7 @@ function getGhostElement(wrapperElement, { x, y }, container) {
 	const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
-	const ghost = document.createElement('div');
+	const ghost = global.document.createElement('div');
 	ghost.style.boxSizing = 'border-box';
 	ghost.style.position = 'fixed';
 	ghost.style.pointerEvents = 'none';
@@ -116,7 +118,7 @@ function handleDropAnimation(callback) {
 	function endDrop() {
 		Utils.removeClass(ghostInfo.ghost, 'animated');
 		ghostInfo.ghost.style.transitionDuration = null;
-		document.body.removeChild(ghostInfo.ghost);
+		global.document.body.removeChild(ghostInfo.ghost);
 		callback();
 	}
 
@@ -204,16 +206,20 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 			timer = setTimeout(callCallback, delay);
 		}
 
-		moveEvents.forEach(e => window.document.addEventListener(e, onMove), { passive: false });
-		releaseEvents.forEach(e => window.document.addEventListener(e, onUp), { passive: false });
-		document.addEventListener('drag', onHTMLDrag, { passive: false });
+		moveEvents.forEach(e => global.document.addEventListener(e, onMove), { passive: false });
+		releaseEvents.forEach(e => global.document.addEventListener(e, onUp), { passive: false });
+		global.document.addEventListener("drag", onHTMLDrag, {
+      passive: false
+    });
 	}
 
 	function deregisterEvent() {
 		clearTimeout(timer);
-		moveEvents.forEach(e => window.document.removeEventListener(e, onMove), { passive: false });
-		releaseEvents.forEach(e => window.document.removeEventListener(e, onUp), { passive: false });
-		document.removeEventListener('drag', onHTMLDrag, { passive: false });
+		moveEvents.forEach(e => global.document.removeEventListener(e, onMove), { passive: false });
+		releaseEvents.forEach(e => global.document.removeEventListener(e, onUp), { passive: false });
+		global.document.removeEventListener("drag", onHTMLDrag, {
+      passive: false
+    });
 	}
 
 	function callCallback() {
@@ -268,8 +274,8 @@ function onMouseUp() {
 	handleScroll({ reset: true });
 	if (draggableInfo) {
 		handleDropAnimation(() => {
-			Utils.removeClass(document.body, constants.disbaleTouchActions);
-			Utils.removeClass(document.body, constants.noUserSelectClass);
+			Utils.removeClass(global.document.body, constants.disbaleTouchActions);
+			Utils.removeClass(global.document.body, constants.noUserSelectClass);
 			(dragListeningContainers || []).forEach(p => {
 				p.handleDrop(draggableInfo);
 			});
@@ -324,10 +330,10 @@ function initiateDrag(position) {
 		y: position.clientY
 	}
 
-	document.body.appendChild(ghostInfo.ghost);
+	global.document.body.appendChild(ghostInfo.ghost);
 
-	Utils.addClass(document.body, constants.disbaleTouchActions);
-	Utils.addClass(document.body, constants.noUserSelectClass);
+	Utils.addClass(global.document.body, constants.disbaleTouchActions);
+	Utils.addClass(global.document.body, constants.noUserSelectClass);
 
 	if (container.getOptions().onDragStart) {
 		container.getOptions().onDragStart(draggableInfo.elementIndex, draggableInfo.payload);

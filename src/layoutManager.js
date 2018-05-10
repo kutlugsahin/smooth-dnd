@@ -62,7 +62,7 @@ export default function layoutManager(containerElement, orientation, _animationD
 	};
 	let registeredScrollListener = null;
 
-	window.addEventListener('resize', function() {
+	global.addEventListener('resize', function() {
 		invalidateContainerRectangles(containerElement);
 		// invalidateContainerScale(containerElement);
 	});

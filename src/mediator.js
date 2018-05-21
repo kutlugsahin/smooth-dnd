@@ -61,12 +61,20 @@ function removeReleaseListeners() {
 	});
 }
 
+function getGhostParent() {
+	if (grabbedElement) {
+		return grabbedElement.parentElement || global.document.body;
+	} else {
+		return global.document.body;
+	}
+}
+
 function getGhostElement(wrapperElement, { x, y }, container) {
 	const { scaleX = 1, scaleY = 1 } = container.getScale();
 	const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
-	const ghost = global.document.createElement('div');
+	const ghost = wrapperElement.cloneNode(true);
 	ghost.style.zIndex = 1000;
 	ghost.style.boxSizing = 'border-box';
 	ghost.style.position = 'fixed';
@@ -75,28 +83,20 @@ function getGhostElement(wrapperElement, { x, y }, container) {
 	ghost.style.width = right - left + 'px';
 	ghost.style.height = bottom - top + 'px';
 	ghost.style.overflow = 'visible';
-	ghost.className = constants.ghostClass;
-	const clone = wrapperElement.cloneNode(true);
+	ghost.style.transition = null;
+	ghost.style.removeProperty("transition");
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
-			Utils.addClass(clone.firstElementChild, container.getOptions().dragClass);
+			Utils.addClass(ghost.firstChild, container.getOptions().dragClass);
 		}
 	});
-	Utils.addClass(clone, container.getOptions().orientation);
-	clone.style.overflow = 'visible';
-	clone.style.width = ((right - left) / scaleX) + 'px';
-	clone.style.height = ((bottom - top) / scaleY) + 'px';
-	clone.style.transform = `scale3d(${scaleX || 1}, ${scaleY || 1}, 1)`;
-	clone.style.transformOrigin = '0 0 0';
-	clone.style.margin = '0px';
-	ghost.appendChild(clone);
+	Utils.addClass(ghost, container.getOptions().orientation);
+	Utils.addClass(ghost, constants.ghostClass);
 
 	return {
 		ghost: ghost,
 		centerDelta: { x: midX - x, y: midY - y },
-		positionDelta: { left: left - x, top: top - y },
-		// clientWidth: right - left,
-		// clientHeight: bottom - top
+		positionDelta: { left: left - x, top: top - y }
 	};
 }
 
@@ -118,14 +118,14 @@ function handleDropAnimation(callback) {
 	function endDrop() {
 		Utils.removeClass(ghostInfo.ghost, 'animated');
 		ghostInfo.ghost.style.transitionDuration = null;		
-		draggableInfo.container.element.removeChild(ghostInfo.ghost);
+		getGhostParent().removeChild(ghostInfo.ghost);
 		callback();
 	}
 
 	function animateGhostToPosition({ top, left }, duration, dropClass) {
 		Utils.addClass(ghostInfo.ghost, 'animated');
 		if (dropClass) {
-			Utils.addClass(ghostInfo.ghost.firstElementChild.firstElementChild, dropClass);
+			Utils.addClass(ghostInfo.ghost.firstChild, dropClass);
 		}
 		ghostInfo.ghost.style.transitionDuration = duration + 'ms';
 		ghostInfo.ghost.style.left = left + 'px';
@@ -344,7 +344,7 @@ function initiateDrag(position) {
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
 	handleDrag(draggableInfo);
 	
-	container.element.appendChild(ghostInfo.ghost);
+	getGhostParent().appendChild(ghostInfo.ghost);
 }
 
 function onMouseMove(event) {

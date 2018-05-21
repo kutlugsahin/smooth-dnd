@@ -276,6 +276,7 @@ function onMouseUp() {
 		handleDropAnimation(() => {
 			Utils.removeClass(global.document.body, constants.disbaleTouchActions);
 			Utils.removeClass(global.document.body, constants.noUserSelectClass);
+			fireOnDragStartEnd(false);
 			(dragListeningContainers || []).forEach(p => {
 				p.handleDrop(draggableInfo);
 			});
@@ -312,6 +313,24 @@ function getScrollHandler(container, dragListeningContainers) {
 	}
 }
 
+function fireOnDragStartEnd(isStart) {
+	containers.forEach(p => {
+			const fn = isStart ? p.getOptions().onDragStart : p.getOptions().onDragEnd;
+			if (fn) {
+				const options = {
+					isSource: p === draggableInfo.container,
+					payload: draggableInfo.payload
+				};
+				if (p.isDragRelevant(draggableInfo.container, draggableInfo.payload)) {
+          options.willAcceptDrop = true;
+        } else {
+          options.willAcceptDrop = false;
+        }
+				fn(options);
+			}
+	});
+}
+
 function initiateDrag(position) {
 	isDragging = true;
 	const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
@@ -334,16 +353,12 @@ function initiateDrag(position) {
 	Utils.addClass(global.document.body, constants.disbaleTouchActions);
 	Utils.addClass(global.document.body, constants.noUserSelectClass);
 	
-	if (container.getOptions().onDragStart) {
-		container.getOptions().onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
-	}
-	
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
 	handleDrag = dragHandler(dragListeningContainers);
 	handleScroll = getScrollHandler(container, dragListeningContainers);
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
-	handleDrag(draggableInfo);
-	
+	fireOnDragStartEnd(true);
+	handleDrag(draggableInfo);	
 	getGhostParent().appendChild(ghostInfo.ghost);
 }
 

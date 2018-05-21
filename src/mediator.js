@@ -69,7 +69,7 @@ function getGhostParent() {
 	}
 }
 
-function getGhostElement(wrapperElement, { x, y }, container) {
+function getGhostElement(wrapperElement, { x, y }, container, cursor) {
 	const { scaleX = 1, scaleY = 1 } = container.getScale();
 	const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
 	const midX = left + ((right - left) / 2);
@@ -85,6 +85,8 @@ function getGhostElement(wrapperElement, { x, y }, container) {
 	ghost.style.overflow = 'visible';
 	ghost.style.transition = null;
 	ghost.style.removeProperty("transition");
+	ghost.style.pointerEvents = 'none';
+	ghost.style.cursor = cursor;
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
 			Utils.addClass(ghost.firstChild, container.getOptions().dragClass);
@@ -259,7 +261,7 @@ function onMouseDown(event) {
 			if (startDrag) {
 				handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
 					Utils.clearSelection();
-					initiateDrag(e);
+					initiateDrag(e, global.getComputedStyle(event.srcElement)['cursor']);
 					addMoveListeners();
 					addReleaseListeners();
 				});
@@ -331,7 +333,7 @@ function fireOnDragStartEnd(isStart) {
 	});
 }
 
-function initiateDrag(position) {
+function initiateDrag(position, cursor) {
 	isDragging = true;
 	const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
 	container.setDraggables();
@@ -339,7 +341,7 @@ function initiateDrag(position) {
 	sourceContainerLockAxis = container.getOptions().lockAxis ? container.getOptions().lockAxis.toLowerCase() : null;
 
 	draggableInfo = getDraggableInfo(grabbedElement);
-	ghostInfo = getGhostElement(grabbedElement, { x: position.clientX, y: position.clientY }, draggableInfo.container);
+	ghostInfo = getGhostElement(grabbedElement, { x: position.clientX, y: position.clientY }, draggableInfo.container, cursor);
 	draggableInfo.position = {
 		x: position.clientX + ghostInfo.centerDelta.x,
 		y: position.clientY + ghostInfo.centerDelta.y
@@ -365,7 +367,7 @@ function initiateDrag(position) {
 function onMouseMove(event) {
 	event.preventDefault();
 	const e = getPointerEvent(event);
-	if (!draggableInfo) {
+	if (!draggableInfo) {		
 		initiateDrag(e);
 	} else {
 		// just update ghost position && draggableInfo position

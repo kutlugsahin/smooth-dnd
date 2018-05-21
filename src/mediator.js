@@ -67,9 +67,9 @@ function getGhostElement(wrapperElement, { x, y }, container) {
 	const midX = left + ((right - left) / 2);
 	const midY = top + ((bottom - top) / 2);
 	const ghost = global.document.createElement('div');
+	ghost.style.zIndex = 1000;
 	ghost.style.boxSizing = 'border-box';
 	ghost.style.position = 'fixed';
-	ghost.style.pointerEvents = 'none';
 	ghost.style.left = left + 'px';
 	ghost.style.top = top + 'px';
 	ghost.style.width = right - left + 'px';
@@ -117,8 +117,8 @@ function getDraggableInfo(draggableElement) {
 function handleDropAnimation(callback) {
 	function endDrop() {
 		Utils.removeClass(ghostInfo.ghost, 'animated');
-		ghostInfo.ghost.style.transitionDuration = null;
-		global.document.body.removeChild(ghostInfo.ghost);
+		ghostInfo.ghost.style.transitionDuration = null;		
+		draggableInfo.container.element.removeChild(ghostInfo.ghost);
 		callback();
 	}
 
@@ -330,20 +330,21 @@ function initiateDrag(position) {
 		y: position.clientY
 	}
 
-	global.document.body.appendChild(ghostInfo.ghost);
-
+	
 	Utils.addClass(global.document.body, constants.disbaleTouchActions);
 	Utils.addClass(global.document.body, constants.noUserSelectClass);
-
+	
 	if (container.getOptions().onDragStart) {
 		container.getOptions().onDragStart(draggableInfo.elementIndex, draggableInfo.payload);
 	}
-
+	
 	dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
 	handleDrag = dragHandler(dragListeningContainers);
 	handleScroll = getScrollHandler(container, dragListeningContainers);
 	dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
 	handleDrag(draggableInfo);
+	
+	container.element.appendChild(ghostInfo.ghost);
 }
 
 function onMouseMove(event) {

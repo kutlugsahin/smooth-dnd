@@ -86,7 +86,7 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
 	ghost.style.transition = null;
 	ghost.style.removeProperty("transition");
 	ghost.style.pointerEvents = 'none';
-	ghost.style.cursor = cursor;
+	// ghost.style.cursor = cursor;
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
 			Utils.addClass(ghost.firstChild, container.getOptions().dragClass);
@@ -261,7 +261,7 @@ function onMouseDown(event) {
 			if (startDrag) {
 				handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
 					Utils.clearSelection();
-					initiateDrag(e, global.getComputedStyle(event.srcElement)['cursor']);
+					initiateDrag(e);
 					addMoveListeners();
 					addReleaseListeners();
 				});

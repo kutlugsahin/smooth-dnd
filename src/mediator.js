@@ -89,7 +89,7 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
 	// ghost.style.cursor = cursor;
 	setTimeout(() => {
 		if (container.getOptions().dragClass) {
-			Utils.addClass(ghost.firstChild, container.getOptions().dragClass);
+			Utils.addClass(ghost.firstElementChild, container.getOptions().dragClass);
 		}
 	});
 	Utils.addClass(ghost, container.getOptions().orientation);
@@ -127,7 +127,7 @@ function handleDropAnimation(callback) {
 	function animateGhostToPosition({ top, left }, duration, dropClass) {
 		Utils.addClass(ghostInfo.ghost, 'animated');
 		if (dropClass) {
-			Utils.addClass(ghostInfo.ghost.firstChild, dropClass);
+			Utils.addClass(ghostInfo.ghost.firstElementChild, dropClass);
 		}
 		ghostInfo.ghost.style.transitionDuration = duration + 'ms';
 		ghostInfo.ghost.style.left = left + 'px';

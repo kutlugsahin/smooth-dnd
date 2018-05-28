@@ -138,10 +138,10 @@ function handleDropAnimation(callback) {
 	}
 
 	function shouldAnimateDrop(options) {
-		return options.shouldAnimateDrop ? options.shouldAnimateDrop({
-			sourceContainerProps: draggableInfo.container.getOptions(),
-			payload: draggableInfo.payload
-		}) : true;
+		return options.shouldAnimateDrop ? options.shouldAnimateDrop(
+			draggableInfo.container.getOptions(),
+			draggableInfo.payload
+		) : true;
 	}
 
 	if (draggableInfo.targetElement) {

@@ -271,7 +271,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 
 function onMouseDown(event) {
   const e = getPointerEvent(event);
-  if (!isDragging) {
+  if (!isDragging && (e.button === undefined || e.button === 0)) {
     grabbedElement = Utils.getParent(e.target, '.' + constants.wrapperClass);
     if (grabbedElement) {
       const containerElement = Utils.getParent(grabbedElement, '.' + constants.containerClass);

@@ -4,5 +4,5 @@ import * as dropHandlers from './src/dropHandlers';
 export default container;
 export {
 	constants,
-	dropHandlers
+	dropHandlers,
 };

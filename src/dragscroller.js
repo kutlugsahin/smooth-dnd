@@ -5,10 +5,18 @@ const minSpeed = 20; // px/s
 
 function addScrollValue(element, axis, value) {
 	if (element) {
-		if (axis === 'x') {
-			element.scrollLeft += value;
+		if (element !== window) {
+			if (axis === 'x') {
+				element.scrollLeft += value;
+			} else {
+				element.scrollTop += value;
+			}
 		} else {
-			element.scrollTop += value;
+			if (axis === 'x') {
+				element.scrollBy(value, 0);
+			} else {
+				element.scrollBy(0, value);
+			}
 		}
 	}
 }
@@ -100,17 +108,20 @@ function scrollableInfo(element) {
 		rect: getVisibleRect(element, element.getBoundingClientRect()),
 		descendants: [],
 		invalidate,
-		axis: null
+		axis: null,
+		dispose
 	};
+
+	function dispose() {
+		element.removeEventListener('scroll', invalidate);
+	}
 
 	function invalidate() {
 		result.rect = getVisibleRect(element, element.getBoundingClientRect());
 		result.descendants.forEach(p => p.invalidate());
 	}
 
-	element.addEventListener('scroll', () => {
-		invalidate();
-	});
+	element.addEventListener('scroll', invalidate);
 
 	return result;
 }
@@ -148,13 +159,27 @@ function getScrollableAnimator(scrollableInfo) {
 	return Object.assign(scrollableInfo, createAnimator(scrollableInfo.element, scrollableInfo.axis));
 }
 
+function getWindowAnimators() {
+	function getWindowRect() {
+		return {
+			left: 0, right: global.innerWidth, top: 0, bottom: global.innerHeight
+		}
+	}
+
+	return [
+		Object.assign({ rect: getWindowRect(), axis: 'y' }, createAnimator(global)),
+		Object.assign({ rect: getWindowRect(), axis: 'x' }, createAnimator(global, 'x'))
+	]
+}
+
 export default (containers) => {
 	const scrollablesInfo = getScrollableElements(containers.map(p => p.element));
-	const animators = scrollablesInfo.map(getScrollableAnimator);
+	const animators = [...scrollablesInfo.map(getScrollableAnimator), ...getWindowAnimators()];
 	return ({ draggableInfo, reset }) => {
 		if (animators.length) {
 			if (reset) {
 				animators.forEach(p => p.stop());
+				scrollablesInfo.forEach(p => p.dispose());
 				return null;
 			}
 

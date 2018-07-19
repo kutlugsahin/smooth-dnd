@@ -406,6 +406,9 @@ function initiateDrag(position, cursor) {
 
   dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
   handleDrag = dragHandler(dragListeningContainers);
+  if (handleScroll) {
+    handleScroll({ reset: true });
+  }
   handleScroll = getScrollHandler(container, dragListeningContainers);
   dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
   fireOnDragStartEnd(true);

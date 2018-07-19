@@ -193,7 +193,7 @@ export const addClass = (element, cls) => {
   if (element) {
     const classes = element.className.split(" ").filter(p => p);
     if (classes.indexOf(cls) === -1) {
-      classes.push(cls);
+      classes.unshift(cls);
       element.className = classes.join(" ");
     }
   }

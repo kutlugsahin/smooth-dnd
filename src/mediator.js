@@ -74,7 +74,8 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
   const midX = left + (right - left) / 2;
   const midY = top + (bottom - top) / 2;
-  const ghost = wrapperElement.cloneNode(true);
+  const ghost = global.document.createElement('div');
+  ghost.appendChild(wrapperElement.cloneNode(true));
   ghost.style.zIndex = 1000;
   ghost.style.boxSizing = 'border-box';
   ghost.style.position = 'fixed';

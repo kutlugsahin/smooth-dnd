@@ -11,7 +11,8 @@ import {
   translationValue,
   containerClass,
   containerInstance,
-  containersInDraggable
+  containersInDraggable,
+  originalTrasitionDuration
 } from './constants';
 
 const defaultOptions = {
@@ -28,10 +29,14 @@ const defaultOptions = {
 function setAnimation(element, add, animationDuration) {
   if (add) {
     addClass(element, animationClass);
+    element[originalTrasitionDuration] = element.style.getPropertyValue('transition-duration');
     element.style.transitionDuration = animationDuration + 'ms';
   } else {
     removeClass(element, animationClass);
     element.style.removeProperty('transition-duration');
+    if (element[originalTrasitionDuration]) {
+      element.style.setProperty('transition-duration', element[originalTrasitionDuration]);      
+    }
   }
 }
 
@@ -67,11 +72,12 @@ function wrapChild(child) {
   if (SmoothDnD.wrapChild) {
     return SmoothDnD.wrapChild(child);
   }
-  const div = global.document.createElement('div');
-  div.className = `${wrapperClass}`;
-  child.parentElement.insertBefore(div, child);
-  div.appendChild(child);
-  return div;
+  // const div = global.document.createElement('div');
+  // div.className = `${wrapperClass}`;
+  // child.parentElement.insertBefore(div, child);
+  // div.appendChild(child);
+  addClass(child, wrapperClass);
+  return child;
 }
 
 function wrapChildren(element) {
@@ -93,15 +99,15 @@ function wrapChildren(element) {
 }
 
 function unwrapChildren(element) {
-  Array.prototype.map.call(element.children, child => {
-    if (child.nodeType === Node.ELEMENT_NODE) {
-      let wrapper = child;
-      if (hasClass(child, wrapperClass)) {
-        element.insertBefore(wrapper, wrapChild.firstElementChild);
-        element.removeChild(wrapper);
-      }
-    }
-  });
+  // Array.prototype.map.call(element.children, child => {
+  //   if (child.nodeType === Node.ELEMENT_NODE) {
+  //     let wrapper = child;
+  //     if (hasClass(child, wrapperClass)) {
+  //       element.insertBefore(wrapper, wrapChild.firstElementChild);
+  //       element.removeChild(wrapper);
+  //     }
+  //   }
+  // });
 }
 
 function findDraggebleAtPos({ layout }) {
@@ -184,7 +190,7 @@ function handleDrop({ element, draggables, layout, options }) {
         removedIndex,
         addedIndex: actualAddIndex,
         payload: draggableInfo.payload,
-        droppedElement: draggableInfo.element.firstElementChild
+        droppedElement: draggableInfo.element
       };
       dropHandler(dropHandlerParams, options.onDrop);
     }

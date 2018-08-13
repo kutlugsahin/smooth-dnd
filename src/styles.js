@@ -2,7 +2,7 @@ import * as constants from './constants';
 
 const verticalWrapperClass = {
 	'overflow': 'hidden',
-	'display': 'block-block',
+	'display': 'block'
 }
 
 const horizontalWrapperClass = {
@@ -13,7 +13,7 @@ const horizontalWrapperClass = {
 }
 
 const stretcherElementHorizontalClass = {
-	'display': 'inline-block',
+	'display': 'inline-block'
 }
 
 const css = {

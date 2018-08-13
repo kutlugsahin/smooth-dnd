@@ -88,13 +88,16 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   ghost.style.removeProperty('transition');
   ghost.style.pointerEvents = 'none';
 
-  setTimeout(() => {
-    if (container.getOptions().dragClass) {
+  if (container.getOptions().dragClass) {
+    setTimeout(() => {
       Utils.addClass(ghost.firstElementChild, container.getOptions().dragClass);
       const cursor = global.getComputedStyle(ghost.firstElementChild).cursor;
       cursorStyleElement = addCursorStyleToBody(cursor);
-    }
-  });
+    });
+  } else {
+    const cursor = global.getComputedStyle(ghost.firstElementChild).cursor;
+    cursorStyleElement = addCursorStyleToBody(cursor);
+  }
   Utils.addClass(ghost, container.getOptions().orientation);
   Utils.addClass(ghost, constants.ghostClass);
 
@@ -350,10 +353,10 @@ function dragHandler(dragListeningContainers) {
     if (containerBoxChanged) {
       containerBoxChanged = false;
       setTimeout(() => {
-				containers.forEach(p => {
-					p.layout.invalidateRects();
-					p.onTranslated();
-				});
+        containers.forEach(p => {
+          p.layout.invalidateRects();
+          p.onTranslated();
+        });
       }, 10);
     }
   };

@@ -80,7 +80,7 @@ function addStyleToHead() {
 }
 
 function addCursorStyleToBody(cursor) {
-	if (typeof (window) !== 'undefined') {
+	if (cursor && typeof (window) !== 'undefined') {
 		const head = global.document.head || global.document.getElementsByTagName("head")[0];
 		const style = global.document.createElement("style");
 		const cssString = convertToCssString({
@@ -99,10 +99,12 @@ function addCursorStyleToBody(cursor) {
 
 		return style;
 	}
+
+	return null;
 }
 
 function removeStyle(styleElement) {
-	if (typeof (window) !== 'undefined') {
+	if (styleElement && typeof (window) !== 'undefined') {
 		const head = global.document.head || global.document.getElementsByTagName("head")[0];
 		head.removeChild(styleElement);
 	}

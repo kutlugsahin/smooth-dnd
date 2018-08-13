@@ -21,19 +21,28 @@ let handleScroll = null;
 let sourceContainer = null;
 let sourceContainerLockAxis = null;
 
-// Utils.addClass(document.body, 'clearfix');
 
 const isMobile = Utils.isMobile();
 
-function listenEvents() {
+function listenEvents(listen = true) {
   if (typeof window !== 'undefined') {
-    addGrabListeners();
+    if (listen) {
+      addGrabListeners();
+    } else {
+      removeGrabListeners();
+    }
   }
 }
 
 function addGrabListeners() {
   grabEvents.forEach(e => {
     global.document.addEventListener(e, onMouseDown, { passive: false });
+  });
+}
+
+function removeGrabListeners() {
+  grabEvents.forEach(e => {
+    global.document.removeEventListener(e, onMouseDown, { passive: false });
   });
 }
 
@@ -74,8 +83,7 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
   const midX = left + (right - left) / 2;
   const midY = top + (bottom - top) / 2;
-  const ghost = global.document.createElement('div');
-  ghost.appendChild(wrapperElement.cloneNode(true));
+  const ghost = wrapperElement.cloneNode(true);
   ghost.style.zIndex = 1000;
   ghost.style.boxSizing = 'border-box';
   ghost.style.position = 'fixed';
@@ -448,13 +456,18 @@ function onMouseMove(event) {
 }
 
 function Mediator() {
-  listenEvents();
   return {
     register: function(container) {
       containers.push(container);
+      if (containers.length === 1) {
+        listenEvents();        
+      }
     },
     unregister: function(container) {
       containers.splice(containers.indexOf(container), 1);
+      if (containers.length === 0) {
+        listenEvents(false);        
+      }
     }
   };
 }

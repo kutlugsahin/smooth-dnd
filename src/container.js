@@ -36,6 +36,7 @@ function setAnimation(element, add, animationDuration) {
     element.style.removeProperty('transition-duration');
     if (element[originalTrasitionDuration]) {
       element.style.setProperty('transition-duration', element[originalTrasitionDuration]);      
+      element[originalTrasitionDuration] = null;
     }
   }
 }
@@ -474,7 +475,7 @@ function getShadowBeginEnd({ draggables, layout }) {
           beforeBounds = { end: layout.getBeginEndOfContainer().begin };
         }
 
-        let end = 10000;
+        let end = 100000;
         let afterIndex = addedIndex;
         if (afterIndex === removedIndex) {
           afterIndex++;
@@ -674,6 +675,8 @@ function Container(element) {
 
     function dispose(container) {
       unwrapChildren(container.element);
+      removeClass(container.element, containerClass);
+      removeClass(container.element, container.getOptions().orientation);
     }
 
     return {
@@ -747,14 +750,29 @@ const options = {
 // exported part of container
 function SmoothDnD(element, options) {
   const containerIniter = Container(element);
-  const container = containerIniter(options);
-  element[containerInstance] = container;
-  Mediator.register(container);
+    
+  
+  function initContainer(element, options) {
+    const dndContainer = containerIniter(options);
+    element[containerInstance] = dndContainer;
+    Mediator.register(dndContainer);
+    return dndContainer;
+  }
+
+  var container = initContainer(element, options);
+
+  function dispose() {
+    Mediator.unregister(container);
+    container.layout.dispose();
+    container.dispose(container);
+  }
+
   return {
-    dispose: function() {
-      Mediator.unregister(container);
-      container.layout.dispose();
-      container.dispose(container);
+    dispose,
+    setOptions: function(newOptions) {
+      const mergedOptions = Object.assign({}, container.getOptions(), newOptions);
+      dispose();
+      container = initContainer(element, mergedOptions);
     }
   };
 }

@@ -8,25 +8,18 @@ import {
 
 export function domDropHandler({ element, draggables, layout, options }) {
 	return (dropResult, onDrop) => {
-		const { removedIndex, addedIndex, droppedElement } = dropResult;
-		let removedWrapper = null;
-		if (removedIndex !== null) {
-			removedWrapper = removeChildAt(element, removedIndex);
-			draggables.splice(removedIndex, 1);
-		}
+		// const { removedIndex, addedIndex, droppedElement } = dropResult;
+		// let removedWrapper = null;
+		// if (removedIndex !== null) {
+		// 	removedWrapper = removeChildAt(element, removedIndex);
+		// 	draggables.splice(removedIndex, 1);
+		// }
 
-		if (addedIndex !== null) {
-			const wrapper = global.document.createElement('div');
-			wrapper.className = `${wrapperClass}`;
-			wrapper.appendChild(removedWrapper.firstElementChild || droppedElement);
-			wrapper[containersInDraggable] = [];
-			addChildAt(element, wrapper, addedIndex);
-			if (addedIndex >= draggables.length) {
-				draggables.push(wrapper);
-			} else {
-				draggables.splice(addedIndex, 0, wrapper);
-			}
-		}
+		// if (addedIndex !== null) {
+		// 	const wrapper = removedWrapper || droppedElement;
+		// 	wrapper[containersInDraggable] = [];
+		// 	addChildAt(element, wrapper, addedIndex);			
+		// }
 
 		if (onDrop) {
 			onDrop(dropResult);

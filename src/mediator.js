@@ -1,7 +1,7 @@
 import './polyfills';
 import * as Utils from './utils';
 import * as constants from './constants';
-import { addStyleToHead } from './styles';
+import { addStyleToHead, addCursorStyleToBody, removeStyle } from './styles';
 import dragScroller from './dragscroller';
 
 const grabEvents = ['mousedown', 'touchstart'];
@@ -20,6 +20,7 @@ let handleDrag = null;
 let handleScroll = null;
 let sourceContainer = null;
 let sourceContainerLockAxis = null;
+let cursorStyleElement = null;
 
 // Utils.addClass(document.body, 'clearfix');
 
@@ -86,10 +87,12 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   ghost.style.transition = null;
   ghost.style.removeProperty('transition');
   ghost.style.pointerEvents = 'none';
-  // ghost.style.cursor = cursor;
+
   setTimeout(() => {
     if (container.getOptions().dragClass) {
       Utils.addClass(ghost.firstElementChild, container.getOptions().dragClass);
+      const cursor = global.getComputedStyle(ghost.firstElementChild).cursor;
+      cursorStyleElement = addCursorStyleToBody(cursor);
     }
   });
   Utils.addClass(ghost, container.getOptions().orientation);
@@ -304,6 +307,10 @@ function onMouseUp() {
   removeMoveListeners();
   removeReleaseListeners();
   handleScroll({ reset: true });
+  if (cursorStyleElement) {
+    removeStyle(cursorStyleElement);
+    cursorStyleElement = null;
+  }
   if (draggableInfo) {
     handleDropAnimation(() => {
       Utils.removeClass(global.document.body, constants.disbaleTouchActions);

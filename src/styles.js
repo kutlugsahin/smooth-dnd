@@ -79,6 +79,37 @@ function addStyleToHead() {
 	}
 }
 
+function addCursorStyleToBody(cursor) {
+	if (typeof (window) !== 'undefined') {
+		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		const style = global.document.createElement("style");
+		const cssString = convertToCssString({
+			'body *': {
+				cursor: `${cursor} !important`
+			}
+		});
+		style.type = 'text/css';
+		if (style.styleSheet) {
+			style.styleSheet.cssText = cssString;
+		} else {
+			style.appendChild(global.document.createTextNode(cssString));
+		}
+
+		head.appendChild(style);
+
+		return style;
+	}
+}
+
+function removeStyle(styleElement) {
+	if (typeof (window) !== 'undefined') {
+		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		head.removeChild(styleElement);
+	}
+}
+
 export {
-	addStyleToHead
+	addStyleToHead,
+	addCursorStyleToBody,
+	removeStyle
 };

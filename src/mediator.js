@@ -91,11 +91,10 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   if (container.getOptions().dragClass) {
     setTimeout(() => {
       Utils.addClass(ghost.firstElementChild, container.getOptions().dragClass);
-      const cursor = global.getComputedStyle(ghost.firstElementChild).cursor;
-      cursorStyleElement = addCursorStyleToBody(cursor);
+      const dragCursor = global.getComputedStyle(ghost.firstElementChild).cursor;
+      cursorStyleElement = addCursorStyleToBody(dragCursor);
     });
   } else {
-    const cursor = global.getComputedStyle(ghost.firstElementChild).cursor;
     cursorStyleElement = addCursorStyleToBody(cursor);
   }
   Utils.addClass(ghost, container.getOptions().orientation);
@@ -297,7 +296,7 @@ function onMouseDown(event) {
       if (startDrag) {
         handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
           Utils.clearSelection();
-          initiateDrag(e);
+          initiateDrag(e, Utils.getElementCursor(event.target));
           addMoveListeners();
           addReleaseListeners();
         });
@@ -430,7 +429,7 @@ function onMouseMove(event) {
   event.preventDefault();
   const e = getPointerEvent(event);
   if (!draggableInfo) {
-    initiateDrag(e);
+    initiateDrag(e, Utils.getElementCursor(event.target));
   } else {
     // just update ghost position && draggableInfo position
     if (sourceContainerLockAxis) {

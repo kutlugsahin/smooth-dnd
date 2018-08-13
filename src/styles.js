@@ -2,7 +2,7 @@ import * as constants from './constants';
 
 const verticalWrapperClass = {
 	'overflow': 'hidden',
-	'display': 'block'
+	'display': 'block-block',
 }
 
 const horizontalWrapperClass = {
@@ -10,6 +10,10 @@ const horizontalWrapperClass = {
 	'display': 'inline-block',
 	'vertical-align': 'top',
 	'white-space': 'normal'
+}
+
+const stretcherElementHorizontalClass = {
+	'display': 'inline-block',
 }
 
 const css = {
@@ -22,6 +26,7 @@ const css = {
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
 	},
+	[`.${constants.containerClass}.horizontal > .${constants.stretcherElementClass}`]: stretcherElementHorizontalClass,
 	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,
 	[`.${constants.containerClass}.vertical > .${constants.wrapperClass}`]: verticalWrapperClass,
 	[`.${constants.wrapperClass}`]: {

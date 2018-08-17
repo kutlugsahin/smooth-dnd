@@ -70,6 +70,7 @@ var container = SmoothDnD(containerElement, options);
 |dropClass|string|`undefined`|Class to be added to the ghost item just before the drop animation begins.|
 |onDragStart|function|`undefined`|*See descriptions below*|
 |onDragEnd|function|`undefined`|*See descriptions below*|
+|onDropReady|function|`undefined`|*See descriptions below*|
 |onDrop|function|`undefined`|*See descriptions below*|
 |getChildPayload|function|`undefined`|*See descriptions below*|
 |shouldAnimateDrop|function|`undefined`|*See descriptions below*|
@@ -104,6 +105,22 @@ function onDragEnd({isSource, payload, willAcceptDrop}) {
 - **isSource** : `boolean` : true if it is called by the container which drag starts from, otherwise false.
 - **payload** : `object` : the payload object that is returned by getChildPayload function. It will be undefined in case getChildPayload is not set.
 - **willAcceptDrop** : `boolean` : true if the dragged item can be dropped into the container, otherwise false.
+
+### onDropReady
+
+The function to be called by the container which is being drag over, when the index of possible drop position changed in container. Basically is is called each time the draggables in a container slides for opening a space for dragged item. **dropResult** is the only parameter passed to the function which contains the following properties.
+```js
+function onDropReady(dropResult) {
+  const { removedIndex, addedIndex, payload, element } = dropResult;
+  ...
+}
+```
+#### Parameters
+- **dropResult** : `object`
+	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
+	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
+	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
+	- **element** : `DOMElement` : the DOM element that is moved 
 
 ### onDrop
 

@@ -63,11 +63,7 @@ function removeReleaseListeners() {
 }
 
 function getGhostParent() {
-  if (grabbedElement) {
-    return grabbedElement.parentElement || global.document.body;
-  } else {
-    return global.document.body;
-  }
+  return global.document.body;
 }
 
 function getGhostElement(wrapperElement, { x, y }, container, cursor) {

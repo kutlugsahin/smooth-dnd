@@ -263,7 +263,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 
   return function(_startEvent, _delay, _clb) {
     startEvent = getPointerEvent(_startEvent);
-    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 20 : 0);
+    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 100 : 0);
     clb = _clb;
 
     registerEvents();

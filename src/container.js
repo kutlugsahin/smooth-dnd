@@ -49,7 +49,7 @@ function isDragRelevant({ element, options }) {
       return options.shouldAcceptDrop(sourceContainer.getOptions(), payload);
     }
     const sourceOptions = sourceContainer.getOptions();
-    if (options.behaviour === 'copy') return false;
+    //if (options.behaviour === 'copy') return false;
 
     const parentWrapper = getParent(element, '.' + wrapperClass);
     if (parentWrapper === sourceContainer.element) {

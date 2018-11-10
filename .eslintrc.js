@@ -8,6 +8,9 @@ module.exports = {
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
+    "globals": {
+        "global": true
+    },
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-newline": "error",

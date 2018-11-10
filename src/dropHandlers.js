@@ -1,12 +1,11 @@
 import { addChildAt, removeChildAt } from './utils';
 import {
 	wrapperClass,
-	animationClass,
 	containersInDraggable
 } from './constants';
 
 
-export function domDropHandler({ element, draggables, layout, options }) {
+export function domDropHandler({ element, draggables, options }) {
 	return (dropResult, onDrop) => {
 		const { removedIndex, addedIndex, droppedElement } = dropResult;
 		let removedWrapper = null;
@@ -41,7 +40,7 @@ export function domDropHandler({ element, draggables, layout, options }) {
 }
 
 export function reactDropHandler() {
-	const handler = ({ element, draggables, layout, options }) => {
+	const handler = () => {
 		return (dropResult, onDrop) => {
 			if (onDrop) {
 				onDrop(dropResult);

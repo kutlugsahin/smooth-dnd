@@ -1,6 +1,6 @@
 {
   "name": "smooth-dnd",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Drag and Drop library",
   "main": "./dist/index.js",
   "module": "./src/index.js",

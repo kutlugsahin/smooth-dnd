@@ -63,11 +63,7 @@ function removeReleaseListeners() {
 }
 
 function getGhostParent() {
-  if (grabbedElement) {
-    return grabbedElement.parentElement || global.document.body;
-  } else {
-    return global.document.body;
-  }
+  return global.document.body;
 }
 
 function getGhostElement(wrapperElement, { x, y }, container, cursor) {
@@ -267,7 +263,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 
   return function(_startEvent, _delay, _clb) {
     startEvent = getPointerEvent(_startEvent);
-    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 200 : 0);
+    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 100 : 0);
     clb = _clb;
 
     registerEvents();

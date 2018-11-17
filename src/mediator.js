@@ -63,6 +63,10 @@ function removeReleaseListeners() {
 }
 
 function getGhostParent() {
+  if (draggableInfo.ghostParent) {
+    return draggableInfo.ghostParent;
+  }
+
   if (grabbedElement) {
     return grabbedElement.parentElement || global.document.body;
   } else {
@@ -110,6 +114,7 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
 function getDraggableInfo(draggableElement) {
   const container = containers.filter(p => draggableElement.parentElement === p.element)[0];
   const draggableIndex = container.draggables.indexOf(draggableElement);
+  const getGhostParent = container.getOptions().getGhostParent;
   return {
     container,
     element: draggableElement,
@@ -119,7 +124,8 @@ function getDraggableInfo(draggableElement) {
       : undefined,
     targetElement: null,
     position: { x: 0, y: 0 },
-    groupName: container.getOptions().groupName
+    groupName: container.getOptions().groupName,
+    ghostParent: getGhostParent ? getGhostParent() : null,
   };
 }
 
@@ -164,7 +170,8 @@ function handleDropAnimation(callback) {
     }
   } else {
     const container = containers.filter(p => p === draggableInfo.container)[0];
-    if (container.getOptions().behaviour === 'move' && container.getDragResult()) {
+    const { behaviour, removeOnDropOut } = container.getOptions();
+    if (behaviour === 'move' && !removeOnDropOut && container.getDragResult()) {
       const { removedIndex, elementSize } = container.getDragResult();
       const layout = container.layout;
       // drag ghost to back

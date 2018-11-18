@@ -1,7 +1,7 @@
 import './polyfills';
 import * as Utils from './utils';
 import * as constants from './constants';
-import { addStyleToHead } from './styles';
+import { addStyleToHead, addCursorStyleToBody, removeStyle } from './styles';
 import dragScroller from './dragscroller';
 
 const grabEvents = ['mousedown', 'touchstart'];
@@ -20,6 +20,7 @@ let handleDrag = null;
 let handleScroll = null;
 let sourceContainer = null;
 let sourceContainerLockAxis = null;
+let cursorStyleElement = null;
 
 
 const isMobile = Utils.isMobile();
@@ -71,6 +72,10 @@ function removeReleaseListeners() {
 }
 
 function getGhostParent() {
+  if (draggableInfo.ghostParent) {
+    return draggableInfo.ghostParent;
+  }
+
   if (grabbedElement) {
     return grabbedElement.parentElement || global.document.body;
   } else {
@@ -95,12 +100,16 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
   ghost.style.transition = null;
   ghost.style.removeProperty('transition');
   ghost.style.pointerEvents = 'none';
-  // ghost.style.cursor = cursor;
-  setTimeout(() => {
-    if (container.getOptions().dragClass) {
+
+  if (container.getOptions().dragClass) {
+    setTimeout(() => {
       Utils.addClass(ghost.firstElementChild, container.getOptions().dragClass);
-    }
-  });
+      const dragCursor = global.getComputedStyle(ghost.firstElementChild).cursor;
+      cursorStyleElement = addCursorStyleToBody(dragCursor);
+    });
+  } else {
+    cursorStyleElement = addCursorStyleToBody(cursor);
+  }
   Utils.addClass(ghost, container.getOptions().orientation);
   Utils.addClass(ghost, constants.ghostClass);
 
@@ -114,6 +123,7 @@ function getGhostElement(wrapperElement, { x, y }, container, cursor) {
 function getDraggableInfo(draggableElement) {
   const container = containers.filter(p => draggableElement.parentElement === p.element)[0];
   const draggableIndex = container.draggables.indexOf(draggableElement);
+  const getGhostParent = container.getOptions().getGhostParent;
   return {
     container,
     element: draggableElement,
@@ -123,7 +133,8 @@ function getDraggableInfo(draggableElement) {
       : undefined,
     targetElement: null,
     position: { x: 0, y: 0 },
-    groupName: container.getOptions().groupName
+    groupName: container.getOptions().groupName,
+    ghostParent: getGhostParent ? getGhostParent() : null,
   };
 }
 
@@ -168,7 +179,8 @@ function handleDropAnimation(callback) {
     }
   } else {
     const container = containers.filter(p => p === draggableInfo.container)[0];
-    if (container.getOptions().behaviour === 'move' && container.getDragResult()) {
+    const { behaviour, removeOnDropOut } = container.getOptions();
+    if (behaviour === 'move' && !removeOnDropOut && container.getDragResult()) {
       const { removedIndex, elementSize } = container.getDragResult();
       const layout = container.layout;
       // drag ghost to back
@@ -300,7 +312,7 @@ function onMouseDown(event) {
       if (startDrag) {
         handleDragStartConditions(e, container.getOptions().dragBeginDelay, () => {
           Utils.clearSelection();
-          initiateDrag(e);
+          initiateDrag(e, Utils.getElementCursor(event.target));
           addMoveListeners();
           addReleaseListeners();
         });
@@ -313,6 +325,10 @@ function onMouseUp() {
   removeMoveListeners();
   removeReleaseListeners();
   handleScroll({ reset: true });
+  if (cursorStyleElement) {
+    removeStyle(cursorStyleElement);
+    cursorStyleElement = null;
+  }
   if (draggableInfo) {
     handleDropAnimation(() => {
       Utils.removeClass(global.document.body, constants.disbaleTouchActions);
@@ -352,10 +368,10 @@ function dragHandler(dragListeningContainers) {
     if (containerBoxChanged) {
       containerBoxChanged = false;
       setTimeout(() => {
-				containers.forEach(p => {
-					p.layout.invalidateRects();
-					p.onTranslated();
-				});
+        containers.forEach(p => {
+          p.layout.invalidateRects();
+          p.onTranslated();
+        });
       }, 10);
     }
   };
@@ -429,7 +445,7 @@ function onMouseMove(event) {
   event.preventDefault();
   const e = getPointerEvent(event);
   if (!draggableInfo) {
-    initiateDrag(e);
+    initiateDrag(e, Utils.getElementCursor(event.target));
   } else {
     // just update ghost position && draggableInfo position
     if (sourceContainerLockAxis) {

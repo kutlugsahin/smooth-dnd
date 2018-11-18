@@ -68,8 +68,10 @@ var container = SmoothDnD(containerElement, options);
 |autoScrollEnabled|boolean|`true`|First scrollable parent will scroll automatically if dragging item is close to boundaries.
 |dragClass|string|`undefined`|Class to be added to the ghost item being dragged. The class will be added after it's added to the DOM so any transition in the class will be applied as intended.
 |dropClass|string|`undefined`|Class to be added to the ghost item just before the drop animation begins.|
+|removeOnDropOut|boolean|`undefined`|When set true onDrop will be called with a removedIndex if you drop element out of any relevant container|
 |onDragStart|function|`undefined`|*See descriptions below*|
 |onDragEnd|function|`undefined`|*See descriptions below*|
+|onDropReady|function|`undefined`|*See descriptions below*|
 |onDrop|function|`undefined`|*See descriptions below*|
 |getChildPayload|function|`undefined`|*See descriptions below*|
 |shouldAnimateDrop|function|`undefined`|*See descriptions below*|
@@ -105,6 +107,22 @@ function onDragEnd({isSource, payload, willAcceptDrop}) {
 - **payload** : `object` : the payload object that is returned by getChildPayload function. It will be undefined in case getChildPayload is not set.
 - **willAcceptDrop** : `boolean` : true if the dragged item can be dropped into the container, otherwise false.
 
+### onDropReady
+
+The function to be called by the container which is being drag over, when the index of possible drop position changed in container. Basically it is called each time the draggables in a container slides for opening a space for dragged item. **dropResult** is the only parameter passed to the function which contains the following properties.
+```js
+function onDropReady(dropResult) {
+  const { removedIndex, addedIndex, payload, element } = dropResult;
+  ...
+}
+```
+#### Parameters
+- **dropResult** : `object`
+	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
+	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
+	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
+	- **element** : `DOMElement` : the DOM element that is moved 
+
 ### onDrop
 
 The function to be called by any relevant container when drop is over. (After drop animation ends). Source container and any container that could accept drop is considered relevant. **dropResult** is the only parameter passed to the function which contains the following properties.
@@ -135,6 +153,17 @@ function getChildPayload(index) {
 - **index** : `number` : index of the child item
 #### Returns
 - **payload** : `object`
+
+### getGhostParent
+
+The function to be called to get the element that the dragged ghost will be appended. Default parent element is the container itself.
+The ghost element is positioned as 'fixed' and appended to given parent element. 
+But if any anchestor of container has a transform property, ghost element will be positioned relative to that element which breaks the calculations. Thats why if you have any transformed parent element of Containers you should set this property so that it returns any element that has not transformed parent element.
+```js
+function getGhostParent() {
+  // i.e return document.body;
+}
+```
 
 ### shouldAnimateDrop
 

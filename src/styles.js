@@ -2,6 +2,7 @@ import * as constants from './constants';
 
 const verticalWrapperClass = {
 	'overflow': 'hidden',
+	'display': 'block'
 }
 
 const horizontalWrapperClass = {
@@ -9,6 +10,10 @@ const horizontalWrapperClass = {
 	'display': 'inline-block',
 	'vertical-align': 'top',
 	'white-space': 'normal'
+}
+
+const stretcherElementHorizontalClass = {
+	'display': 'inline-block'
 }
 
 const css = {
@@ -21,6 +26,7 @@ const css = {
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
 	},
+	[`.${constants.containerClass}.horizontal > .${constants.stretcherElementClass}`]: stretcherElementHorizontalClass,
 	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,
 	[`.${constants.containerClass}.vertical > .${constants.wrapperClass}`]: verticalWrapperClass,
 	[`.${constants.wrapperClass}`]: {
@@ -78,6 +84,39 @@ function addStyleToHead() {
 	}
 }
 
+function addCursorStyleToBody(cursor) {
+	if (cursor && typeof (window) !== 'undefined') {
+		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		const style = global.document.createElement("style");
+		const cssString = convertToCssString({
+			'body *': {
+				cursor: `${cursor} !important`
+			}
+		});
+		style.type = 'text/css';
+		if (style.styleSheet) {
+			style.styleSheet.cssText = cssString;
+		} else {
+			style.appendChild(global.document.createTextNode(cssString));
+		}
+
+		head.appendChild(style);
+
+		return style;
+	}
+
+	return null;
+}
+
+function removeStyle(styleElement) {
+	if (styleElement && typeof (window) !== 'undefined') {
+		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		head.removeChild(styleElement);
+	}
+}
+
 export {
-	addStyleToHead
+	addStyleToHead,
+	addCursorStyleToBody,
+	removeStyle
 };

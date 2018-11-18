@@ -1,6 +1,6 @@
 {
   "name": "smooth-dnd",
-  "version": "0.5.6",
+  "version": "0.6.3",
   "description": "Drag and Drop library",
   "main": "./dist/index.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
-    "webpack": "^4.2.0",
+    "webpack": "4.19.1",
     "webpack-cli": "^2.0.13"
   }
 }

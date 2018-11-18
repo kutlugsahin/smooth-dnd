@@ -184,7 +184,7 @@ function handleDrop({ element, draggables, layout, options }) {
   return function(draggableInfo, { addedIndex, removedIndex }) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
-    if (draggableInfo.targetElement) {
+    if (draggableInfo.targetElement || options.removeOnDropOut) {
       let actualAddIndex =
         addedIndex !== null ? (removedIndex !== null && removedIndex < addedIndex ? addedIndex - 1 : addedIndex) : null;
       const dropHandlerParams = {
@@ -552,6 +552,22 @@ function fireDragEnterLeaveEvents({ options }) {
   };
 }
 
+function fireOnDropReady({ options }) {
+  let lastAddedIndex = null;
+  return ({ dragResult: { addedIndex, removedIndex }, draggableInfo: { payload, element } }) => {
+    if (options.onDropReady && lastAddedIndex !== addedIndex) {
+      lastAddedIndex = addedIndex;
+      let adjustedAddedIndex = addedIndex;
+
+      if (removedIndex !== null && addedIndex > removedIndex) {
+        adjustedAddedIndex--;
+      }
+
+      options.onDropReady({ addedIndex: adjustedAddedIndex, removedIndex, payload, element: element.firstElementChild });
+    }
+  }
+}
+
 function getDragHandler(params) {
   if (params.options.behaviour === 'drop-zone') {
     // sorting is disabled in container, addedIndex will always be 0 if dropped in
@@ -564,7 +580,8 @@ function getDragHandler(params) {
       handleTargetContainer,
       getDragInsertionIndexForDropZone,
       getShadowBeginEndForDropZone,
-      fireDragEnterLeaveEvents
+      fireDragEnterLeaveEvents,
+      fireOnDropReady
     );
   } else {
     return compose(params)(
@@ -581,7 +598,8 @@ function getDragHandler(params) {
       calculateTranslations,
       getShadowBeginEnd,
       handleFirstInsertShadowAdjustment,
-      fireDragEnterLeaveEvents
+      fireDragEnterLeaveEvents,
+      fireOnDropReady
     );
   }
 }
@@ -744,7 +762,8 @@ const options = {
   shouldAnimateDrop: (sourceContainerOptions, payload) => true,
   shouldAcceptDrop: (sourceContainerOptions, payload) => true,
   onDragEnter: () => {},
-  onDragLeave: () => {}
+  onDragLeave: () => { },
+  onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
 };
 
 // exported part of container

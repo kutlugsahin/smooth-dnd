@@ -268,3 +268,14 @@ export const clearSelection = () => {
     global.document.selection.empty();
   }
 };
+
+export const getElementCursor = (element) => {
+  if (element) {
+    const style = global.getComputedStyle(element);
+    if (style) {
+      return style.cursor;
+    }
+  }
+
+  return null;
+}

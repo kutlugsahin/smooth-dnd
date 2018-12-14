@@ -13,7 +13,7 @@
         return i > -1;
       };
   }
-})(global.Node || global.Element);
+})(global.Element);
 
 // Overwrites native 'firstElementChild' prototype.
 // Adds Document & DocumentFragment support for IE9 & Safari.

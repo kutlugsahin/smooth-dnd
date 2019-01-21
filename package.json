@@ -19,7 +19,7 @@
     "name": "Kutlu Sahin",
     "email": "kutlugsahin@gmail.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/kutlugsahin/smooth-dnd.git"

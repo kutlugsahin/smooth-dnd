@@ -3,10 +3,10 @@ var path = require('path');
 const dirname = __dirname// eslint-disable-line
 
 module.exports = {
-	entry: './index.js',
+	entry: './src/index.js',
 	// devtool: 'source-map',
 	output: {
-		path: path.resolve(dirname, 'dist'), 
+		path: path.resolve(dirname, 'dist'),
 		filename: 'index.js',
 		library: 'SmoothDnD',
 		libraryTarget: "umd",

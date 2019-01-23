@@ -3,7 +3,6 @@ import layoutManager from './layoutManager';
 import { hasClass, addClass, removeClass, getParent } from './utils';
 import { domDropHandler } from './dropHandlers';
 import {
-  defaultGroupName,
   wrapperClass,
   animationClass,
   stretcherElementClass,
@@ -49,7 +48,7 @@ function isDragRelevant({ element, options }) {
       return options.shouldAcceptDrop(sourceContainer.getOptions(), payload);
     }
     const sourceOptions = sourceContainer.getOptions();
-    if (options.behaviour === 'copy') return false;
+    //if (options.behaviour === 'copy') return false;
 
     const parentWrapper = getParent(element, '.' + wrapperClass);
     if (parentWrapper === sourceContainer.element) {
@@ -145,7 +144,7 @@ function findDraggebleAtPos({ layout }) {
   };
 }
 
-function resetDraggables({ element, draggables, layout, options }) {
+function resetDraggables({ element, draggables, layout }) {
   return function() {
     draggables.forEach(p => {
       setAnimation(p, false);
@@ -231,9 +230,9 @@ function registerToParentContainer(container, relevantContainers) {
   }
 }
 
-function getRemovedItem({ draggables, element, options }) {
+function getRemovedItem({ element, options }) {
   let prevRemovedIndex = null;
-  return ({ draggableInfo, dragResult }) => {
+  return ({ draggableInfo }) => {
     let removedIndex = prevRemovedIndex;
     if (prevRemovedIndex == null && draggableInfo.container.element === element && options.behaviour !== 'copy') {
       removedIndex = prevRemovedIndex = draggableInfo.elementIndex;
@@ -244,7 +243,7 @@ function getRemovedItem({ draggables, element, options }) {
 }
 
 function setRemovedItemVisibilty({ draggables, layout }) {
-  return ({ draggableInfo, dragResult }) => {
+  return ({ dragResult }) => {
     if (dragResult.removedIndex !== null) {
       layout.setVisibility(draggables[dragResult.removedIndex], false);
     }
@@ -261,7 +260,7 @@ function getPosition({ element, layout }) {
 
 function notifyParentOnPositionCapture({ element }) {
   let isCaptured = false;
-  return ({ draggableInfo, dragResult }) => {
+  return ({ dragResult }) => {
     if (getContainer(element).getParentContainer() && isCaptured !== (dragResult.pos !== null)) {
       isCaptured = dragResult.pos !== null;
       getContainer(element)
@@ -312,13 +311,13 @@ function getDragInsertionIndex({ draggables, layout }) {
   };
 }
 
-function getDragInsertionIndexForDropZone({ draggables, layout }) {
+function getDragInsertionIndexForDropZone() {
   return ({ dragResult: { pos } }) => {
     return pos !== null ? { addedIndex: 0 } : { addedIndex: null };
   };
 }
 
-function getShadowBeginEndForDropZone({ draggables, layout }) {
+function getShadowBeginEndForDropZone({ layout }) {
   let prevAddedIndex = null;
   return ({ dragResult: { addedIndex } }) => {
     if (addedIndex !== prevAddedIndex) {
@@ -414,7 +413,7 @@ function handleInsertionSizeChange({ element, draggables, layout, options }) {
   };
 }
 
-function calculateTranslations({ element, draggables, layout }) {
+function calculateTranslations({ draggables, layout }) {
   let prevAddedIndex = null;
   let prevRemovedIndex = null;
   return function({ dragResult: { addedIndex, removedIndex, elementSize } }) {
@@ -512,7 +511,7 @@ function getShadowBeginEnd({ draggables, layout }) {
 
 function handleFirstInsertShadowAdjustment() {
   let lastAddedIndex = null;
-  return ({ dragResult: { pos, addedIndex, shadowBeginEnd }, draggableInfo: { invalidateShadow } }) => {
+  return ({ dragResult: { pos, addedIndex, shadowBeginEnd } }) => {
     if (pos !== null) {
       if (addedIndex != null && lastAddedIndex === null) {
         if (pos < shadowBeginEnd.begin) {
@@ -735,27 +734,27 @@ function Container(element) {
   };
 }
 
-const options = {
-  behaviour: 'move',
-  groupName: 'bla bla', // if not defined => container will not interfere with other containers
-  orientation: 'vertical',
-  dragHandleSelector: null,
-  nonDragAreaSelector: 'some selector',
-  dragBeginDelay: 0,
-  animationDuration: 180,
-  autoScrollEnabled: true,
-  lockAxis: true,
-  dragClass: null,
-  dropClass: null,
-  onDragStart: (index, payload) => {},
-  onDrop: ({ removedIndex, addedIndex, payload, element }) => {},
-  getChildPayload: index => null,
-  shouldAnimateDrop: (sourceContainerOptions, payload) => true,
-  shouldAcceptDrop: (sourceContainerOptions, payload) => true,
-  onDragEnter: () => {},
-  onDragLeave: () => { },
-  onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
-};
+// const options = {
+//   behaviour: 'move',
+//   groupName: 'bla bla', // if not defined => container will not interfere with other containers
+//   orientation: 'vertical',
+//   dragHandleSelector: null,
+//   nonDragAreaSelector: 'some selector',
+//   dragBeginDelay: 0,
+//   animationDuration: 180,
+//   autoScrollEnabled: true,
+//   lockAxis: true,
+//   dragClass: null,
+//   dropClass: null,
+//   onDragStart: (index, payload) => {},
+//   onDrop: ({ removedIndex, addedIndex, payload, element }) => {},
+//   getChildPayload: index => null,
+//   shouldAnimateDrop: (sourceContainerOptions, payload) => true,
+//   shouldAcceptDrop: (sourceContainerOptions, payload) => true,
+//   onDragEnter: () => {},
+//   onDragLeave: () => { },
+//   onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
+// };
 
 // exported part of container
 function SmoothDnD(element, options) {

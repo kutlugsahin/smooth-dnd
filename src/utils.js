@@ -60,7 +60,7 @@ export const getScrollingAxis = element => {
   return `${xScroll ? "x" : ""}${yScroll ? "y" : ""}` || null;
 };
 
-export const isScrolling = (element, axis) => {
+const isScrolling = (element, axis) => {
   const style = global.getComputedStyle(element);
   const overflow = style["overflow"];
   const overFlowAxis = style[`overflow-${axis}`];
@@ -69,7 +69,7 @@ export const isScrolling = (element, axis) => {
   return general || dimensionScroll;
 };
 
-export const isScrollingOrHidden = (element, axis) => {
+const isScrollingOrHidden = (element, axis) => {
   const style = global.getComputedStyle(element);
   const overflow = style["overflow"];
   const overFlowAxis = style[`overflow-${axis}`];
@@ -204,23 +204,6 @@ export const removeClass = (element, cls) => {
     const classes = element.className.split(" ").filter(p => p && p !== cls);
     element.className = classes.join(" ");
   }
-};
-
-export const debounce = (fn, delay, immediate) => {
-  let timer = null;
-  return (...params) => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    if (immediate && !timer) {
-      fn.call(this, ...params);
-    } else {
-      timer = setTimeout(() => {
-        timer = null;
-        fn.call(this, ...params);
-      }, delay);
-    }
-  };
 };
 
 export const removeChildAt = (parent, index) => {

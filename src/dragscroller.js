@@ -1,7 +1,6 @@
-import { isScrolling, getScrollingAxis, getVisibleRect, debounce } from './utils';
+import { getScrollingAxis, getVisibleRect } from './utils';
 
 const maxSpeed = 1500; // px/s
-const minSpeed = 20; // px/s
 
 function addScrollValue(element, axis, value) {
 	if (element) {
@@ -193,5 +192,4 @@ export default (containers) => {
 			});
 		}
 	}
-	return null;
 }

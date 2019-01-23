@@ -14,11 +14,9 @@ let ghostInfo = null;
 let draggableInfo = null;
 let containers = [];
 let isDragging = false;
-let removedElement = null;
 
 let handleDrag = null;
 let handleScroll = null;
-let sourceContainer = null;
 let sourceContainerLockAxis = null;
 let cursorStyleElement = null;
 
@@ -75,7 +73,6 @@ function getGhostParent() {
 }
 
 function getGhostElement(wrapperElement, { x, y }, container, cursor) {
-  const { scaleX = 1, scaleY = 1 } = container.getScale();
   const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
   const midX = left + (right - left) / 2;
   const midY = top + (bottom - top) / 2;
@@ -274,7 +271,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
 
   return function(_startEvent, _delay, _clb) {
     startEvent = getPointerEvent(_startEvent);
-    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 200 : 0);
+    delay = (typeof _delay === 'number') ? _delay : (isMobile ? 100 : 0);
     clb = _clb;
 
     registerEvents();
@@ -334,7 +331,6 @@ function onMouseUp() {
       ghostInfo = null;
       draggableInfo = null;
       isDragging = false;
-      sourceContainer = null;
       sourceContainerLockAxis = null;
       handleDrag = null;
     });
@@ -398,7 +394,6 @@ function initiateDrag(position, cursor) {
   isDragging = true;
   const container = containers.filter(p => grabbedElement.parentElement === p.element)[0];
   container.setDraggables();
-  sourceContainer = container;
   sourceContainerLockAxis = container.getOptions().lockAxis ? container.getOptions().lockAxis.toLowerCase() : null;
 
   draggableInfo = getDraggableInfo(grabbedElement);

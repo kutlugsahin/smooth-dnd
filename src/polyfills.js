@@ -8,8 +8,10 @@
       constructor.prototype.webkitMatchesSelector ||
       function(s) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-          i = matches.length;
-        while (--i >= 0 && matches.item(i) !== this) {}
+          i = matches.length - 1;
+        while (i >= 0 && matches.item(i) !== this) {
+            i--
+        }
         return i > -1;
       };
   }

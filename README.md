@@ -72,6 +72,7 @@ var container = SmoothDnD(containerElement, options);
 |onDragStart|function|`undefined`|*See descriptions below*|
 |onDragEnd|function|`undefined`|*See descriptions below*|
 |onDropReady|function|`undefined`|*See descriptions below*|
+|beforeDrop|function|`undefined`|*See descriptions below*|
 |onDrop|function|`undefined`|*See descriptions below*|
 |getChildPayload|function|`undefined`|*See descriptions below*|
 |shouldAnimateDrop|function|`undefined`|*See descriptions below*|
@@ -121,7 +122,26 @@ function onDropReady(dropResult) {
 	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
 	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
 	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
-	- **element** : `DOMElement` : the DOM element that is moved 
+	- **droppedElement** : `DOMElement` : the DOM element that is moved 
+
+### beforeDrop
+
+The function will be called just before commiting a drop (after mouseup at a dropzone). Return value of this function decides if drop will be commited or aborted. Source container and any container that could accept drop is considered relevant. **dropResult** is the only parameter passed to the function which contains the following properties. Return falsy to abort the drop or truthy to commit the drop.
+```js
+function beforeDrop(dropResult) {
+  const { removedIndex, addedIndex, payload, element } = dropResult;
+  ...
+  // Return falsy value to abort the drop and truthy value to commit the drop.
+}
+```
+#### Parameters
+- **dropResult** : `object`
+	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
+	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
+	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
+	- **droppedElement** : `DOMElement` : the DOM element that is moved 
+#### Returns
+- **boolean** : **true / false**
 
 ### onDrop
 
@@ -137,7 +157,7 @@ function onDrop(dropResult) {
 	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
 	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
 	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
-	- **element** : `DOMElement` : the DOM element that is moved 
+	- **droppedElement** : `DOMElement` : the DOM element that is moved 
 
 ### getChildPayload
 

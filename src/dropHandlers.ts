@@ -1,14 +1,14 @@
 import { addChildAt, removeChildAt } from './utils';
 import {
 	wrapperClass,
-	animationClass,
 	containersInDraggable
 } from './constants';
+import { ContainerProps, DropResult, DropCallback } from './interfaces';
 
 
-export function domDropHandler({ element, draggables, layout, options }) {
-	return (dropResult, onDrop) => {
-		const { removedIndex, addedIndex, droppedElement } = dropResult;
+export function domDropHandler({ element, draggables }: ContainerProps) {
+	return (dropResult: DropResult, onDrop: DropCallback) => {
+		const { removedIndex, addedIndex, droppedElement } = dropResult as any;
 		let removedWrapper = null;
 		if (removedIndex !== null) {
 			removedWrapper = removeChildAt(element, removedIndex);
@@ -35,8 +35,8 @@ export function domDropHandler({ element, draggables, layout, options }) {
 }
 
 export function reactDropHandler() {
-	const handler = ({ element, draggables, layout, options }) => {
-		return (dropResult, onDrop) => {
+	const handler = () => {
+		return (dropResult: DropResult, onDrop: DropCallback) => {
 			if (onDrop) {
 				onDrop(dropResult);
 			}

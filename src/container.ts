@@ -3,7 +3,6 @@ import layoutManager from './layoutManager';
 import { hasClass, addClass, removeClass, getParent } from './utils';
 import { domDropHandler } from './dropHandlers';
 import {
-  defaultGroupName,
   wrapperClass,
   animationClass,
   stretcherElementClass,
@@ -11,21 +10,31 @@ import {
   translationValue,
   containerClass,
   containerInstance,
-  containersInDraggable
+  containersInDraggable,
 } from './constants';
+import {
+  SmoothDnD,
+  ContainerOptions,
+  ElementX,
+  IContainer,
+  DragInfo,
+  ContainerProps,
+  DraggableInfo,
+  DragResult,
+} from './interfaces';
 
-const defaultOptions = {
-  groupName: null,
+const defaultOptions: ContainerOptions = {
+  groupName: undefined,
   behaviour: 'move', // move | copy
   orientation: 'vertical', // vertical | horizontal
-  getChildPayload: null,
+  getChildPayload: undefined,
   animationDuration: 250,
   autoScrollEnabled: true,
-  shouldAcceptDrop: null,
-  shouldAnimateDrop: null
+  shouldAcceptDrop: undefined,
+  shouldAnimateDrop: undefined,
 };
 
-function setAnimation(element, add, animationDuration) {
+function setAnimation(element: HTMLElement, add: boolean, animationDuration = defaultOptions.animationDuration) {
   if (add) {
     addClass(element, animationClass);
     element.style.transitionDuration = animationDuration + 'ms';
@@ -35,16 +44,16 @@ function setAnimation(element, add, animationDuration) {
   }
 }
 
-function getContainer(element) {
+function getContainer(element: ElementX) {
   return element ? element[containerInstance] : null;
 }
 
-function initOptions(props = defaultOptions) {
+function initOptions(props = defaultOptions): ContainerOptions {
   return Object.assign({}, defaultOptions, props);
 }
 
-function isDragRelevant({ element, options }) {
-  return function(sourceContainer, payload) {
+function isDragRelevant({ element, options }: ContainerProps) {
+  return function(sourceContainer: IContainer, payload: any) {
     if (options.shouldAcceptDrop) {
       return options.shouldAcceptDrop(sourceContainer.getOptions(), payload);
     }
@@ -63,20 +72,20 @@ function isDragRelevant({ element, options }) {
   };
 }
 
-function wrapChild(child) {
-  if (SmoothDnD.wrapChild) {
-    return SmoothDnD.wrapChild(child);
+function wrapChild(child: HTMLElement) {
+  if (SmoothDnDCreator.wrapChild) {
+    return SmoothDnDCreator.wrapChild(child);
   }
   const div = global.document.createElement('div');
   div.className = `${wrapperClass}`;
-  child.parentElement.insertBefore(div, child);
+  child.parentElement!.insertBefore(div, child);
   div.appendChild(child);
   return div;
 }
 
-function wrapChildren(element) {
-  const draggables = [];
-  Array.prototype.map.call(element.children, child => {
+function wrapChildren(element: HTMLElement) {
+  const draggables: ElementX[] = [];
+  Array.prototype.forEach.call(element.children, (child: ElementX) => {
     if (child.nodeType === Node.ELEMENT_NODE) {
       let wrapper = child;
       if (!hasClass(child, wrapperClass)) {
@@ -92,20 +101,26 @@ function wrapChildren(element) {
   return draggables;
 }
 
-function unwrapChildren(element) {
-  Array.prototype.map.call(element.children, child => {
+function unwrapChildren(element: HTMLElement) {
+  Array.prototype.forEach.call(element.children, (child: HTMLElement) => {
     if (child.nodeType === Node.ELEMENT_NODE) {
       let wrapper = child;
       if (hasClass(child, wrapperClass)) {
-        element.insertBefore(wrapper, wrapChild.firstElementChild);
+        element.insertBefore(wrapper, child.firstElementChild as HTMLElement);
         element.removeChild(wrapper);
       }
     }
   });
 }
 
-function findDraggebleAtPos({ layout }) {
-  const find = (draggables, pos, startIndex, endIndex, withRespectToMiddlePoints = false) => {
+function findDraggebleAtPos({ layout }: { layout: ReturnType<typeof layoutManager> }) {
+  const find = (
+    draggables: HTMLElement[],
+    pos: number,
+    startIndex: number,
+    endIndex: number,
+    withRespectToMiddlePoints = false
+  ): number | null => {
     if (endIndex < startIndex) {
       return startIndex;
     }
@@ -140,14 +155,14 @@ function findDraggebleAtPos({ layout }) {
     }
   };
 
-  return (draggables, pos, withRespectToMiddlePoints = false) => {
+  return (draggables: HTMLElement[], pos: number, withRespectToMiddlePoints = false) => {
     return find(draggables, pos, 0, draggables.length - 1, withRespectToMiddlePoints);
   };
 }
 
-function resetDraggables({ element, draggables, layout, options }) {
+function resetDraggables({ element, draggables, layout }: ContainerProps) {
   return function() {
-    draggables.forEach(p => {
+    draggables.forEach((p: ElementX) => {
       setAnimation(p, false);
       layout.setTranslation(p, 0);
       layout.setVisibility(p, true);
@@ -161,7 +176,7 @@ function resetDraggables({ element, draggables, layout, options }) {
   };
 }
 
-function setTargetContainer(draggableInfo, element, set = true) {
+function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, set = true) {
   if (element && set) {
     draggableInfo.targetElement = element;
   } else {
@@ -171,10 +186,10 @@ function setTargetContainer(draggableInfo, element, set = true) {
   }
 }
 
-function handleDrop({ element, draggables, layout, options }) {
+function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   const draggablesReset = resetDraggables({ element, draggables, layout, options });
-  const dropHandler = (SmoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, options });
-  return function(draggableInfo, { addedIndex, removedIndex }) {
+  const dropHandler = (SmoothDnDCreator.dropHandler || domDropHandler)({ element, draggables, layout, options });
+  return function(draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
     if (draggableInfo.targetElement || options.removeOnDropOut) {
@@ -184,35 +199,35 @@ function handleDrop({ element, draggables, layout, options }) {
         removedIndex,
         addedIndex: actualAddIndex,
         payload: draggableInfo.payload,
-        droppedElement: draggableInfo.element.firstElementChild
+        droppedElement: draggableInfo.element.firstElementChild,
       };
       dropHandler(dropHandlerParams, options.onDrop);
     }
   };
 }
 
-function getContainerProps(element, initialOptions) {
+function getContainerProps(element: HTMLElement, initialOptions: ContainerOptions): ContainerProps {
   const options = initOptions(initialOptions);
-  const draggables = wrapChildren(element, options.orientation, options.animationDuration);
+  const draggables = wrapChildren(element);
   // set flex classes before layout is inited for scroll listener
   addClass(element, `${containerClass} ${options.orientation}`);
-  const layout = layoutManager(element, options.orientation, options.animationDuration);
+  const layout = layoutManager(element, options.orientation!, options.animationDuration!);
   return {
     element,
     draggables,
     options,
-    layout
+    layout,
   };
 }
 
-function getRelaventParentContainer(container, relevantContainers) {
-  let current = container.element;
+function getRelaventParentContainer(container: IContainer, relevantContainers: IContainer[]) {
+  let current: ElementX | null = container.element;
   while (current) {
-    const containerOfParentElement = getContainer(current.parentElement);
+    const containerOfParentElement = getContainer(current.parentElement as ElementX);
     if (containerOfParentElement && relevantContainers.indexOf(containerOfParentElement) > -1) {
       return {
         container: containerOfParentElement,
-        draggable: current
+        draggable: current,
       };
     }
     current = current.parentElement;
@@ -221,7 +236,7 @@ function getRelaventParentContainer(container, relevantContainers) {
   return null;
 }
 
-function registerToParentContainer(container, relevantContainers) {
+function registerToParentContainer(container: IContainer, relevantContainers: IContainer[]) {
   const parentInfo = getRelaventParentContainer(container, relevantContainers);
   if (parentInfo) {
     parentInfo.container.getChildContainers().push(container);
@@ -231,9 +246,9 @@ function registerToParentContainer(container, relevantContainers) {
   }
 }
 
-function getRemovedItem({ draggables, element, options }) {
-  let prevRemovedIndex = null;
-  return ({ draggableInfo, dragResult }) => {
+function getRemovedItem({ element, options }: ContainerProps) {
+  let prevRemovedIndex: number | null = null;
+  return ({ draggableInfo }: DragInfo) => {
     let removedIndex = prevRemovedIndex;
     if (prevRemovedIndex == null && draggableInfo.container.element === element && options.behaviour !== 'copy') {
       removedIndex = prevRemovedIndex = draggableInfo.elementIndex;
@@ -243,25 +258,25 @@ function getRemovedItem({ draggables, element, options }) {
   };
 }
 
-function setRemovedItemVisibilty({ draggables, layout }) {
-  return ({ draggableInfo, dragResult }) => {
+function setRemovedItemVisibilty({ draggables, layout }: ContainerProps) {
+  return ({ dragResult }: DragInfo) => {
     if (dragResult.removedIndex !== null) {
       layout.setVisibility(draggables[dragResult.removedIndex], false);
     }
   };
 }
 
-function getPosition({ element, layout }) {
-  return ({ draggableInfo }) => {
+function getPosition({ element, layout }: ContainerProps) {
+  return ({ draggableInfo }: DragInfo) => {
     return {
-      pos: !getContainer(element).isPosInChildContainer() ? layout.getPosition(draggableInfo.position) : null
+      pos: !getContainer(element).isPosInChildContainer() ? layout.getPosition(draggableInfo.position) : null,
     };
   };
 }
 
-function notifyParentOnPositionCapture({ element }) {
+function notifyParentOnPositionCapture({ element }: ContainerProps) {
   let isCaptured = false;
-  return ({ draggableInfo, dragResult }) => {
+  return ({ dragResult }: DragInfo) => {
     if (getContainer(element).getParentContainer() && isCaptured !== (dragResult.pos !== null)) {
       isCaptured = dragResult.pos !== null;
       getContainer(element)
@@ -271,9 +286,9 @@ function notifyParentOnPositionCapture({ element }) {
   };
 }
 
-function getElementSize({ layout }) {
-  let elementSize = null;
-  return ({ draggableInfo, dragResult }) => {
+function getElementSize({ layout }: ContainerProps) {
+  let elementSize: number | null = null;
+  return ({ draggableInfo, dragResult }: DragInfo) => {
     if (dragResult.pos === null) {
       return (elementSize = null);
     } else {
@@ -283,15 +298,15 @@ function getElementSize({ layout }) {
   };
 }
 
-function handleTargetContainer({ element }) {
-  return ({ draggableInfo, dragResult }) => {
+function handleTargetContainer({ element }: ContainerProps) {
+  return ({ draggableInfo, dragResult }: DragInfo) => {
     setTargetContainer(draggableInfo, element, !!dragResult.pos);
   };
 }
 
-function getDragInsertionIndex({ draggables, layout }) {
+function getDragInsertionIndex({ draggables, layout }: ContainerProps) {
   const findDraggable = findDraggebleAtPos({ layout });
-  return ({ dragResult: { shadowBeginEnd, pos } }) => {
+  return ({ dragResult: { shadowBeginEnd, pos } }: { dragResult: DragResult }) => {
     if (!shadowBeginEnd) {
       const index = findDraggable(draggables, pos, true);
       return index !== null ? index : draggables.length;
@@ -305,37 +320,39 @@ function getDragInsertionIndex({ draggables, layout }) {
     if (pos < shadowBeginEnd.begin + shadowBeginEnd.beginAdjustment) {
       return findDraggable(draggables, pos);
     } else if (pos > shadowBeginEnd.end) {
-      return findDraggable(draggables, pos) + 1;
+      return findDraggable(draggables, pos)! + 1;
     } else {
       return draggables.length;
     }
   };
 }
 
-function getDragInsertionIndexForDropZone({ draggables, layout }) {
-  return ({ dragResult: { pos } }) => {
+function getDragInsertionIndexForDropZone() {
+  return ({ dragResult: { pos } }: DragInfo) => {
     return pos !== null ? { addedIndex: 0 } : { addedIndex: null };
   };
 }
 
-function getShadowBeginEndForDropZone({ draggables, layout }) {
-  let prevAddedIndex = null;
-  return ({ dragResult: { addedIndex } }) => {
+function getShadowBeginEndForDropZone({ draggables, layout }: ContainerProps) {
+  let prevAddedIndex: number | null = null;
+  return ({ dragResult: { addedIndex } }: DragInfo) => {
     if (addedIndex !== prevAddedIndex) {
       prevAddedIndex = addedIndex;
       const { begin, end } = layout.getBeginEndOfContainer();
       return {
         shadowBeginEnd: {
-          rect: layout.getTopLeftOfElementBegin(begin, end)
-        }
+          rect: layout.getTopLeftOfElementBegin(begin),
+        },
       };
     }
+
+    return null;
   };
 }
 
-function invalidateShadowBeginEndIfNeeded(params) {
+function invalidateShadowBeginEndIfNeeded(params: ContainerProps) {
   const shadowBoundsGetter = getShadowBeginEnd(params);
-  return ({ draggableInfo, dragResult }) => {
+  return ({ draggableInfo, dragResult }: DragInfo) => {
     if (draggableInfo.invalidateShadow) {
       return shadowBoundsGetter({ draggableInfo, dragResult });
     }
@@ -343,9 +360,9 @@ function invalidateShadowBeginEndIfNeeded(params) {
   };
 }
 
-function getNextAddedIndex(params) {
+function getNextAddedIndex(params: ContainerProps) {
   const getIndexForPos = getDragInsertionIndex(params);
-  return ({ dragResult }) => {
+  return ({ dragResult }: DragInfo) => {
     let index = null;
     if (dragResult.pos !== null) {
       index = getIndexForPos({ dragResult });
@@ -354,14 +371,14 @@ function getNextAddedIndex(params) {
       }
     }
     return {
-      addedIndex: index
+      addedIndex: index,
     };
   };
 }
 
 function resetShadowAdjustment() {
-  let lastAddedIndex = null;
-  return ({ dragResult: { addedIndex, shadowBeginEnd } }) => {
+  let lastAddedIndex: number | null = null;
+  return ({ dragResult: { addedIndex, shadowBeginEnd } }: DragInfo) => {
     if (addedIndex !== lastAddedIndex && lastAddedIndex !== null && shadowBeginEnd) {
       shadowBeginEnd.beginAdjustment = 0;
     }
@@ -369,32 +386,31 @@ function resetShadowAdjustment() {
   };
 }
 
-function handleInsertionSizeChange({ element, draggables, layout, options }) {
-  let strectherElement = null;
-  return function({ dragResult: { addedIndex, removedIndex, elementSize } }) {
+function handleInsertionSizeChange({ element, draggables, layout, options }: ContainerProps) {
+  let strectherElement: HTMLElement | null = null;
+  return function({ dragResult: { addedIndex, removedIndex, elementSize } }: DragInfo) {
     if (removedIndex === null) {
       if (addedIndex !== null) {
-				if (!strectherElement) {
-					const containerBeginEnd = layout.getBeginEndOfContainer();
-					containerBeginEnd.end = containerBeginEnd.begin + layout.getSize(element);
+        if (!strectherElement) {
+          const containerBeginEnd = layout.getBeginEndOfContainer();
+          containerBeginEnd.end = containerBeginEnd.begin + layout.getSize(element);
           const hasScrollBar = layout.getScrollSize(element) > layout.getSize(element);
           const containerEnd = hasScrollBar
             ? containerBeginEnd.begin + layout.getScrollSize(element) - layout.getScrollValue(element)
             : containerBeginEnd.end;
           const lastDraggableEnd =
             draggables.length > 0
-              ? layout.getBeginEnd(draggables[draggables.length - 1]).end -
-                draggables[draggables.length - 1][translationValue]
+              ? layout.getBeginEnd(draggables[draggables.length - 1]).end - draggables[draggables.length - 1][translationValue]
               : containerBeginEnd.begin;
           if (lastDraggableEnd + elementSize > containerEnd) {
-            strectherElement = global.document.createElement('div');
+            strectherElement = global.document.createElement('div') as HTMLElement;
             strectherElement.className = stretcherElementClass + ' ' + options.orientation;
             const stretcherSize = elementSize + lastDraggableEnd - containerEnd;
             layout.setSize(strectherElement.style, `${stretcherSize}px`);
             element.appendChild(strectherElement);
             element[stretcherElementInstance] = strectherElement;
             return {
-              containerBoxChanged: true
+              containerBoxChanged: true,
             };
           }
         }
@@ -406,18 +422,20 @@ function handleInsertionSizeChange({ element, draggables, layout, options }) {
           element.removeChild(toRemove);
           element[stretcherElementInstance] = null;
           return {
-            containerBoxChanged: true
+            containerBoxChanged: true,
           };
         }
       }
     }
+
+    return undefined;
   };
 }
 
-function calculateTranslations({ element, draggables, layout }) {
-  let prevAddedIndex = null;
-  let prevRemovedIndex = null;
-  return function({ dragResult: { addedIndex, removedIndex, elementSize } }) {
+function calculateTranslations({ draggables, layout }: ContainerProps) {
+  let prevAddedIndex: number | null = null;
+  let prevRemovedIndex: number | null = null;
+  return function({ dragResult: { addedIndex, removedIndex, elementSize } }: { dragResult: DragResult }) {
     if (addedIndex !== prevAddedIndex || removedIndex !== prevRemovedIndex) {
       for (let index = 0; index < draggables.length; index++) {
         if (index !== removedIndex) {
@@ -438,12 +456,14 @@ function calculateTranslations({ element, draggables, layout }) {
 
       return { addedIndex, removedIndex };
     }
+
+    return undefined;
   };
 }
 
-function getShadowBeginEnd({ draggables, layout }) {
-  let prevAddedIndex = null;
-  return ({ draggableInfo, dragResult }) => {
+function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
+  let prevAddedIndex: number | null = null;
+  return ({ draggableInfo, dragResult }: DragInfo) => {
     const { addedIndex, removedIndex, elementSize, pos, shadowBeginEnd } = dragResult;
     if (pos !== null) {
       if (addedIndex !== null && (draggableInfo.invalidateShadow || addedIndex !== prevAddedIndex)) {
@@ -484,19 +504,18 @@ function getShadowBeginEnd({ draggables, layout }) {
             end = afterBounds.begin;
           }
         } else {
-          afterBounds = { begin: layout.getContainerRectangles().end };
+          afterBounds = { begin: layout.getContainerRectangles().rect.end };
         }
 
-        const shadowRectTopLeft =
-          beforeBounds && afterBounds ? layout.getTopLeftOfElementBegin(beforeBounds.end, afterBounds.begin) : null;
+        const shadowRectTopLeft = beforeBounds && afterBounds ? layout.getTopLeftOfElementBegin(beforeBounds.end) : null;
 
         return {
           shadowBeginEnd: {
             begin,
             end,
             rect: shadowRectTopLeft,
-            beginAdjustment: shadowBeginEnd ? shadowBeginEnd.beginAdjustment : 0
-          }
+            beginAdjustment: shadowBeginEnd ? shadowBeginEnd.beginAdjustment : 0,
+          },
         };
       } else {
         return null;
@@ -504,15 +523,15 @@ function getShadowBeginEnd({ draggables, layout }) {
     } else {
       prevAddedIndex = null;
       return {
-        shadowBeginEnd: null
+        shadowBeginEnd: null,
       };
     }
   };
 }
 
 function handleFirstInsertShadowAdjustment() {
-  let lastAddedIndex = null;
-  return ({ dragResult: { pos, addedIndex, shadowBeginEnd }, draggableInfo: { invalidateShadow } }) => {
+  let lastAddedIndex: number | null = null;
+  return ({ dragResult: { pos, addedIndex, shadowBeginEnd } }: DragInfo) => {
     if (pos !== null) {
       if (addedIndex != null && lastAddedIndex === null) {
         if (pos < shadowBeginEnd.begin) {
@@ -527,9 +546,9 @@ function handleFirstInsertShadowAdjustment() {
   };
 }
 
-function fireDragEnterLeaveEvents({ options }) {
+function fireDragEnterLeaveEvents({ options }: ContainerProps) {
   let wasDragIn = false;
-  return ({ dragResult: { pos } }) => {
+  return ({ dragResult: { pos } }: DragInfo) => {
     const isDragIn = !!pos;
     if (isDragIn !== wasDragIn) {
       wasDragIn = isDragIn;
@@ -538,17 +557,19 @@ function fireDragEnterLeaveEvents({ options }) {
       } else {
         options.onDragLeave && options.onDragLeave();
         return {
-          dragLeft: true
+          dragLeft: true,
         };
       }
     }
+
+    return undefined;
   };
 }
 
-function fireOnDropReady({ options }) {
-  let lastAddedIndex = null;
-  return ({ dragResult: { addedIndex, removedIndex }, draggableInfo: { payload, element } }) => {
-    if (options.onDropReady && lastAddedIndex !== addedIndex) {
+function fireOnDropReady({ options }: ContainerProps) {
+  let lastAddedIndex: number | null = null;
+  return ({ dragResult: { addedIndex, removedIndex }, draggableInfo: { payload, element } }: DragInfo) => {
+    if (options.onDropReady && addedIndex !== null && lastAddedIndex !== addedIndex) {
       lastAddedIndex = addedIndex;
       let adjustedAddedIndex = addedIndex;
 
@@ -556,12 +577,17 @@ function fireOnDropReady({ options }) {
         adjustedAddedIndex--;
       }
 
-      options.onDropReady({ addedIndex: adjustedAddedIndex, removedIndex, payload, element: element.firstElementChild });
+      options.onDropReady({
+        addedIndex: adjustedAddedIndex,
+        removedIndex,
+        payload,
+        element: element.firstElementChild as HTMLElement,
+      });
     }
-  }
+  };
 }
 
-function getDragHandler(params) {
+function getDragHandler(params: any) {
   if (params.options.behaviour === 'drop-zone') {
     // sorting is disabled in container, addedIndex will always be 0 if dropped in
     return compose(params)(
@@ -603,15 +629,15 @@ function getDefaultDragResult() {
     removedIndex: null,
     elementSize: null,
     pos: null,
-    shadowBeginEnd: null
+    shadowBeginEnd: null,
   };
 }
 
-function compose(params) {
-  return (...functions) => {
+function compose(params: any) {
+  return (...functions: any[]) => {
     const hydratedFunctions = functions.map(p => p(params));
-    let result = null;
-    return draggableInfo => {
+    let result: DragResult | null = null;
+    return (draggableInfo: DraggableInfo) => {
       result = hydratedFunctions.reduce((dragResult, fn) => {
         return Object.assign(dragResult, fn({ draggableInfo, dragResult }));
       }, result || getDefaultDragResult());
@@ -621,26 +647,26 @@ function compose(params) {
 }
 
 // Container definition begin
-function Container(element) {
-  return function(options) {
-    let dragResult = null;
-    let lastDraggableInfo = null;
+function Container(element: HTMLElement): (options: ContainerOptions) => any {
+  return function(options: ContainerOptions) {
+    let dragResult: DragResult | null = null;
+    let lastDraggableInfo: DraggableInfo | null = null;
     const props = getContainerProps(element, options);
     let dragHandler = getDragHandler(props);
     let dropHandler = handleDrop(props);
-    let parentContainer = null;
+    let parentContainer: IContainer | null = null;
     let posIsInChildContainer = false;
-    let childContainers = [];
+    let childContainers: IContainer[] = [];
 
     function processLastDraggableInfo() {
       if (lastDraggableInfo !== null) {
         lastDraggableInfo.invalidateShadow = true;
-        dragResult = dragHandler(lastDraggableInfo);
+        dragResult = dragHandler(lastDraggableInfo!);
         lastDraggableInfo.invalidateShadow = false;
       }
     }
 
-    function onChildPositionCaptured(isCaptured) {
+    function onChildPositionCaptured(isCaptured: boolean) {
       posIsInChildContainer = isCaptured;
       if (parentContainer) {
         parentContainer.onChildPositionCaptured(isCaptured);
@@ -650,8 +676,8 @@ function Container(element) {
       }
     }
 
-    function setDraggables(draggables, element, options) {
-      const newDraggables = wrapChildren(element, options.orientation, options.animationDuration);
+    function setDraggables(draggables: HTMLElement[], element: HTMLElement) {
+      const newDraggables = wrapChildren(element);
       for (let i = 0; i < newDraggables.length; i++) {
         draggables[i] = newDraggables[i];
       }
@@ -661,11 +687,11 @@ function Container(element) {
       }
     }
 
-    function prepareDrag(container, relevantContainers) {
+    function prepareDrag(container: IContainer, relevantContainers: IContainer[]) {
       const element = container.element;
       const draggables = props.draggables;
       const options = container.getOptions();
-      setDraggables(draggables, element, options);
+      setDraggables(draggables, element);
       container.layout.invalidateRects();
       registerToParentContainer(container, relevantContainers);
       draggables.forEach(p => setAnimation(p, true, options.animationDuration));
@@ -676,19 +702,21 @@ function Container(element) {
     });
 
     function handleDragLeftDeferedTranslation() {
-      if (dragResult.dragLeft && props.options.behaviour !== 'drop-zone') {
+      if (dragResult && dragResult.dragLeft && props.options.behaviour !== 'drop-zone') {
         dragResult.dragLeft = false;
         setTimeout(() => {
-          if (dragResult) calculateTranslations(props)({ dragResult });
+          if (dragResult) {
+            calculateTranslations(props)({ dragResult });
+          }
         }, 20);
       }
     }
 
-    function dispose(container) {
+    function dispose(container: IContainer) {
       unwrapChildren(container.element);
     }
 
-    return {
+    const container: IContainer = {
       element,
       draggables: props.draggables,
       isDragRelevant: isDragRelevant(props),
@@ -699,29 +727,29 @@ function Container(element) {
       dispose,
       prepareDrag,
       isPosInChildContainer: () => posIsInChildContainer,
-      handleDrag: function(draggableInfo) {
+      handleDrag(draggableInfo: DraggableInfo) {
         lastDraggableInfo = draggableInfo;
         dragResult = dragHandler(draggableInfo);
         handleDragLeftDeferedTranslation();
         return dragResult;
       },
-      handleDrop: function(draggableInfo) {
+      handleDrop(draggableInfo: DraggableInfo) {
         lastDraggableInfo = null;
         onChildPositionCaptured(false);
         dragHandler = getDragHandler(props);
-        dropHandler(draggableInfo, dragResult);
+        dropHandler(draggableInfo, dragResult!);
         dragResult = null;
         parentContainer = null;
         childContainers = [];
       },
-      getDragResult: function() {
+      getDragResult() {
         return dragResult;
       },
-      getTranslateCalculator: function(...params) {
-        return calculateTranslations(props)(...params);
+      getTranslateCalculator(dragresult: { dragResult: DragResult }) {
+        return calculateTranslations(props)(dragresult);
       },
-      setParentContainer: e => {
-        parentContainer = e;
+      setParentContainer: (container: IContainer) => {
+        parentContainer = container;
       },
       getParentContainer: () => parentContainer,
       onTranslated: () => {
@@ -729,47 +757,52 @@ function Container(element) {
       },
       getOptions: () => props.options,
       setDraggables: () => {
-        setDraggables(props.draggables, element, props.options);
-      }
+        setDraggables(props.draggables, element);
+      },
     };
+
+    return container;
   };
 }
 
-const options = {
-  behaviour: 'move',
-  groupName: 'bla bla', // if not defined => container will not interfere with other containers
-  orientation: 'vertical',
-  dragHandleSelector: null,
-  nonDragAreaSelector: 'some selector',
-  dragBeginDelay: 0,
-  animationDuration: 180,
-  autoScrollEnabled: true,
-  lockAxis: true,
-  dragClass: null,
-  dropClass: null,
-  onDragStart: (index, payload) => {},
-  onDrop: ({ removedIndex, addedIndex, payload, element }) => {},
-  getChildPayload: index => null,
-  shouldAnimateDrop: (sourceContainerOptions, payload) => true,
-  shouldAcceptDrop: (sourceContainerOptions, payload) => true,
-  onDragEnter: () => {},
-  onDragLeave: () => { },
-  onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
-};
+// const options: ContainerOptions = {
+//   behaviour: 'move',
+//   groupName: 'bla bla', // if not defined => container will not interfere with other containers
+//   orientation: 'vertical',
+//   dragHandleSelector: undefined,
+//   nonDragAreaSelector: 'some selector',
+//   dragBeginDelay: 0,
+//   animationDuration: 180,
+//   autoScrollEnabled: true,
+//   lockAxis: 'x',
+//   dragClass: undefined,
+//   dropClass: undefined,
+//   onDragStart: (index, payload) => {},
+//   onDrop: ({ removedIndex, addedIndex, payload, element }) => {},
+//   getChildPayload: index => null,
+//   shouldAnimateDrop: (sourceContainerOptions, payload) => true,
+//   shouldAcceptDrop: (sourceContainerOptions, payload) => true,
+//   onDragEnter: () => {},
+//   onDragLeave: () => { },
+//   onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
+// };
 
 // exported part of container
-function SmoothDnD(element, options) {
+const SmoothDnDCreator: Function & {
+  dropHandler?: any;
+  wrapChild?: any;
+} = function(element: ElementX, options: ContainerOptions): SmoothDnD {
   const containerIniter = Container(element);
   const container = containerIniter(options);
   element[containerInstance] = container;
   Mediator.register(container);
   return {
-    dispose: function() {
+    dispose() {
       Mediator.unregister(container);
       container.layout.dispose();
       container.dispose(container);
-    }
+    },
   };
-}
+};
 
-export default SmoothDnD;
+export default SmoothDnDCreator;

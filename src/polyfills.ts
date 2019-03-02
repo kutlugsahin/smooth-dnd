@@ -1,4 +1,6 @@
-(function(constructor) {
+declare var global: any;
+
+(function (constructor) {
   if (constructor && constructor.prototype && !constructor.prototype.matches) {
     constructor.prototype.matches =
       constructor.prototype.matchesSelector ||
@@ -6,7 +8,7 @@
       constructor.prototype.msMatchesSelector ||
       constructor.prototype.oMatchesSelector ||
       constructor.prototype.webkitMatchesSelector ||
-      function(s) {
+      function(s: string) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
           i = matches.length;
         while (--i >= 0 && matches.item(i) !== this) {}

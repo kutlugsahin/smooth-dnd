@@ -1,4 +1,6 @@
 import * as constants from './constants';
+import { Dictionary } from './interfaces';
+declare const global: any;
 
 const verticalWrapperClass = {
 	'overflow': 'hidden',
@@ -58,7 +60,7 @@ const css = {
 	}
 };
 
-function convertToCssString(css) {
+function convertToCssString(css: Dictionary): string {
 	return Object.keys(css).reduce((styleString, propName) => {
 		const propValue = css[propName];
 		if (typeof (propValue) === 'object') {
@@ -84,7 +86,7 @@ function addStyleToHead() {
 	}
 }
 
-function addCursorStyleToBody(cursor) {
+function addCursorStyleToBody(cursor: string) {
 	if (cursor && typeof (window) !== 'undefined') {
 		const head = global.document.head || global.document.getElementsByTagName("head")[0];
 		const style = global.document.createElement("style");
@@ -108,7 +110,7 @@ function addCursorStyleToBody(cursor) {
 	return null;
 }
 
-function removeStyle(styleElement) {
+function removeStyle(styleElement: HTMLStyleElement) {
 	if (styleElement && typeof (window) !== 'undefined') {
 		const head = global.document.head || global.document.getElementsByTagName("head")[0];
 		head.removeChild(styleElement);

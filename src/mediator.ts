@@ -391,7 +391,7 @@ function fireOnDragStartEnd(isStart: boolean) {
 }
 
 function initiateDrag(position: MousePosition, cursor: string) {
-  if (grabbedElement !== null && dragListeningContainers) {
+  if (grabbedElement !== null) {
     isDragging = true;
     const container = (containers.filter(p => grabbedElement!.parentElement === p.element)[0]) as IContainer;
     container.setDraggables();

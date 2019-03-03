@@ -38,8 +38,6 @@ export interface ScrolableInfo {
 export interface SmoothDnD {
     dispose: () => void;
 }
-export interface DragPayload {
-}
 export interface DropResult {
     removedIndex: number | null;
     addedIndex: number | null;

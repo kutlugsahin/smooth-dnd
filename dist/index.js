@@ -1647,8 +1647,8 @@
 	}
 
 	function wrapChild(child) {
-	  if (SmoothDnDCreator.wrapChild) {
-	    return SmoothDnDCreator.wrapChild(child);
+	  if (smoothDnd.wrapChild) {
+	    return smoothDnd.wrapChild(child);
 	  }
 
 	  var div = global.document.createElement('div');
@@ -1787,7 +1787,7 @@
 	    layout: layout,
 	    options: options
 	  });
-	  var dropHandler = (SmoothDnDCreator.dropHandler || domDropHandler)({
+	  var dropHandler = (smoothDnd.dropHandler || domDropHandler)({
 	    element: element,
 	    draggables: draggables,
 	    layout: layout,
@@ -2510,7 +2510,7 @@
 	// exported part of container
 
 
-	var SmoothDnDCreator = function SmoothDnDCreator(element, options) {
+	var smoothDnd = function smoothDnd(element, options) {
 	  var containerIniter = Container(element);
 	  var container = containerIniter(options);
 	  element[containerInstance] = container;
@@ -2524,7 +2524,7 @@
 	  };
 	};
 
-	exports.smoothDnD = SmoothDnDCreator;
+	exports.smoothDnD = smoothDnd;
 	exports.constants = constants;
 	exports.dropHandlers = dropHandlers;
 

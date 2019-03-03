@@ -21,6 +21,7 @@ import {
   ContainerProps,
   DraggableInfo,
   DragResult,
+  SmoothDnDCreator,
 } from './interfaces';
 
 const defaultOptions: ContainerOptions = {
@@ -73,8 +74,8 @@ function isDragRelevant({ element, options }: ContainerProps) {
 }
 
 function wrapChild(child: HTMLElement) {
-  if (SmoothDnDCreator.wrapChild) {
-    return SmoothDnDCreator.wrapChild(child);
+  if (smoothDnd.wrapChild) {
+    return smoothDnd.wrapChild(child);
   }
   const div = global.document.createElement('div');
   div.className = `${wrapperClass}`;
@@ -188,7 +189,7 @@ function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, 
 
 function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   const draggablesReset = resetDraggables({ element, draggables, layout, options });
-  const dropHandler = (SmoothDnDCreator.dropHandler || domDropHandler)({ element, draggables, layout, options });
+  const dropHandler = (smoothDnd.dropHandler || domDropHandler)({ element, draggables, layout, options });
   return function(draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
@@ -788,7 +789,7 @@ function Container(element: HTMLElement): (options: ContainerOptions) => any {
 // };
 
 // exported part of container
-const SmoothDnDCreator: Function & {
+const smoothDnd: SmoothDnDCreator & {
   dropHandler?: any;
   wrapChild?: any;
 } = function(element: ElementX, options: ContainerOptions): SmoothDnD {
@@ -805,4 +806,4 @@ const SmoothDnDCreator: Function & {
   };
 };
 
-export default SmoothDnDCreator;
+export default smoothDnd;

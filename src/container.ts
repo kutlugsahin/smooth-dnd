@@ -74,8 +74,8 @@ function isDragRelevant({ element, options }: ContainerProps) {
 }
 
 function wrapChild(child: HTMLElement) {
-  if (smoothDnd.wrapChild) {
-    return smoothDnd.wrapChild(child);
+  if (smoothDnD.wrapChild) {
+    return smoothDnD.wrapChild(child);
   }
   const div = global.document.createElement('div');
   div.className = `${wrapperClass}`;
@@ -189,7 +189,7 @@ function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, 
 
 function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   const draggablesReset = resetDraggables({ element, draggables, layout, options });
-  const dropHandler = (smoothDnd.dropHandler || domDropHandler)({ element, draggables, layout, options });
+  const dropHandler = (smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, options });
   return function(draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
@@ -789,7 +789,7 @@ function Container(element: HTMLElement): (options: ContainerOptions) => any {
 // };
 
 // exported part of container
-const smoothDnd: SmoothDnDCreator & {
+const smoothDnD: SmoothDnDCreator & {
   dropHandler?: any;
   wrapChild?: any;
 } = function(element: ElementX, options: ContainerOptions): SmoothDnD {
@@ -806,4 +806,4 @@ const smoothDnd: SmoothDnDCreator & {
   };
 };
 
-export default smoothDnd;
+export default smoothDnD;

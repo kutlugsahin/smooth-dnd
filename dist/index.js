@@ -1647,8 +1647,8 @@
 	}
 
 	function wrapChild(child) {
-	  if (smoothDnd.wrapChild) {
-	    return smoothDnd.wrapChild(child);
+	  if (smoothDnD.wrapChild) {
+	    return smoothDnD.wrapChild(child);
 	  }
 
 	  var div = global.document.createElement('div');
@@ -1787,7 +1787,7 @@
 	    layout: layout,
 	    options: options
 	  });
-	  var dropHandler = (smoothDnd.dropHandler || domDropHandler)({
+	  var dropHandler = (smoothDnD.dropHandler || domDropHandler)({
 	    element: element,
 	    draggables: draggables,
 	    layout: layout,
@@ -2510,7 +2510,7 @@
 	// exported part of container
 
 
-	var smoothDnd = function smoothDnd(element, options) {
+	var smoothDnD = function smoothDnD(element, options) {
 	  var containerIniter = Container(element);
 	  var container = containerIniter(options);
 	  element[containerInstance] = container;
@@ -2524,7 +2524,7 @@
 	  };
 	};
 
-	exports.smoothDnD = smoothDnd;
+	exports.smoothDnD = smoothDnD;
 	exports.constants = constants;
 	exports.dropHandlers = dropHandlers;
 

@@ -22,6 +22,6 @@ module.exports = {
 		commonjs({
 			extensions
 		}),
-    // uglify()
+    uglify()
   ],
 };

@@ -75,13 +75,14 @@ function isDragRelevant({ element, options }: ContainerProps) {
 
 function wrapChild(child: HTMLElement) {
   if (smoothDnD.wrapChild) {
-    return smoothDnD.wrapChild(child);
+    const div = global.document.createElement('div');
+    div.className = `${wrapperClass}`;
+    child.parentElement!.insertBefore(div, child);
+    div.appendChild(child);
+    return div;
   }
-  const div = global.document.createElement('div');
-  div.className = `${wrapperClass}`;
-  child.parentElement!.insertBefore(div, child);
-  div.appendChild(child);
-  return div;
+
+  return child;
 }
 
 function wrapChildren(element: HTMLElement) {
@@ -103,15 +104,16 @@ function wrapChildren(element: HTMLElement) {
 }
 
 function unwrapChildren(element: HTMLElement) {
-  Array.prototype.forEach.call(element.children, (child: HTMLElement) => {
-    if (child.nodeType === Node.ELEMENT_NODE) {
-      let wrapper = child;
-      if (hasClass(child, wrapperClass)) {
-        element.insertBefore(wrapper, child.firstElementChild as HTMLElement);
-        element.removeChild(wrapper);
+  if (smoothDnD.wrapChild) {
+    Array.prototype.forEach.call(element.children, (child: HTMLElement) => {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        if (hasClass(child, wrapperClass)) {
+          element.insertBefore(child.firstElementChild as HTMLElement, child);
+          element.removeChild(child);
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 function findDraggebleAtPos({ layout }: { layout: ReturnType<typeof layoutManager> }) {
@@ -791,7 +793,7 @@ function Container(element: HTMLElement): (options: ContainerOptions) => any {
 // exported part of container
 const smoothDnD: SmoothDnDCreator & {
   dropHandler?: any;
-  wrapChild?: any;
+  wrapChild?: boolean;
 } = function(element: ElementX, options: ContainerOptions): SmoothDnD {
   const containerIniter = Container(element);
   const container = containerIniter(options);
@@ -805,5 +807,9 @@ const smoothDnD: SmoothDnDCreator & {
     },
   };
 };
+
+// wrap all draggables by default 
+// in react,vue,angular this value will be set to false
+smoothDnD.wrapChild = true;
 
 export default smoothDnD;

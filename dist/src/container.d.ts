@@ -1,6 +1,3 @@
 import { SmoothDnDCreator } from './interfaces';
-declare const smoothDnD: SmoothDnDCreator & {
-    dropHandler?: any;
-    wrapChild?: boolean;
-};
+declare const smoothDnD: SmoothDnDCreator;
 export default smoothDnD;

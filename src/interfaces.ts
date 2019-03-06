@@ -26,7 +26,10 @@ export interface ScrolableInfo {
   dispose: Function;
 }
 
-export type SmoothDnDCreator = (element: HTMLElement, options: ContainerOptions) => SmoothDnD;
+export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
+  dropHandler?: any;
+  wrapChild?: boolean;
+};
 
 export interface SmoothDnD {
   dispose: () => void;

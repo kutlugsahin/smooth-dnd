@@ -209,7 +209,7 @@ function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   };
 }
 
-function getContainerProps(element: HTMLElement, initialOptions: ContainerOptions): ContainerProps {
+function getContainerProps(element: HTMLElement, initialOptions?: ContainerOptions): ContainerProps {
   const options = initOptions(initialOptions);
   const draggables = wrapChildren(element);
   // set flex classes before layout is inited for scroll listener
@@ -650,8 +650,8 @@ function compose(params: any) {
 }
 
 // Container definition begin
-function Container(element: HTMLElement): (options: ContainerOptions) => any {
-  return function(options: ContainerOptions) {
+function Container(element: HTMLElement): (options?: ContainerOptions) => any {
+  return function(options?: ContainerOptions) {
     let dragResult: DragResult | null = null;
     let lastDraggableInfo: DraggableInfo | null = null;
     const props = getContainerProps(element, options);
@@ -791,22 +791,21 @@ function Container(element: HTMLElement): (options: ContainerOptions) => any {
 // };
 
 // exported part of container
-const smoothDnD: SmoothDnDCreator & {
-  dropHandler?: any;
-  wrapChild?: boolean;
-} = function(element: ElementX, options: ContainerOptions): SmoothDnD {
+const smoothDnD: SmoothDnDCreator = function(element: HTMLElement, options?: ContainerOptions): SmoothDnD {
   const containerIniter = Container(element);
   const container = containerIniter(options);
-  element[containerInstance] = container;
+  (element as ElementX)[containerInstance] = container;
   Mediator.register(container);
   return {
     dispose() {
-      Mediator.unregister(container);
+      Mediator.unregister(container); 
       container.layout.dispose();
       container.dispose(container);
     },
   };
-};
+  };
+
+  HTMLDivElement
 
 // wrap all draggables by default 
 // in react,vue,angular this value will be set to false

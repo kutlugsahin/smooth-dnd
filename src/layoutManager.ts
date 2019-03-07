@@ -1,9 +1,12 @@
 import * as Utils from './utils';
 import { translationValue, visibilityValue, extraSizeForInsertion, containersInDraggable } from './constants';
+import { Orientation, ElementX, Rect, Dictionary, Position, IContainer } from './interfaces';
 
+export interface PropMap {
+	[key: string]: any;
+}
 
-
-const horizontalMap = {
+const horizontalMap: PropMap = {
 	size: 'offsetWidth',
 	distanceToParent: 'offsetLeft',
 	translate: 'transform',
@@ -16,11 +19,11 @@ const horizontalMap = {
 	scale: 'scaleX',
 	setSize: 'width',
 	setters: {
-		'translate': (val) => `translate3d(${val}px, 0, 0)`
+		'translate': (val: number) => `translate3d(${val}px, 0, 0)`
 	}
 };
 
-const verticalMap = {
+const verticalMap: PropMap = {
 	size: 'offsetHeight',
 	distanceToParent: 'offsetTop',
 	translate: 'transform',
@@ -33,34 +36,36 @@ const verticalMap = {
 	scale: 'scaleY',
 	setSize: 'height',
 	setters: {
-		'translate': (val) => `translate3d(0,${val}px, 0)`
+		'translate': (val: string) => `translate3d(0,${val}px, 0)`
 	}
 };
 
-function orientationDependentProps(map) {
-	function get(obj, prop) {
+function orientationDependentProps(map: PropMap) {
+	function get(obj: Dictionary, prop:string) {
 		const mappedProp = map[prop];
 		return obj[mappedProp || prop];
 	}
 
-	function set(obj, prop, value) {
-		requestAnimationFrame(() => {
-			obj[map[prop]] = map.setters[prop] ? map.setters[prop](value) : value;
-		});
-	}
+	function set(obj: Dictionary, prop: string, value: any) {
+        requestAnimationFrame(() => {
+            obj[map[prop]] = map.setters[prop] ? map.setters[prop](value) : value;
+        });
+    }
 
 	return { get, set };
 }
 
-export default function layoutManager(containerElement, orientation, _animationDuration) {
+
+
+export default function layoutManager(containerElement: ElementX, orientation: Orientation, _animationDuration: number) {
 	containerElement[extraSizeForInsertion] = 0;
 	const animationDuration = _animationDuration;
 	const map = orientation === 'horizontal' ? horizontalMap : verticalMap;
 	const propMapper = orientationDependentProps(map);
-	const values = {
+	const values: Dictionary = {
 		translation: 0
 	};
-	let registeredScrollListener = null;
+	let registeredScrollListener: Function | null = null;
 
 	global.addEventListener('resize', function() {
 		invalidateContainerRectangles(containerElement);
@@ -81,13 +86,13 @@ export default function layoutManager(containerElement, orientation, _animationD
 		invalidateContainerScale(containerElement);
 	}
 
-	let visibleRect;
-	function invalidateContainerRectangles(containerElement) {
+	let visibleRect: Rect;
+	function invalidateContainerRectangles(containerElement: ElementX) {
 		values.rect = Utils.getContainerRect(containerElement);
 		values.visibleRect = Utils.getVisibleRect(containerElement, values.rect);
 	}
 
-	function invalidateContainerScale(containerElement) {
+	function invalidateContainerScale(containerElement: ElementX) {
 		const rect = containerElement.getBoundingClientRect();
 		values.scaleX = containerElement.offsetWidth ? ((rect.right - rect.left) / containerElement.offsetWidth) : 1;
 		values.scaleY = containerElement.offsetHeight ? ((rect.bottom - rect.top) / containerElement.offsetHeight) : 1;
@@ -100,7 +105,7 @@ export default function layoutManager(containerElement, orientation, _animationD
 		};
 	}
 
-	function getBeginEndOfDOMRect(rect) {
+	function getBeginEndOfDOMRect(rect: Rect) {
 		return {
 			begin: propMapper.get(rect, 'begin'),
 			end: propMapper.get(rect, 'end')
@@ -123,16 +128,16 @@ export default function layoutManager(containerElement, orientation, _animationD
 		return { scaleX: values.scaleX, scaleY: values.scaleY };
 	}
 
-	function getSize(element) {
+	function getSize(element: HTMLElement) {
 		return propMapper.get(element, 'size') * propMapper.get(values, 'scale');
 	}
 
-	function getDistanceToOffsetParent(element) {
+	function getDistanceToOffsetParent(element: ElementX) {
 		const distance = propMapper.get(element, 'distanceToParent') + (element[translationValue] || 0);
 		return distance * propMapper.get(values, 'scale');
 	}
 
-	function getBeginEnd(element) {
+	function getBeginEnd(element: HTMLElement) {
 		const begin = getDistanceToOffsetParent(element) + (propMapper.get(values.rect, 'begin') + values.translation) - propMapper.get(containerElement, 'scrollValue');
 		return {
 			begin,
@@ -140,15 +145,15 @@ export default function layoutManager(containerElement, orientation, _animationD
 		};
 	}
 
-	function setSize(element, size) {
+	function setSize(element: HTMLElement | CSSStyleDeclaration, size: string) {
 		propMapper.set(element, 'setSize', size);
 	}
 
-	function getAxisValue(position) {
+	function getAxisValue(position: Position) {
 		return propMapper.get(position, 'dragPosition');
 	}
 
-	function updateDescendantContainerRects(container) {
+	function updateDescendantContainerRects(container: IContainer) {
 		container.layout.invalidateRects();
 		container.onTranslated();
 		if (container.getChildContainers()) {
@@ -156,7 +161,7 @@ export default function layoutManager(containerElement, orientation, _animationD
 		}
 	}
 
-	function setTranslation(element, translation) {
+	function setTranslation(element: ElementX, translation: number) {
 		if (!translation) {
 			element.style.removeProperty('transform');
 		} else {
@@ -166,18 +171,18 @@ export default function layoutManager(containerElement, orientation, _animationD
 
 		if (element[containersInDraggable]) {
 			setTimeout(() => {
-				element[containersInDraggable].forEach(p => {
+				element[containersInDraggable].forEach((p: IContainer) => {
 					updateDescendantContainerRects(p);
 				});
 			}, animationDuration + 20);
 		}
 	}
 
-	function getTranslation(element) {
+	function getTranslation(element: ElementX) {
 		return element[translationValue];
 	}
 
-	function setVisibility(element, isVisible) {
+	function setVisibility(element: ElementX, isVisible: boolean) {
 		if (element[visibilityValue] === undefined || element[visibilityValue] !== isVisible) {
 			if (isVisible) {
 				element.style.removeProperty('visibility');
@@ -188,11 +193,11 @@ export default function layoutManager(containerElement, orientation, _animationD
 		}
 	}
 
-	function isVisible(element) {
+	function isVisible(element: ElementX) {
 		return element[visibilityValue] === undefined || element[visibilityValue];
 	}
 
-	function isInVisibleRect(x, y) {
+	function isInVisibleRect(x: number, y: number) {
 		let { left, top, right, bottom } = values.visibleRect;
 
 		// if there is no wrapper in rect size will be 0 and wont accept any drop
@@ -208,11 +213,11 @@ export default function layoutManager(containerElement, orientation, _animationD
 		}
 	}
 
-	function setScrollListener(callback) {
+	function setScrollListener(callback: Function) {
 		registeredScrollListener = callback;
 	}
 
-	function getTopLeftOfElementBegin(begin) {
+	function getTopLeftOfElementBegin(begin: number) {
 		let top = 0;
 		let left = 0;
 		if (orientation === 'horizontal') {
@@ -228,15 +233,15 @@ export default function layoutManager(containerElement, orientation, _animationD
 		};
 	}
 
-	function getScrollSize(element) {
+	function getScrollSize(element: HTMLElement) {
 		return propMapper.get(element, 'scrollSize');
 	}
 
-	function getScrollValue(element) {
+	function getScrollValue(element: HTMLElement) {
 		return propMapper.get(element, 'scrollValue');
 	}
 
-	function setScrollValue(element, val) {
+	function setScrollValue(element:HTMLElement, val: number) {
 		return propMapper.set(element, 'scrollValue', val);
 	}
 
@@ -245,13 +250,13 @@ export default function layoutManager(containerElement, orientation, _animationD
 			scrollListener.dispose();
 		}
 
-		if (visibleRect) {
-			visibleRect.parentNode.removeChild(visibleRect);
-			visibleRect = null;
-		}
+		// if (visibleRect) {
+		// 	visibleRect.parentNode.removeChild(visibleRect);
+		// 	visibleRect = null;
+		// }
 	}
 
-	function getPosition(position) {
+	function getPosition(position: Position) {
 		return isInVisibleRect(position.x, position.y) ? getAxisValue(position) : null;
 	}
 

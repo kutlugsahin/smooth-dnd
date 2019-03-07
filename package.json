@@ -1,11 +1,17 @@
 {
   "name": "smooth-dnd",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Drag and Drop library",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "webpack --mode production"
+    "bundle": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "tsc": "tsc --emitDeclarationOnly --outDir dist",
+    "build": "npm run tsc && npm run bundle"
   },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "sortable",
     "drag and drop",
@@ -25,10 +31,13 @@
     "url": "https://github.com/kutlugsahin/smooth-dnd.git"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.6.1",
-    "webpack": "4.19.1",
-    "webpack-cli": "^2.0.13"
+    "@babel/core": "7.3.4",
+    "@babel/preset-env": "7.3.4",
+    "@babel/preset-typescript": "7.3.3",
+    "rollup": "1.4.0",
+    "rollup-plugin-babel": "4.3.2",
+    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-uglify": "6.0.2",
+    "typescript": "3.3.3333"
   }
 }

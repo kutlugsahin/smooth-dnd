@@ -1,15 +1,16 @@
-import { isScrolling, getScrollingAxis, getVisibleRect, debounce } from './utils';
+import { getScrollingAxis, getVisibleRect } from './utils';
+import { Axis, ScrolableInfo, Position, IContainer, DraggableInfo } from './interfaces';
 
 const maxSpeed = 1500; // px/s
 const minSpeed = 20; // px/s
 
-function addScrollValue(element, axis, value) {
+function addScrollValue(element: HTMLElement | Window, axis: Axis, value: number) {
 	if (element) {
 		if (element !== window) {
 			if (axis === 'x') {
-				element.scrollLeft += value;
+				(element as HTMLElement).scrollLeft += value;
 			} else {
-				element.scrollTop += value;
+				(element as HTMLElement).scrollTop += value;
 			}
 		} else {
 			if (axis === 'x') {
@@ -21,21 +22,21 @@ function addScrollValue(element, axis, value) {
 	}
 }
 
-const createAnimator = (element, axis = 'y') => {
+const createAnimator = (element: HTMLElement, axis: Axis = 'y') => {
 	let isAnimating = false;
-	let request = null;
-	let startTime = null;
-	let direction = null;
-	let speed = null;
+	let request: number | null = null;
+	let startTime: number | null = null;
+	let direction: 'begin' | 'end' | null = null;
+	let speed: number | null = null;
 
-	function animate(_direction, _speed) {
-		direction = _direction;
-		speed = _speed;
-		isAnimating = true;
-		if (isAnimating) {
-			start();
-		}
-	}
+	function animate(_direction: 'begin' | 'end', _speed: number) {
+    direction = _direction;
+    speed = _speed;
+    isAnimating = true;
+    if (isAnimating) {
+      start();
+    }
+  }
 
 	function start() {
 		if (request === null) {
@@ -43,7 +44,7 @@ const createAnimator = (element, axis = 'y') => {
 				if (startTime === null) { startTime = timestamp; }
 				const timeDiff = timestamp - startTime;
 				startTime = timestamp;
-				let distanceDiff = (timeDiff / 1000) * speed;
+				let distanceDiff = (timeDiff / 1000) * speed!;
 				distanceDiff = direction === 'begin' ? (0 - distanceDiff) : distanceDiff;
 				addScrollValue(element, axis, distanceDiff);
 				request = null;
@@ -54,7 +55,7 @@ const createAnimator = (element, axis = 'y') => {
 
 	function stop() {
 		if (isAnimating) {
-			cancelAnimationFrame(request);
+			cancelAnimationFrame(request!);
 			isAnimating = false;
 			startTime = null;
 			request = null;
@@ -67,7 +68,10 @@ const createAnimator = (element, axis = 'y') => {
 	};
 }
 
-function getAutoScrollInfo(position, scrollableInfo) {
+function getAutoScrollInfo(position: Position, scrollableInfo: ScrolableInfo): {
+	direction: 'begin' | 'end',
+	speedFactor: number;
+} | null {
 	const { left, right, top, bottom } = scrollableInfo.rect;
 	const { x, y } = position;
 	if (x < left || x > right || y < top || y > bottom) {
@@ -100,37 +104,39 @@ function getAutoScrollInfo(position, scrollableInfo) {
 			speedFactor: (moveDistance - (pos - begin)) / moveDistance
 		};
 	}
+
+	return null;
 }
 
-function scrollableInfo(element) {
-	var result = {
-		element,
-		rect: getVisibleRect(element, element.getBoundingClientRect()),
-		descendants: [],
-		invalidate,
-		axis: null,
-		dispose
-	};
+function scrollableInfo(element: HTMLElement): ScrolableInfo {
+  var result: ScrolableInfo = {
+    element,
+    rect: getVisibleRect(element, element.getBoundingClientRect()),
+    descendants: [],
+    invalidate,
+    axis: 'y',
+    dispose,
+  };
 
-	function dispose() {
-		element.removeEventListener('scroll', invalidate);
-	}
+  function dispose() {
+    element.removeEventListener('scroll', invalidate);
+  }
 
-	function invalidate() {
-		result.rect = getVisibleRect(element, element.getBoundingClientRect());
-		result.descendants.forEach(p => p.invalidate());
-	}
+  function invalidate() {
+    result.rect = getVisibleRect(element, element.getBoundingClientRect());
+    result.descendants.forEach(p => p.invalidate());
+  }
 
-	element.addEventListener('scroll', invalidate);
+  element.addEventListener('scroll', invalidate);
 
-	return result;
+  return result;
 }
 
-function getScrollableElements(containerElements) {
-	const scrollables = [];
+function getScrollableElements(containerElements: HTMLElement[]) {
+	const scrollables: ScrolableInfo[] = [];
 	let firstDescendentScrollable = null;
 	containerElements.forEach(el => {
-		let current = el;
+		let current: HTMLElement | null = el;
 		firstDescendentScrollable = null;
 		while (current) {
 			const scrollingAxis = getScrollingAxis(current);
@@ -155,7 +161,7 @@ function getScrollableElements(containerElements) {
 	return scrollables;
 }
 
-function getScrollableAnimator(scrollableInfo) {
+function getScrollableAnimator(scrollableInfo: ScrolableInfo) {
 	return Object.assign(scrollableInfo, createAnimator(scrollableInfo.element, scrollableInfo.axis));
 }
 
@@ -172,19 +178,19 @@ function getWindowAnimators() {
 	]
 }
 
-export default (containers) => {
+export default (containers: IContainer[]) => {
 	const scrollablesInfo = getScrollableElements(containers.map(p => p.element));
 	const animators = [...scrollablesInfo.map(getScrollableAnimator), ...getWindowAnimators()];
-	return ({ draggableInfo, reset }) => {
+	return ({ draggableInfo, reset }: { draggableInfo?: DraggableInfo; reset?: boolean}) => {
 		if (animators.length) {
 			if (reset) {
 				animators.forEach(p => p.stop());
 				scrollablesInfo.forEach(p => p.dispose());
-				return null;
+				return;
 			}
 
 			animators.forEach(animator => {
-				const scrollParams = getAutoScrollInfo(draggableInfo.mousePosition, animator);
+				const scrollParams = getAutoScrollInfo(draggableInfo!.mousePosition, animator as any as ScrolableInfo);
 				if (scrollParams) {
 					animator.animate(scrollParams.direction, scrollParams.speedFactor * maxSpeed);
 				} else {
@@ -193,5 +199,4 @@ export default (containers) => {
 			});
 		}
 	}
-	return null;
 }

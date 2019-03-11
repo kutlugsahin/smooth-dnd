@@ -460,13 +460,32 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
   }
 }
 
+function registerContainer(container: IContainer) {
+  containers.push(container);
+
+  if (isDragging && draggableInfo) {
+    if (container.isDragRelevant(draggableInfo.container, draggableInfo.payload)) {
+      dragListeningContainers.push(container);
+      container.prepareDrag(container, dragListeningContainers);
+
+      if (handleScroll) {
+        handleScroll({ reset: true, draggableInfo: undefined! });
+      }
+      handleScroll = getScrollHandler(container, dragListeningContainers);
+      dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
+
+      container.handleDrag(draggableInfo);
+    }
+  }
+}
+
 function Mediator() {
   listenEvents();
   return {
-    register: function(container: IContainer) {
-      containers.push(container);
+    register: function (container: IContainer) {
+      registerContainer(container);
     },
-    unregister: function(container: IContainer) {
+    unregister: function (container: IContainer) {
       containers.splice(containers.indexOf(container), 1);
     },
   };

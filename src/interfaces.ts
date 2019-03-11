@@ -125,6 +125,7 @@ export interface IContainer {
   onTranslated: () => void;
   getOptions: () => ContainerOptions;
   setDraggables: () => void;
+  fireRemoveElement: () => void;
 }
 
 export interface GhostInfo {

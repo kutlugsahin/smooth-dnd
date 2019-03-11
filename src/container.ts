@@ -745,6 +745,9 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
         parentContainer = null;
         childContainers = [];
       },
+      fireRemoveElement() {        
+        dropHandler(lastDraggableInfo!, dragResult!)
+      },
       getDragResult() {
         return dragResult;
       },

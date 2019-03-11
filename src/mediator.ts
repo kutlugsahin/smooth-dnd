@@ -478,6 +478,27 @@ function registerContainer(container: IContainer) {
   }
 }
 
+function unregisterContainer(container: IContainer) {
+  containers.splice(containers.indexOf(container), 1);
+
+  if (isDragging && draggableInfo) {
+    if (draggableInfo.container === container) {
+      container.fireRemoveElement();
+    }
+
+    if (draggableInfo.targetElement === container.element) {
+      draggableInfo.targetElement = null;
+    }
+
+    dragListeningContainers.splice(containers.indexOf(container), 1);
+    if (handleScroll) {
+      handleScroll({ reset: true, draggableInfo: undefined! });
+    }
+    handleScroll = getScrollHandler(container, dragListeningContainers);
+    handleDrag = dragHandler(dragListeningContainers);
+  }
+}
+
 function Mediator() {
   listenEvents();
   return {
@@ -485,7 +506,7 @@ function Mediator() {
       registerContainer(container);
     },
     unregister: function (container: IContainer) {
-      containers.splice(containers.indexOf(container), 1);
+      unregisterContainer(container);
     },
   };
 }

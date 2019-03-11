@@ -472,8 +472,7 @@ function registerContainer(container: IContainer) {
         handleScroll({ reset: true, draggableInfo: undefined! });
       }
       handleScroll = getScrollHandler(container, dragListeningContainers);
-      dragListeningContainers.forEach(p => p.prepareDrag(p, dragListeningContainers));
-
+      handleDrag = dragHandler(dragListeningContainers);
       container.handleDrag(draggableInfo);
     }
   }

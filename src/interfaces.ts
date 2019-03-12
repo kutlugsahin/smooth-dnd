@@ -9,6 +9,8 @@ export interface Rect {
   bottom: number;
 }
 
+export type OffsetSize = { offsetWidth: number; offsetHeight: number }
+
 export type Axis = 'x' | 'y';
 export type Boundary = { begin: number; end: number };
 export type TopLeft = { top: number; left: number };
@@ -19,11 +21,9 @@ export type ElementX = HTMLElement & Dictionary;
 
 export interface ScrolableInfo {
   element: HTMLElement;
-  rect: Rect;
+  getRect: () => Rect;
   descendants: ScrolableInfo[];
-  invalidate: () => void;
   axis: Axis;
-  dispose: Function;
 }
 
 export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
@@ -39,7 +39,7 @@ export interface DropResult {
   removedIndex: number | null;
   addedIndex: number | null;
   payload?: any;
-  element: HTMLElement;
+  element?: HTMLElement;
 }
 
 export interface DragResult {
@@ -56,7 +56,8 @@ export interface DraggableInfo {
   invalidateShadow: boolean | null;
   targetElement: HTMLElement | null;
   payload?: any;
-  element: HTMLElement;
+  element?: HTMLElement;
+  size: OffsetSize;
   container: IContainer;
   elementIndex: number;
   position: Position;

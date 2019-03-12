@@ -24,7 +24,7 @@ import {
   SmoothDnDCreator,
 } from './interfaces';
 
-const defaultOptions: ContainerOptions = {
+export const defaultOptions: ContainerOptions = {
   groupName: undefined,
   behaviour: 'move', // move | copy
   orientation: 'vertical', // vertical | horizontal
@@ -54,7 +54,7 @@ function initOptions(props = defaultOptions): ContainerOptions {
 }
 
 function isDragRelevant({ element, options }: ContainerProps) {
-  return function(sourceContainer: IContainer, payload: any) {
+  return function (sourceContainer: IContainer, payload: any) {
     if (options.shouldAcceptDrop) {
       return options.shouldAcceptDrop(sourceContainer.getOptions(), payload);
     }
@@ -164,7 +164,7 @@ function findDraggebleAtPos({ layout }: { layout: ReturnType<typeof layoutManage
 }
 
 function resetDraggables({ element, draggables, layout }: ContainerProps) {
-  return function() {
+  return function () {
     draggables.forEach((p: ElementX) => {
       setAnimation(p, false);
       layout.setTranslation(p, 0);
@@ -192,7 +192,7 @@ function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, 
 function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   const draggablesReset = resetDraggables({ element, draggables, layout, options });
   const dropHandler = (smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, options });
-  return function(draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
+  return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
     if (draggableInfo.targetElement || options.removeOnDropOut) {
@@ -202,7 +202,7 @@ function handleDrop({ element, draggables, layout, options }: ContainerProps) {
         removedIndex,
         addedIndex: actualAddIndex,
         payload: draggableInfo.payload,
-        droppedElement: draggableInfo.element.firstElementChild,
+        // droppedElement: draggableInfo.element.firstElementChild,
       };
       dropHandler(dropHandlerParams, options.onDrop);
     }
@@ -295,7 +295,7 @@ function getElementSize({ layout }: ContainerProps) {
     if (dragResult.pos === null) {
       return (elementSize = null);
     } else {
-      elementSize = elementSize || layout.getSize(draggableInfo.element);
+      elementSize = elementSize || layout.getSize(draggableInfo.size);
     }
     return { elementSize };
   };
@@ -391,7 +391,7 @@ function resetShadowAdjustment() {
 
 function handleInsertionSizeChange({ element, draggables, layout, options }: ContainerProps) {
   let strectherElement: HTMLElement | null = null;
-  return function({ dragResult: { addedIndex, removedIndex, elementSize } }: DragInfo) {
+  return function ({ dragResult: { addedIndex, removedIndex, elementSize } }: DragInfo) {
     if (removedIndex === null) {
       if (addedIndex !== null) {
         if (!strectherElement) {
@@ -438,7 +438,7 @@ function handleInsertionSizeChange({ element, draggables, layout, options }: Con
 function calculateTranslations({ draggables, layout }: ContainerProps) {
   let prevAddedIndex: number | null = null;
   let prevRemovedIndex: number | null = null;
-  return function({ dragResult: { addedIndex, removedIndex, elementSize } }: { dragResult: DragResult }) {
+  return function ({ dragResult: { addedIndex, removedIndex, elementSize } }: { dragResult: DragResult }) {
     if (addedIndex !== prevAddedIndex || removedIndex !== prevRemovedIndex) {
       for (let index = 0; index < draggables.length; index++) {
         if (index !== removedIndex) {
@@ -584,7 +584,7 @@ function fireOnDropReady({ options }: ContainerProps) {
         addedIndex: adjustedAddedIndex,
         removedIndex,
         payload,
-        element: element.firstElementChild as HTMLElement,
+        element: element ? element.firstElementChild as HTMLElement : undefined,
       });
     }
   };
@@ -651,7 +651,7 @@ function compose(params: any) {
 
 // Container definition begin
 function Container(element: HTMLElement): (options?: ContainerOptions) => any {
-  return function(options?: ContainerOptions) {
+  return function (options?: ContainerOptions) {
     let dragResult: DragResult | null = null;
     let lastDraggableInfo: DraggableInfo | null = null;
     const props = getContainerProps(element, options);
@@ -700,7 +700,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       draggables.forEach(p => setAnimation(p, true, options.animationDuration));
     }
 
-    props.layout.setScrollListener(function() {
+    props.layout.setScrollListener(function () {
       processLastDraggableInfo();
     });
 
@@ -745,8 +745,8 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
         parentContainer = null;
         childContainers = [];
       },
-      fireRemoveElement() {        
-        dropHandler(lastDraggableInfo!, dragResult!)
+      fireRemoveElement() {
+        dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { removedIndex: null }));
       },
       getDragResult() {
         return dragResult;
@@ -794,21 +794,21 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
 // };
 
 // exported part of container
-const smoothDnD: SmoothDnDCreator = function(element: HTMLElement, options?: ContainerOptions): SmoothDnD {
+const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: ContainerOptions): SmoothDnD {
   const containerIniter = Container(element);
   const container = containerIniter(options);
   (element as ElementX)[containerInstance] = container;
   Mediator.register(container);
   return {
     dispose() {
-      Mediator.unregister(container); 
+      Mediator.unregister(container);
       container.layout.dispose();
       container.dispose(container);
     },
   };
-  };
+};
 
-  HTMLDivElement
+HTMLDivElement
 
 // wrap all draggables by default 
 // in react,vue,angular this value will be set to false

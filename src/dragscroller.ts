@@ -72,7 +72,7 @@ function getAutoScrollInfo(position: Position, scrollableInfo: ScrolableInfo): {
 	direction: 'begin' | 'end',
 	speedFactor: number;
 } | null {
-	const { left, right, top, bottom } = scrollableInfo.rect;
+	const { left, right, top, bottom } = scrollableInfo.getRect();
 	const { x, y } = position;
 	if (x < left || x > right || y < top || y > bottom) {
 		return null;
@@ -108,50 +108,38 @@ function getAutoScrollInfo(position: Position, scrollableInfo: ScrolableInfo): {
 	return null;
 }
 
-function scrollableInfo(element: HTMLElement): ScrolableInfo {
+function scrollableInfo(element: HTMLElement, container: IContainer): ScrolableInfo {
   var result: ScrolableInfo = {
     element,
-    rect: getVisibleRect(element, element.getBoundingClientRect()),
+    getRect: () => container.layout.getContainerRectangles().visibleRect,
     descendants: [],
-    invalidate,
     axis: 'y',
-    dispose,
   };
-
-  function dispose() {
-    element.removeEventListener('scroll', invalidate);
-  }
-
-  function invalidate() {
-    result.rect = getVisibleRect(element, element.getBoundingClientRect());
-    result.descendants.forEach(p => p.invalidate());
-  }
-
-  element.addEventListener('scroll', invalidate);
 
   return result;
 }
 
-function getScrollableElements(containerElements: HTMLElement[]) {
+function getScrollableElements(containers: IContainer[]) {
 	const scrollables: ScrolableInfo[] = [];
 	let firstDescendentScrollable = null;
-	containerElements.forEach(el => {
+	containers.forEach((container: IContainer) => {
+		const el = container.element;
 		let current: HTMLElement | null = el;
 		firstDescendentScrollable = null;
 		while (current) {
 			const scrollingAxis = getScrollingAxis(current);
 			if (scrollingAxis) {
 				if (!scrollables.some(p => p.element === current)) {
-					const info = scrollableInfo(current);
+					const info = scrollableInfo(current, container);
 					if (firstDescendentScrollable) {
 						info.descendants.push(firstDescendentScrollable);
 					}
 					firstDescendentScrollable = info;
 					if (scrollingAxis === 'xy') {
-						scrollables.push(Object.assign({}, info, { axis: 'x' }));
-						scrollables.push(Object.assign({}, info, { axis: 'y' }, { descendants: [] }));
+						scrollables.push(Object.assign(info, { axis: 'x' }));
+						scrollables.push(Object.assign(info, { axis: 'y' }, { descendants: [] }));
 					} else {
-						scrollables.push(Object.assign({}, info, { axis: scrollingAxis }));
+						scrollables.push(Object.assign(info, { axis: scrollingAxis }));
 					}
 				}
 			}
@@ -173,19 +161,18 @@ function getWindowAnimators() {
 	}
 
 	return [
-		Object.assign({ rect: getWindowRect(), axis: 'y' }, createAnimator(global)),
-		Object.assign({ rect: getWindowRect(), axis: 'x' }, createAnimator(global, 'x'))
+		Object.assign({ getRect: getWindowRect, axis: 'y' }, createAnimator(global)),
+		Object.assign({ getRect: getWindowRect, axis: 'x' }, createAnimator(global, 'x'))
 	]
 }
 
 export default (containers: IContainer[]) => {
-	const scrollablesInfo = getScrollableElements(containers.map(p => p.element));
+	const scrollablesInfo = getScrollableElements(containers);
 	const animators = [...scrollablesInfo.map(getScrollableAnimator), ...getWindowAnimators()];
 	return ({ draggableInfo, reset }: { draggableInfo?: DraggableInfo; reset?: boolean}) => {
 		if (animators.length) {
 			if (reset) {
 				animators.forEach(p => p.stop());
-				scrollablesInfo.forEach(p => p.dispose());
 				return;
 			}
 

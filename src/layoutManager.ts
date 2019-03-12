@@ -1,6 +1,6 @@
 import * as Utils from './utils';
 import { translationValue, visibilityValue, extraSizeForInsertion, containersInDraggable } from './constants';
-import { Orientation, ElementX, Rect, Dictionary, Position, IContainer } from './interfaces';
+import { Orientation, ElementX, Rect, Dictionary, Position, IContainer, OffsetSize } from './interfaces';
 
 export interface PropMap {
 	[key: string]: any;
@@ -128,7 +128,7 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return { scaleX: values.scaleX, scaleY: values.scaleY };
 	}
 
-	function getSize(element: HTMLElement) {
+	function getSize(element: HTMLElement | OffsetSize) {
 		return propMapper.get(element, 'size') * propMapper.get(values, 'scale');
 	}
 

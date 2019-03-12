@@ -163,6 +163,16 @@ function handleDropAnimation(callback: Function) {
       : true;
   }
 
+  function disappearAnimation(duration: number, clb: Function) {
+    Utils.addClass(ghostInfo.ghost, 'animated');
+    ghostInfo.ghost.style.transitionDuration = duration + 'ms';
+    ghostInfo.ghost.style.opacity = '0';
+    ghostInfo.ghost.style.transform = 'scale(0.90)';
+    setTimeout(function () {
+      clb();
+    }, duration);
+  }
+
   if (draggableInfo.targetElement) {
     const container = containers.filter(p => p.element === draggableInfo.targetElement)[0];
     if (shouldAnimateDrop(container.getOptions())) {
@@ -202,22 +212,11 @@ function handleDropAnimation(callback: Function) {
           container.getOptions().dropClass
         );
       } else {
-        Utils.addClass(ghostInfo.ghost, 'animated');
-        ghostInfo.ghost.style.transitionDuration = container.getOptions().animationDuration + 'ms';
-        ghostInfo.ghost.style.opacity = '0';
-        ghostInfo.ghost.style.transform = 'scale(0.90)';
-        setTimeout(function () {
-          endDrop();
-        }, container.getOptions().animationDuration);
+        disappearAnimation(container.getOptions().animationDuration!, endDrop);
       }
     } else {
-      Utils.addClass(ghostInfo.ghost, 'animated');
-      ghostInfo.ghost.style.transitionDuration = defaultOptions.animationDuration! + 'ms';
-      ghostInfo.ghost.style.opacity = '0';
-      ghostInfo.ghost.style.transform = 'scale(0.90)';
-      setTimeout(function () {
-        endDrop();
-      }, defaultOptions.animationDuration);
+      // container is disposed due to removal
+      disappearAnimation(defaultOptions.animationDuration!, endDrop);
     }
   }
 }

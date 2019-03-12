@@ -746,7 +746,8 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
         childContainers = [];
       },
       fireRemoveElement() {
-        dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { removedIndex: null }));
+        // will be called when container is disposed while dragging so ignore addedIndex
+        dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { addedIndex: null }));
       },
       getDragResult() {
         return dragResult;

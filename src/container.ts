@@ -192,10 +192,10 @@ function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, 
 function handleDrop({ element, draggables, layout, options }: ContainerProps) {
   const draggablesReset = resetDraggables({ element, draggables, layout, options });
   const dropHandler = (smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, options });
-  return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult) {
+  return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult, forDispose: boolean = false) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
-    if (draggableInfo.targetElement || options.removeOnDropOut) {
+    if (draggableInfo.targetElement || options.removeOnDropOut || forDispose) {
       let actualAddIndex =
         addedIndex !== null ? (removedIndex !== null && removedIndex < addedIndex ? addedIndex - 1 : addedIndex) : null;
       const dropHandlerParams = {
@@ -747,7 +747,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       },
       fireRemoveElement() {
         // will be called when container is disposed while dragging so ignore addedIndex
-        dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { addedIndex: null }));
+        dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { addedIndex: null }), true);
       },
       getDragResult() {
         return dragResult;

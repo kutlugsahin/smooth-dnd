@@ -110,8 +110,9 @@ function getAutoScrollInfo(position: Position, scrollableInfo: ScrolableInfo): {
 
 function scrollableInfo(element: HTMLElement, container: IContainer): ScrolableInfo {
   var result: ScrolableInfo = {
-    element,
-    getRect: () => container.layout.getContainerRectangles().visibleRect,
+		element,
+		// TODO: improve perf of getRect by using a watcher for scrallable containers
+    getRect: () => getVisibleRect(element, element.getBoundingClientRect()),
     descendants: [],
     axis: 'y',
   };
@@ -121,25 +122,18 @@ function scrollableInfo(element: HTMLElement, container: IContainer): ScrolableI
 
 function getScrollableElements(containers: IContainer[]) {
 	const scrollables: ScrolableInfo[] = [];
-	let firstDescendentScrollable = null;
 	containers.forEach((container: IContainer) => {
-		const el = container.element;
-		let current: HTMLElement | null = el;
-		firstDescendentScrollable = null;
+		let current: HTMLElement | null = container.element;
 		while (current) {
 			const scrollingAxis = getScrollingAxis(current);
 			if (scrollingAxis) {
 				if (!scrollables.some(p => p.element === current)) {
-					const info = scrollableInfo(current, container);
-					if (firstDescendentScrollable) {
-						info.descendants.push(firstDescendentScrollable);
-					}
-					firstDescendentScrollable = info;
+					const info = scrollableInfo(current, container);				
 					if (scrollingAxis === 'xy') {
-						scrollables.push(Object.assign(info, { axis: 'x' }));
-						scrollables.push(Object.assign(info, { axis: 'y' }, { descendants: [] }));
+						scrollables.push(Object.assign({},info, { axis: 'x' }));
+						scrollables.push(Object.assign({},info, { axis: 'y' }));
 					} else {
-						scrollables.push(Object.assign(info, { axis: scrollingAxis }));
+						scrollables.push(Object.assign({},info, { axis: scrollingAxis }));
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 import Mediator from './mediator';
 import layoutManager from './layoutManager';
-import { hasClass, addClass, removeClass, getParent } from './utils';
+import { hasClass, addClass, removeClass, getParent, getParentContainerElement } from './utils';
 import { domDropHandler } from './dropHandlers';
 import {
   wrapperClass,
@@ -271,9 +271,29 @@ function setRemovedItemVisibilty({ draggables, layout }: ContainerProps) {
 
 function getPosition({ element, layout }: ContainerProps) {
   return ({ draggableInfo }: DragInfo) => {
+    const hitElement = document.elementFromPoint(draggableInfo.position.x, draggableInfo.position.y);
+
+    if (hitElement) {
+      const container: IContainer = getParentContainerElement(hitElement);
+      if (
+        container && // hit test inside any container
+        container.element !== element && // not this container
+        container.isDragRelevant(draggableInfo.container, draggableInfo.payload) // drag is relevant to that container
+      ) {
+        // than return null -> drag is captured by that container
+        return {
+          pos: null,
+        }
+      }
+    }
+
     return {
-      pos: !getContainer(element).isPosInChildContainer() ? layout.getPosition(draggableInfo.position) : null,
+      pos: layout.getPosition(draggableInfo.position),
     };
+
+    // return {
+    //   pos: !getContainer(element).isPosInChildContainer() ? layout.getPosition(draggableInfo.position) : null,
+    // };
   };
 }
 

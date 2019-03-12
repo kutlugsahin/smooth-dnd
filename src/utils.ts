@@ -1,4 +1,5 @@
-import { Rect, Axis } from './interfaces';
+import { Rect, Axis, ElementX } from './interfaces';
+import { containerInstance } from './constants';
 
 declare const global: any;
 
@@ -112,6 +113,19 @@ export const getVisibleRect = (element: HTMLElement, elementRect: Rect) => {
 
   return rect;
 };
+
+export const getParentContainerElement = (element: Element) => {
+  let current: ElementX = element as ElementX;
+
+  while (current) {
+    if ((current as ElementX)[containerInstance]) {
+      return current[containerInstance];
+    }
+    current = current.parentElement as ElementX;
+  }
+
+  return null;
+}
 
 export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
   let scrollers: HTMLElement[] = [];

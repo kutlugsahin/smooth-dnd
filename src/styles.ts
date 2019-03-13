@@ -46,11 +46,14 @@ const css = {
 	[`.${constants.ghostClass}.animated`]: {
 		'transition': 'all ease-in-out'
 	},
+	[`.${constants.ghostClass} *`]: {
+		'pointer-events': 'none'
+	},
 	[`.${constants.disbaleTouchActions} *`]: {
 		'touch-actions': 'none',
 		'-ms-touch-actions': 'none'
 	},
-	[`.${constants.noUserSelectClass} *`]: {
+	[`.${constants.noUserSelectClass}`]: {
 		'-webkit-touch-callout': 'none',
 		'-webkit-user-select': 'none',
 		'-khtml-user-select': 'none',

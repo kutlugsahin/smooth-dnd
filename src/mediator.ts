@@ -93,6 +93,7 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   ghost.style.transition = null!;
   ghost.style.removeProperty('transition');
   ghost.style.pointerEvents = 'none';
+  ghost.style.userSelect = 'none';
 
   if (container.getOptions().dragClass) {
     setTimeout(() => {
@@ -313,6 +314,19 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
       }
 
       if (startDrag) {
+        Utils.addClass(global.document.body, constants.disbaleTouchActions);
+        Utils.addClass(global.document.body, constants.noUserSelectClass);
+
+        const onMouseUp = () => {
+          Utils.removeClass(global.document.body, constants.disbaleTouchActions);
+          Utils.removeClass(global.document.body, constants.noUserSelectClass);
+          global.document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        global.document.addEventListener('mouseup', onMouseUp);
+      }
+
+      if (startDrag) {
         handleDragStartConditions(e, container.getOptions().dragBeginDelay!, () => {
           Utils.clearSelection();
           initiateDrag(e, Utils.getElementCursor(event.target as Element));
@@ -328,6 +342,7 @@ function onMouseUp() {
   removeMoveListeners();
   removeReleaseListeners();
   handleScroll({ reset: true });
+
   if (cursorStyleElement) {
     removeStyle(cursorStyleElement);
     cursorStyleElement = null;
@@ -335,8 +350,6 @@ function onMouseUp() {
   if (draggableInfo) {
     containerRectableWatcher.stop();
     handleDropAnimation(() => {
-      Utils.removeClass(global.document.body, constants.disbaleTouchActions);
-      Utils.removeClass(global.document.body, constants.noUserSelectClass);
       fireOnDragStartEnd(false);
       (dragListeningContainers || []).forEach(p => {
         p.handleDrop(draggableInfo);
@@ -430,9 +443,6 @@ function initiateDrag(position: MousePosition, cursor: string) {
       x: position.clientX,
       y: position.clientY,
     };
-
-    Utils.addClass(global.document.body, constants.disbaleTouchActions);
-    Utils.addClass(global.document.body, constants.noUserSelectClass);
 
     dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
     handleDrag = dragHandler(dragListeningContainers);

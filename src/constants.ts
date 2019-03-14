@@ -20,4 +20,4 @@ export const isDraggableDetached = 'smoth-dnd-is-draggable-detached';
 export const disbaleTouchActions = 'smooth-dnd-disable-touch-action';
 export const noUserSelectClass = 'smooth-dnd-no-user-select';
 
-export const preventSmoothDnDAutoScroll = 'smooth-dnd-prevent-auto-scroll';
+export const preventAutoScrollClass = 'smooth-dnd-prevent-auto-scroll-class';

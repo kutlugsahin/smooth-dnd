@@ -1,5 +1,6 @@
-import { getScrollingAxis, getVisibleRect } from './utils';
+import { getScrollingAxis, getVisibleRect, hasClass } from './utils';
 import { Axis, ScrolableInfo, Position, IContainer, DraggableInfo } from './interfaces';
+import { preventSmoothDnDAutoScroll } from './constants';
 
 const maxSpeed = 1500; // px/s
 const minSpeed = 20; // px/s
@@ -126,7 +127,7 @@ function getScrollableElements(containers: IContainer[]) {
 		let current: HTMLElement | null = container.element;
 		while (current) {
 			const scrollingAxis = getScrollingAxis(current);
-			if (scrollingAxis) {
+			if (scrollingAxis && !hasClass(current, preventSmoothDnDAutoScroll)) {
 				if (!scrollables.some(p => p.element === current)) {
 					const info = scrollableInfo(current, container);				
 					if (scrollingAxis === 'xy') {

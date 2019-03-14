@@ -136,7 +136,7 @@ export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
     global.removeEventListener('scroll', clb);
   };
 
-  setTimeout(function() {
+  setTimeout(function () {
     let currentElement = element;
     while (currentElement) {
       if (isScrolling(currentElement, 'x') || isScrolling(currentElement, 'y')) {
@@ -276,3 +276,18 @@ export const getElementCursor = (element: Element | null) => {
 
   return null;
 };
+
+
+export const getDistanceToParent = (parent: HTMLElement, child: HTMLElement): number | null => {
+  let current: Element | null = child;
+  let dist = 0;
+  while (current) {
+    if (current === parent) {
+      return dist;
+    }
+    dist++;
+    current = current.parentElement;
+  }
+
+  return null;
+}

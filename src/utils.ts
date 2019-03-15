@@ -1,4 +1,4 @@
-import { Rect, Axis, ElementX } from './interfaces';
+import { Rect, Axis, ElementX, ScrollAxis } from './interfaces';
 import { containerInstance } from './constants';
 
 declare const global: any;
@@ -52,17 +52,20 @@ export const getContainerRect = (element: HTMLElement): Rect => {
   return rect;
 };
 
-export const getScrollingAxis = (element: HTMLElement) => {
+export const getScrollingAxis = (element: HTMLElement): ScrollAxis | null => {
   const style = global.getComputedStyle(element);
   const overflow = style['overflow'];
   const general = overflow === 'auto' || overflow === 'scroll';
-  if (general) return 'xy';
+  if (general) return ScrollAxis.xy;
   const overFlowX = style[`overflow-x`];
   const xScroll = overFlowX === 'auto' || overFlowX === 'scroll';
   const overFlowY = style[`overflow-y`];
   const yScroll = overFlowY === 'auto' || overFlowY === 'scroll';
 
-  return `${xScroll ? 'x' : ''}${yScroll ? 'y' : ''}` || null;
+  if (xScroll && yScroll) return ScrollAxis.xy;
+  if (xScroll) return ScrollAxis.x;
+  if (yScroll) return ScrollAxis.y;
+  return null;
 };
 
 export const isScrolling = (element: HTMLElement, axis: Axis) => {

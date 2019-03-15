@@ -1,10 +1,10 @@
-import './polyfills';
-import * as Utils from './utils';
 import * as constants from './constants';
-import { addStyleToHead, addCursorStyleToBody, removeStyle } from './styles';
-import dragScroller from './dragscroller';
-import { DraggableInfo, IContainer, ElementX, Position, GhostInfo, TopLeft, ContainerOptions, MousePosition, Axis } from './interfaces';
-import { defaultOptions } from './container';
+import { defaultOptions } from './defaults';
+import dragScroller from './scroller';
+import { Axis, ContainerOptions, DraggableInfo, ElementX, GhostInfo, IContainer, MousePosition, Position, TopLeft } from './interfaces';
+import './polyfills';
+import { addCursorStyleToBody, addStyleToHead, removeStyle } from './styles';
+import * as Utils from './utils';
 
 const grabEvents = ['mousedown', 'touchstart'];
 const moveEvents = ['mousemove', 'touchmove'];

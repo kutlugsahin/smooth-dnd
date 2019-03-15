@@ -12,6 +12,11 @@ export interface Rect {
 export type OffsetSize = { offsetWidth: number; offsetHeight: number }
 
 export type Axis = 'x' | 'y';
+export enum ScrollAxis {
+  x = 'x',
+  y = 'y',
+  xy = 'xy'
+}
 export type Boundary = { begin: number; end: number };
 export type TopLeft = { top: number; left: number };
 

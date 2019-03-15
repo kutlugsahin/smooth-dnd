@@ -1,39 +1,12 @@
-import Mediator from './mediator';
-import layoutManager from './layoutManager';
-import { hasClass, addClass, removeClass, getParent, getParentContainerElement } from './utils';
+import { animationClass, containerClass, containerInstance, containersInDraggable, stretcherElementClass, stretcherElementInstance, translationValue, wrapperClass } from './constants';
+import { defaultOptions } from './defaults';
 import { domDropHandler } from './dropHandlers';
-import {
-  wrapperClass,
-  animationClass,
-  stretcherElementClass,
-  stretcherElementInstance,
-  translationValue,
-  containerClass,
-  containerInstance,
-  containersInDraggable,
-} from './constants';
-import {
-  SmoothDnD,
-  ContainerOptions,
-  ElementX,
-  IContainer,
-  DragInfo,
-  ContainerProps,
-  DraggableInfo,
-  DragResult,
-  SmoothDnDCreator,
-} from './interfaces';
+import { ContainerOptions, ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer, SmoothDnD, SmoothDnDCreator } from './interfaces';
+import layoutManager from './layoutManager';
+import Mediator from './mediator';
+import { addClass, getParent, getParentContainerElement, hasClass, removeClass } from './utils';
 
-export const defaultOptions: ContainerOptions = {
-  groupName: undefined,
-  behaviour: 'move', // move | copy
-  orientation: 'vertical', // vertical | horizontal
-  getChildPayload: undefined,
-  animationDuration: 250,
-  autoScrollEnabled: true,
-  shouldAcceptDrop: undefined,
-  shouldAnimateDrop: undefined,
-};
+
 
 function setAnimation(element: HTMLElement, add: boolean, animationDuration = defaultOptions.animationDuration) {
   if (add) {

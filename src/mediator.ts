@@ -191,27 +191,42 @@ function handleDropAnimation(callback: Function) {
     if (container) {
       const { behaviour, removeOnDropOut } = container.getOptions();
       if (behaviour === 'move' && !removeOnDropOut && container.getDragResult()) {
-        const { removedIndex, elementSize } = container.getDragResult()!;
-        const layout = container.layout;
-        // drag ghost to back
-        container.getTranslateCalculator({
-          dragResult: {
-            removedIndex,
-            addedIndex: removedIndex,
-            elementSize,
-            pos: undefined!,
-            shadowBeginEnd: undefined!,
-          },
-        });
-        const prevDraggableEnd =
-          removedIndex! > 0
-            ? layout.getBeginEnd(container.draggables[removedIndex! - 1]).end
-            : layout.getBeginEndOfContainer().begin;
-        animateGhostToPosition(
-          layout.getTopLeftOfElementBegin(prevDraggableEnd),
-          container.getOptions().animationDuration!,
-          container.getOptions().dropClass
-        );
+        const rectangles = container.layout.getContainerRectangles();
+
+        // container is hidden somehow
+        // move ghost back to last seen position
+        if (!Utils.isVisible(rectangles.visibleRect) && Utils.isVisible(rectangles.lastVisibleRect)) {
+          animateGhostToPosition(
+            {
+              top: rectangles.lastVisibleRect.top,
+              left: rectangles.lastVisibleRect.left
+            },
+            container.getOptions().animationDuration!,
+            container.getOptions().dropClass
+          );
+        } else {
+          const { removedIndex, elementSize } = container.getDragResult()!;
+          const layout = container.layout;
+          // drag ghost to back
+          container.getTranslateCalculator({
+            dragResult: {
+              removedIndex,
+              addedIndex: removedIndex,
+              elementSize,
+              pos: undefined!,
+              shadowBeginEnd: undefined!,
+            },
+          });
+          const prevDraggableEnd =
+            removedIndex! > 0
+              ? layout.getBeginEnd(container.draggables[removedIndex! - 1]).end
+              : layout.getBeginEndOfContainer().begin;
+          animateGhostToPosition(
+            layout.getTopLeftOfElementBegin(prevDraggableEnd),
+            container.getOptions().animationDuration!,
+            container.getOptions().dropClass
+          );
+        }
       } else {
         disappearAnimation(container.getOptions().animationDuration!, endDrop);
       }

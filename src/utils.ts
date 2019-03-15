@@ -294,3 +294,7 @@ export const getDistanceToParent = (parent: HTMLElement, child: HTMLElement): nu
 
   return null;
 }
+
+export function isVisible(rect: Rect): boolean{
+  return !(rect.bottom <= rect.top || rect.right <= rect.left);
+}

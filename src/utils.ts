@@ -1,4 +1,5 @@
-import { Rect, Axis } from './interfaces';
+import { Rect, Axis, ElementX, ScrollAxis } from './interfaces';
+import { containerInstance } from './constants';
 
 declare const global: any;
 
@@ -51,17 +52,20 @@ export const getContainerRect = (element: HTMLElement): Rect => {
   return rect;
 };
 
-export const getScrollingAxis = (element: HTMLElement) => {
+export const getScrollingAxis = (element: HTMLElement): ScrollAxis | null => {
   const style = global.getComputedStyle(element);
   const overflow = style['overflow'];
   const general = overflow === 'auto' || overflow === 'scroll';
-  if (general) return 'xy';
+  if (general) return ScrollAxis.xy;
   const overFlowX = style[`overflow-x`];
   const xScroll = overFlowX === 'auto' || overFlowX === 'scroll';
   const overFlowY = style[`overflow-y`];
   const yScroll = overFlowY === 'auto' || overFlowY === 'scroll';
 
-  return `${xScroll ? 'x' : ''}${yScroll ? 'y' : ''}` || null;
+  if (xScroll && yScroll) return ScrollAxis.xy;
+  if (xScroll) return ScrollAxis.x;
+  if (yScroll) return ScrollAxis.y;
+  return null;
 };
 
 export const isScrolling = (element: HTMLElement, axis: Axis) => {
@@ -113,6 +117,19 @@ export const getVisibleRect = (element: HTMLElement, elementRect: Rect) => {
   return rect;
 };
 
+export const getParentContainerElement = (element: Element) => {
+  let current: ElementX = element as ElementX;
+
+  while (current) {
+    if ((current as ElementX)[containerInstance]) {
+      return current[containerInstance];
+    }
+    current = current.parentElement as ElementX;
+  }
+
+  return null;
+}
+
 export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
   let scrollers: HTMLElement[] = [];
   const dispose = () => {
@@ -122,7 +139,7 @@ export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
     global.removeEventListener('scroll', clb);
   };
 
-  setTimeout(function() {
+  setTimeout(function () {
     let currentElement = element;
     while (currentElement) {
       if (isScrolling(currentElement, 'x') || isScrolling(currentElement, 'y')) {
@@ -262,3 +279,22 @@ export const getElementCursor = (element: Element | null) => {
 
   return null;
 };
+
+
+export const getDistanceToParent = (parent: HTMLElement, child: HTMLElement): number | null => {
+  let current: Element | null = child;
+  let dist = 0;
+  while (current) {
+    if (current === parent) {
+      return dist;
+    }
+    dist++;
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
+export function isVisible(rect: Rect): boolean{
+  return !(rect.bottom <= rect.top || rect.right <= rect.left);
+}

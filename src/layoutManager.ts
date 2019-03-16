@@ -1,6 +1,6 @@
 import * as Utils from './utils';
 import { translationValue, visibilityValue, extraSizeForInsertion, containersInDraggable } from './constants';
-import { Orientation, ElementX, Rect, Dictionary, Position, IContainer } from './interfaces';
+import { Orientation, ElementX, Rect, Dictionary, Position, IContainer, OffsetSize } from './interfaces';
 
 export interface PropMap {
 	[key: string]: any;
@@ -86,10 +86,14 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		invalidateContainerScale(containerElement);
 	}
 
-	let visibleRect: Rect;
 	function invalidateContainerRectangles(containerElement: ElementX) {
 		values.rect = Utils.getContainerRect(containerElement);
-		values.visibleRect = Utils.getVisibleRect(containerElement, values.rect);
+		const visibleRect = Utils.getVisibleRect(containerElement, values.rect);
+		if (Utils.isVisible(visibleRect)) {
+			values.lastVisibleRect = values.visibleRect;
+		}
+
+		values.visibleRect = visibleRect;
 	}
 
 	function invalidateContainerScale(containerElement: ElementX) {
@@ -101,7 +105,8 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 	function getContainerRectangles() {
 		return {
 			rect: values.rect,
-			visibleRect: values.visibleRect
+			visibleRect: values.visibleRect,
+			lastVisibleRect: values.lastVisibleRect
 		};
 	}
 
@@ -128,7 +133,7 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return { scaleX: values.scaleX, scaleY: values.scaleY };
 	}
 
-	function getSize(element: HTMLElement) {
+	function getSize(element: HTMLElement | OffsetSize) {
 		return propMapper.get(element, 'size') * propMapper.get(values, 'scale');
 	}
 

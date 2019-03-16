@@ -683,6 +683,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       fireRemoveElement() {
         // will be called when container is disposed while dragging so ignore addedIndex
         dropHandler(lastDraggableInfo!, Object.assign({}, dragResult!, { addedIndex: null }), true);
+        dragResult = null;
       },
       getDragResult() {
         return dragResult;
@@ -738,8 +739,6 @@ const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: Co
     },
   };
 };
-
-HTMLDivElement
 
 // wrap all draggables by default 
 // in react,vue,angular this value will be set to false

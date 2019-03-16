@@ -132,8 +132,10 @@ export const getParentContainerElement = (element: Element) => {
 
 export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
   let scrollers: HTMLElement[] = [];
-  
-  setTimeout(function () {
+
+  setScrollers();
+
+  function setScrollers() {
     let currentElement = element;
     while (currentElement) {
       if (isScrolling(currentElement, 'x') || isScrolling(currentElement, 'y')) {
@@ -141,21 +143,25 @@ export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
       }
       currentElement = currentElement.parentElement!;
     }
-  }, 10);
-  
+  }
+
   function dispose() {
     stop();
     scrollers = null!;
   };
 
   function start() {
-    scrollers.forEach(p => p.addEventListener('scroll', clb));
-    global.addEventListener('scroll', clb);
+    if (scrollers) {
+      scrollers.forEach(p => p.addEventListener('scroll', clb));
+      global.addEventListener('scroll', clb);
+    }
   }
 
   function stop() {
-    scrollers.forEach(p => p.removeEventListener('scroll', clb));
-    global.removeEventListener('scroll', clb);
+    if (scrollers) {
+      scrollers.forEach(p => p.removeEventListener('scroll', clb));
+      global.removeEventListener('scroll', clb);
+    }
   }
 
   return {
@@ -303,6 +309,6 @@ export const getDistanceToParent = (parent: HTMLElement, child: HTMLElement): nu
   return null;
 }
 
-export function isVisible(rect: Rect): boolean{
+export function isVisible(rect: Rect): boolean {
   return !(rect.bottom <= rect.top || rect.right <= rect.left);
 }

@@ -77,7 +77,6 @@ function getGhostParent() {
 }
 
 function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, container: IContainer, cursor: string): GhostInfo {
-  // const { scaleX = 1, scaleY = 1 } = container.getScale();
   const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
   const midX = left + (right - left) / 2;
   const midY = top + (bottom - top) / 2;

@@ -116,18 +116,12 @@ export interface IContainer {
   draggables: HTMLElement[];
   layout: ReturnType<typeof layoutManager>;
   isDragRelevant: (sourceContainer: IContainer, payload: any) => boolean;
-  getScale: () => { scaleX: number; scaleY: number };
-  getChildContainers: () => IContainer[];
-  onChildPositionCaptured: (isCaptured: boolean) => void;
   dispose: (container: IContainer) => void;
   prepareDrag: (container: IContainer, relevantContainer: IContainer[]) => void;
-  isPosInChildContainer: () => boolean;
   handleDrag: (draggableInfo: DraggableInfo) => DragResult | null;
   handleDrop: (draggableInfo: DraggableInfo) => void;
   getDragResult: () => DragResult | null;
   getTranslateCalculator: (info: { dragResult: DragResult }) => any;
-  setParentContainer: (container: IContainer) => void;
-  getParentContainer: () => IContainer | null;
   onTranslated: () => void;
   getOptions: () => ContainerOptions;
   setDraggables: () => void;

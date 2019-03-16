@@ -132,28 +132,36 @@ export const getParentContainerElement = (element: Element) => {
 
 export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
   let scrollers: HTMLElement[] = [];
-  const dispose = () => {
-    scrollers.forEach(p => {
-      p.removeEventListener('scroll', clb);
-    });
-    global.removeEventListener('scroll', clb);
-  };
-
+  
   setTimeout(function () {
     let currentElement = element;
     while (currentElement) {
       if (isScrolling(currentElement, 'x') || isScrolling(currentElement, 'y')) {
-        currentElement.addEventListener('scroll', clb);
         scrollers.push(currentElement);
       }
       currentElement = currentElement.parentElement!;
     }
-
-    global.addEventListener('scroll', clb);
   }, 10);
+  
+  function dispose() {
+    stop();
+    scrollers = null!;
+  };
+
+  function start() {
+    scrollers.forEach(p => p.addEventListener('scroll', clb));
+    global.addEventListener('scroll', clb);
+  }
+
+  function stop() {
+    scrollers.forEach(p => p.removeEventListener('scroll', clb));
+    global.removeEventListener('scroll', clb);
+  }
 
   return {
     dispose,
+    start,
+    stop
   };
 };
 

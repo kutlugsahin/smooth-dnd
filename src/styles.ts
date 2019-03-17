@@ -21,9 +21,12 @@ const stretcherElementHorizontalClass = {
 const css = {
 	[`.${constants.containerClass}`]: {
 		'position': 'relative',
+		'min-height': '30px',
+		'min-width': '30px'
 	},
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
+		'overflow-x': 'auto',
 	},
 	[`.${constants.containerClass}.horizontal > .${constants.stretcherElementClass}`]: stretcherElementHorizontalClass,
 	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,

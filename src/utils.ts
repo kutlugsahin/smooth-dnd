@@ -34,7 +34,7 @@ export const getContainerRect = (element: HTMLElement): Rect => {
   const _rect = element.getBoundingClientRect();
   const rect = {
     left: _rect.left,
-    right: _rect.right + 10,
+    right: _rect.right,
     top: _rect.top,
     bottom: _rect.bottom,
   };

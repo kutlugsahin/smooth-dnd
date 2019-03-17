@@ -22,9 +22,6 @@ const css = {
 	[`.${constants.containerClass}`]: {
 		'position': 'relative',
 	},
-	[`.${constants.containerClass} *`]: {
-		'box-sizing': 'border-box',
-	},
 	[`.${constants.containerClass}.horizontal`]: {
 		'white-space': 'nowrap',
 	},
@@ -32,16 +29,12 @@ const css = {
 	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,
 	[`.${constants.containerClass}.vertical > .${constants.wrapperClass}`]: verticalWrapperClass,
 	[`.${constants.wrapperClass}`]: {
-		// 'overflow': 'hidden'
+		'box-sizing': 'border-box'
 	},
 	[`.${constants.wrapperClass}.horizontal`]: horizontalWrapperClass, 
 	[`.${constants.wrapperClass}.vertical`]: verticalWrapperClass, 
 	[`.${constants.wrapperClass}.animated`]: {
 		'transition': 'transform ease'
-	},
-	[`.${constants.ghostClass} *`]: {
-		//'perspective': '800px',
-		'box-sizing': 'border-box',
 	},
 	[`.${constants.ghostClass}.animated`]: {
 		'transition': 'all ease-in-out'
@@ -77,6 +70,7 @@ function addStyleToHead() {
 	if (typeof (window) !== 'undefined') {
 		const head = global.document.head || global.document.getElementsByTagName("head")[0];
 		const style = global.document.createElement("style");
+		style.id = 'smooth-dnd-style-definitions';
 		const cssString = convertToCssString(css);
 		style.type = 'text/css';
 		if (style.styleSheet) {

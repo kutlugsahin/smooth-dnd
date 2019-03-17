@@ -5,7 +5,6 @@ import { preventAutoScrollClass } from "./constants";
 type Direction = 'begin' | 'end';
 
 const maxSpeed = 1500; // px/s
-const minSpeed = 20; // px/s
 
 interface Animator {
 	stop: () => void;
@@ -34,10 +33,6 @@ interface ScrollerAnimator {
 	cachedRect?: Rect;
 }
 
-function isInRect(position: Position, rect: Rect) {
-	return !(position.x < rect.left || position.x > rect.right || position.y < rect.top || position.y > rect.bottom);
-}
-
 function getScrollParams(position: Position, axis: Axis, rect: Rect): ScrollParams | null {
 	const { left, right, top, bottom } = rect;
 	const { x, y } = position;
@@ -58,7 +53,9 @@ function getScrollParams(position: Position, axis: Axis, rect: Rect): ScrollPara
 		pos = y;
 	}
 
-	const moveDistance = 100;
+	const scrollerSize = end - begin;
+
+	const moveDistance = scrollerSize > 400 ? 100 : scrollerSize / 4;
 	if (end - pos < moveDistance) {
 		return {
 			direction: 'end',

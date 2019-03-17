@@ -1,5 +1,5 @@
 import * as Utils from './utils';
-import { translationValue, visibilityValue, extraSizeForInsertion, containersInDraggable } from './constants';
+import { translationValue, visibilityValue, extraSizeForInsertion } from './constants';
 import { Orientation, ElementX, Rect, Dictionary, Position, IContainer, OffsetSize } from './interfaces';
 
 export interface PropMap {
@@ -129,11 +129,13 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return { begin, end };
 	}
 
-	function getContainerScale() {
-		return { scaleX: values.scaleX, scaleY: values.scaleY };
-	}
-
 	function getSize(element: HTMLElement | OffsetSize) {
+		const htmlElement = element as HTMLElement;
+		if (htmlElement.tagName) {
+			const rect = htmlElement.getBoundingClientRect();
+			return orientation === 'vertical' ? rect.bottom - rect.top : rect.right - rect.left;
+		}
+
 		return propMapper.get(element, 'size') * propMapper.get(values, 'scale');
 	}
 
@@ -158,14 +160,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return propMapper.get(position, 'dragPosition');
 	}
 
-	function updateDescendantContainerRects(container: IContainer) {
-		container.layout.invalidateRects();
-		container.onTranslated();
-		if (container.getChildContainers()) {
-			container.getChildContainers().forEach(p => updateDescendantContainerRects(p));
-		}
-	}
-
 	function setTranslation(element: ElementX, translation: number) {
 		if (!translation) {
 			element.style.removeProperty('transform');
@@ -173,14 +167,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 			propMapper.set(element.style, 'translate', translation);
 		}
 		element[translationValue] = translation;
-
-		if (element[containersInDraggable]) {
-			setTimeout(() => {
-				element[containersInDraggable].forEach((p: IContainer) => {
-					updateDescendantContainerRects(p);
-				});
-			}, animationDuration + 20);
-		}
 	}
 
 	function getTranslation(element: ElementX) {
@@ -218,10 +204,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		}
 	}
 
-	function setScrollListener(callback: Function) {
-		registeredScrollListener = callback;
-	}
-
 	function getTopLeftOfElementBegin(begin: number) {
 		let top = 0;
 		let left = 0;
@@ -250,17 +232,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return propMapper.set(element, 'scrollValue', val);
 	}
 
-	function dispose() {
-		if (scrollListener) {
-			scrollListener.dispose();
-		}
-
-		// if (visibleRect) {
-		// 	visibleRect.parentNode.removeChild(visibleRect);
-		// 	visibleRect = null;
-		// }
-	}
-
 	function getPosition(position: Position) {
 		return isInVisibleRect(position.x, position.y) ? getAxisValue(position) : null;
 	}
@@ -283,9 +254,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		setVisibility,
 		isVisible,
 		isInVisibleRect,
-		dispose,
-		getContainerScale,
-		setScrollListener,
 		setSize,
 		getTopLeftOfElementBegin,
 		getScrollSize,

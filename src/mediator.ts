@@ -77,7 +77,6 @@ function getGhostParent() {
 }
 
 function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, container: IContainer, cursor: string): GhostInfo {
-  // const { scaleX = 1, scaleY = 1 } = container.getScale();
   const { left, top, right, bottom } = wrapperElement.getBoundingClientRect();
   const midX = left + (right - left) / 2;
   const midY = top + (bottom - top) / 2;
@@ -365,16 +364,20 @@ function onMouseUp() {
   if (draggableInfo) {
     containerRectableWatcher.stop();
     handleDropAnimation(() => {
+      isDragging = false;
       fireOnDragStartEnd(false);
-      (dragListeningContainers || []).forEach(p => {
-        p.handleDrop(draggableInfo);
-      });
+      const containers = dragListeningContainers || [];
+      
+      let containerToCallDrop = containers.shift();
+      while (containerToCallDrop !== undefined) {
+        containerToCallDrop.handleDrop(draggableInfo);
+        containerToCallDrop = containers.shift();
+      }
 
       dragListeningContainers = null!;
       grabbedElement = null;
       ghostInfo = null!;
       draggableInfo = null!;
-      isDragging = false;
       sourceContainer = null;
       sourceContainerLockAxis = null;
       handleDrag = null!;
@@ -534,12 +537,15 @@ function unregisterContainer(container: IContainer) {
       draggableInfo.targetElement = null;
     }
 
-    dragListeningContainers.splice(containers.indexOf(container), 1);
-    if (handleScroll) {
-      handleScroll({ reset: true, draggableInfo: undefined! });
+    const indexInDragListeners = dragListeningContainers.indexOf(container);
+    if (indexInDragListeners > -1) {
+      dragListeningContainers.splice(indexInDragListeners, 1);
+      if (handleScroll) {
+        handleScroll({ reset: true, draggableInfo: undefined! });
+      }
+      handleScroll = getScrollHandler(container, dragListeningContainers);
+      handleDrag = dragHandler(dragListeningContainers);
     }
-    handleScroll = getScrollHandler(container, dragListeningContainers);
-    handleDrag = dragHandler(dragListeningContainers);
   }
 }
 

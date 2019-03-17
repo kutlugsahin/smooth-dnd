@@ -233,7 +233,7 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 	}
 
 	function getPosition(position: Position) {
-		return isInVisibleRect(position.x, position.y) ? getAxisValue(position) : null;
+		return getAxisValue(position);
 	}
 
 	function invalidateRects() {

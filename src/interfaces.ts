@@ -80,7 +80,7 @@ export type DragStartEndCallback = (info: { isSource: boolean; payload: any; wil
 export type DropCallback = (dropResult: DropResult) => void;
 
 export interface ContainerOptions {
-  behaviour?: 'move' | 'copy' | 'drop-zone';
+  behaviour?: 'move' | 'copy' | 'drop-zone' | 'contain';
   groupName?: string; // if not defined => container will not interfere with other containers
   orientation?: 'vertical' | 'horizontal';
   dragHandleSelector?: string;

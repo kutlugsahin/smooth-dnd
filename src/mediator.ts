@@ -483,8 +483,28 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
   if (!draggableInfo) {
     initiateDrag(e, Utils.getElementCursor(event.target as Element));
   } else {
-    // just update ghost position && draggableInfo position
-    if (sourceContainerLockAxis) {
+    const containerOptions = draggableInfo.container.getOptions();
+    const isContainDrag = containerOptions.behaviour === 'contain';
+    if (isContainDrag) {
+      const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
+      if (containerOptions.orientation === 'vertical') {
+        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetHeight / 2);
+        const endBoundary = beginEnd.end - (draggableInfo.size.offsetHeight / 2);
+        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientY + ghostInfo.positionDelta.top)));
+
+        ghostInfo.ghost.style.top = `${positionInBoundary}px`;
+        draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
+        draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
+      } else {
+        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
+        const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
+        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
+
+        ghostInfo.ghost.style.left = `${positionInBoundary}px`;
+        draggableInfo.position.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientX + ghostInfo.centerDelta.x)));
+        draggableInfo.mousePosition.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientX));
+      }
+    } else if (sourceContainerLockAxis) {
       if (sourceContainerLockAxis === 'y') {
         ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
         draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;

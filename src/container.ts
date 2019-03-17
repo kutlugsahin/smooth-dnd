@@ -220,25 +220,16 @@ function getPosition({ element, layout }: ContainerProps) {
 
     if (hitElement) {
       const container: IContainer = getParentContainerElement(hitElement);
-      if (
-        container && // hit test inside any container
-        container.element !== element && // not this container
-        container.isDragRelevant(draggableInfo.container, draggableInfo.payload) // drag is relevant to that container
-      ) {
-        // than return null -> drag is captured by that container
+      if (container && container.element === element) {
         return {
-          pos: null,
+          pos: layout.getPosition(draggableInfo.position),
         }
       }
     }
 
     return {
-      pos: layout.getPosition(draggableInfo.position),
+      pos: null,
     };
-
-    // return {
-    //   pos: !getContainer(element).isPosInChildContainer() ? layout.getPosition(draggableInfo.position) : null,
-    // };
   };
 }
 

@@ -133,6 +133,7 @@ function getDraggableInfo(draggableElement: HTMLElement): DraggableInfo {
     ghostParent: getGhostParent ? getGhostParent() : null,
     invalidateShadow: null,
     mousePosition: null!,
+    relevantContainers: null!
   };
 }
 
@@ -463,6 +464,7 @@ function initiateDrag(position: MousePosition, cursor: string) {
     };
 
     dragListeningContainers = containers.filter(p => p.isDragRelevant(container, draggableInfo.payload));
+    draggableInfo.relevantContainers = dragListeningContainers;
     handleDrag = dragHandler(dragListeningContainers);
     if (handleScroll) {
       handleScroll({ reset: true, draggableInfo: undefined! });

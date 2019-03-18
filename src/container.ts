@@ -4,7 +4,7 @@ import { domDropHandler } from './dropHandlers';
 import { ContainerOptions, ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer, SmoothDnD, SmoothDnDCreator } from './interfaces';
 import layoutManager from './layoutManager';
 import Mediator from './mediator';
-import { addClass, getParent, getParentContainerElement, hasClass, removeClass, listenScrollParent } from './utils';
+import { addClass, getParent, getParentRelevantContainerElement, hasClass, removeClass, listenScrollParent } from './utils';
 
 
 
@@ -219,7 +219,7 @@ function getPosition({ element, layout }: ContainerProps) {
     const hitElement = document.elementFromPoint(draggableInfo.position.x, draggableInfo.position.y);
 
     if (hitElement) {
-      const container: IContainer = getParentContainerElement(hitElement);
+      const container: IContainer = getParentRelevantContainerElement(hitElement, draggableInfo.relevantContainers);
       if (container && container.element === element) {
         return {
           pos: layout.getPosition(draggableInfo.position),

@@ -9,9 +9,8 @@ const verticalWrapperClass = {
 
 const horizontalWrapperClass = {
 	'height': '100%',
-	'display': 'inline-block',
+	'display': 'table-cell',
 	'vertical-align': 'top',
-	'white-space': 'normal'
 }
 
 const stretcherElementHorizontalClass = {
@@ -25,8 +24,7 @@ const css = {
 		'min-width': '30px'
 	},
 	[`.${constants.containerClass}.horizontal`]: {
-		'white-space': 'nowrap',
-		'overflow-x': 'auto',
+		'display': 'table',
 	},
 	[`.${constants.containerClass}.horizontal > .${constants.stretcherElementClass}`]: stretcherElementHorizontalClass,
 	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,

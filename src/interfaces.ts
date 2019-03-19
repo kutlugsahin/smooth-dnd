@@ -97,8 +97,8 @@ export interface ContainerOptions {
   getChildPayload?: (index: number) => any;
   shouldAnimateDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
   shouldAcceptDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
-  onDragEnter?: () => {};
-  onDragLeave?: () => {};
+  onDragEnter?: () => void;
+  onDragLeave?: () => void;
   onDropReady?: DropCallback;
   removeOnDropOut?: boolean;
   getGhostParent?: () => HTMLElement;

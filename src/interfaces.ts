@@ -1,4 +1,5 @@
 import layoutManager from './layoutManager';
+import { ContainerOptions } from './exportTypes';
 
 export type Position = { x: number; y: number };
 export type MousePosition = { clientX: number; clientY: number };
@@ -31,20 +32,10 @@ export interface ScrolableInfo {
   axis: Axis;
 }
 
-export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
-  dropHandler?: any;
-  wrapChild?: boolean;
-};
 
-export interface SmoothDnD {
-  dispose: () => void;
-}
-
-export interface DropResult {
-  removedIndex: number | null;
-  addedIndex: number | null;
-  payload?: any;
-  element?: HTMLElement;
+export interface DragInfo {
+  dragResult: DragResult;
+  draggableInfo: DraggableInfo;
 }
 
 export interface DragResult {
@@ -70,39 +61,6 @@ export interface DraggableInfo {
   groupName?: string;
   ghostParent: HTMLElement | null;
   relevantContainers: IContainer[];
-}
-
-export interface DragInfo {
-  dragResult: DragResult;
-  draggableInfo: DraggableInfo;
-}
-
-export type DragStartEndCallback = (info: { isSource: boolean; payload: any; willAcceptDrop: boolean }) => void;
-export type DropCallback = (dropResult: DropResult) => void;
-
-export interface ContainerOptions {
-  behaviour?: 'move' | 'copy' | 'drop-zone' | 'contain';
-  groupName?: string; // if not defined => container will not interfere with other containers
-  orientation?: 'vertical' | 'horizontal';
-  dragHandleSelector?: string;
-  nonDragAreaSelector?: string;
-  dragBeginDelay?: number;
-  animationDuration?: number;
-  autoScrollEnabled?: boolean;
-  lockAxis?: Axis;
-  dragClass?: string;
-  dropClass?: string;
-  onDragStart?: DragStartEndCallback;
-  onDrop?: DropCallback;
-  getChildPayload?: (index: number) => any;
-  shouldAnimateDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
-  shouldAcceptDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
-  onDragEnter?: () => void;
-  onDragLeave?: () => void;
-  onDropReady?: DropCallback;
-  removeOnDropOut?: boolean;
-  getGhostParent?: () => HTMLElement;
-  onDragEnd?: DragStartEndCallback;
 }
 
 export interface ContainerProps {

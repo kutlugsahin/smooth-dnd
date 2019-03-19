@@ -2,7 +2,8 @@ import { addChildAt, removeChildAt } from './utils';
 import {
 	wrapperClass,
 } from './constants';
-import { ContainerProps, DropResult, DropCallback } from './interfaces';
+import { ContainerProps } from './interfaces';
+import { DropCallback, DropResult } from './exportTypes';
 
 
 export function domDropHandler({ element, draggables }: ContainerProps) {

@@ -1,10 +1,11 @@
 import * as constants from './constants';
 import { defaultOptions } from './defaults';
 import dragScroller from './scroller';
-import { Axis, ContainerOptions, DraggableInfo, ElementX, GhostInfo, IContainer, MousePosition, Position, TopLeft } from './interfaces';
+import { Axis, DraggableInfo, ElementX, GhostInfo, IContainer, MousePosition, Position, TopLeft } from './interfaces';
 import './polyfills';
 import { addCursorStyleToBody, addStyleToHead, removeStyle } from './styles';
 import * as Utils from './utils';
+import { ContainerOptions } from './exportTypes';
 
 const grabEvents = ['mousedown', 'touchstart'];
 const moveEvents = ['mousemove', 'touchmove'];
@@ -19,7 +20,6 @@ let isDragging = false;
 
 let handleDrag: (info: DraggableInfo) => void = null!;
 let handleScroll: (props: { draggableInfo?: DraggableInfo; reset?: boolean }) => void = null!;
-let sourceContainer = null;
 let sourceContainerLockAxis: Axis | null = null;
 let cursorStyleElement: HTMLStyleElement | null = null;
 const containerRectableWatcher = watchRectangles();
@@ -379,7 +379,6 @@ function onMouseUp() {
       grabbedElement = null;
       ghostInfo = null!;
       draggableInfo = null!;
-      sourceContainer = null;
       sourceContainerLockAxis = null;
       handleDrag = null!;
     });
@@ -444,7 +443,6 @@ function initiateDrag(position: MousePosition, cursor: string) {
     isDragging = true;
     const container = (containers.filter(p => grabbedElement!.parentElement === p.element)[0]) as IContainer;
     container.setDraggables();
-    sourceContainer = container;
     sourceContainerLockAxis = container.getOptions().lockAxis ? container.getOptions().lockAxis!.toLowerCase() as Axis : null;
 
     draggableInfo = getDraggableInfo(grabbedElement);

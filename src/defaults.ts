@@ -1,4 +1,4 @@
-import { ContainerOptions } from "./interfaces";
+import { ContainerOptions } from "./exportTypes";
 
 export const defaultOptions: ContainerOptions = {
 	groupName: undefined,

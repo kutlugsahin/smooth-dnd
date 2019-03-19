@@ -1,10 +1,11 @@
 import { animationClass, containerClass, containerInstance, stretcherElementClass, stretcherElementInstance, translationValue, wrapperClass } from './constants';
 import { defaultOptions } from './defaults';
 import { domDropHandler } from './dropHandlers';
-import { ContainerOptions, ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer, SmoothDnD, SmoothDnDCreator } from './interfaces';
+import { ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer } from './interfaces';
 import layoutManager from './layoutManager';
 import Mediator from './mediator';
 import { addClass, getParent, getParentRelevantContainerElement, hasClass, removeClass, listenScrollParent } from './utils';
+import { ContainerOptions, SmoothDnDCreator, SmoothDnD } from './exportTypes';
 
 
 

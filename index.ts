@@ -1,9 +1,16 @@
-import container from './src/container';
 import * as constants from './src/constants';
+import container from './src/container';
 import * as dropHandlers from './src/dropHandlers';
-import { SmoothDnDCreator, ElementX, ContainerOptions } from './src/interfaces';
+import { SmoothDnDCreator, ContainerOptions } from './src/exportTypes';
+import { ElementX } from './src/interfaces';
 
-export { container as smoothDnD, constants, dropHandlers };
+export * from './src/exportTypes';
+
+export {
+    container as smoothDnD,
+    constants,
+    dropHandlers,
+};
 
 const deprecetedDefaultExport: SmoothDnDCreator = function(element: ElementX, options?: ContainerOptions) {
     console.warn('default export is deprecated. please use named export "smoothDnD"');

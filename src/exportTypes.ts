@@ -5,6 +5,7 @@ export interface SmoothDnD {
 export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
 	dropHandler?: any;
 	wrapChild?: boolean;
+	maxScrollSpeed?: number;
 };
 
 export interface DropResult {

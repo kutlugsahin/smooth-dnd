@@ -86,6 +86,7 @@ export interface IContainer {
   getOptions: () => ContainerOptions;
   setDraggables: () => void;
   fireRemoveElement: () => void;
+  getScrollMaxSpeed: () => number | undefined;
 }
 
 export interface GhostInfo {

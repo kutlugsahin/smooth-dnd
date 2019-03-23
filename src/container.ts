@@ -756,6 +756,9 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       setDraggables: () => {
         setDraggables(props.draggables, element);
       },
+      getScrollMaxSpeed() {
+        return smoothDnD.maxScrollSpeed;
+      }
     };
 
     return container;

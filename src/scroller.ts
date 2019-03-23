@@ -220,7 +220,7 @@ function getTopmostScrollAnimator(animatorInfos: ScrollerAnimator[], position: P
 	return null;
 }
 
-export default (containers: IContainer[]) => {
+export default (containers: IContainer[], maxScrollSpeed = maxSpeed) => {
 	const animatorInfos = containers.reduce((acc: ScrollerAnimator[], container: IContainer) => {
 		const filteredAnimators = getScrollerAnimator(container).filter(p => {
 			return !acc.find(q => q.scrollerElement === p.scrollerElement);
@@ -246,7 +246,7 @@ export default (containers: IContainer[]) => {
 				if (x) {
 					if (x.scrollParams) {
 						const { direction, speedFactor } = x.scrollParams;
-						x.animator.animate(direction, speedFactor * maxSpeed);
+						x.animator.animate(direction, speedFactor * maxScrollSpeed);
 					} else {
 						x.animator.stop();
 					}
@@ -255,7 +255,7 @@ export default (containers: IContainer[]) => {
 				if (y) {
 					if (y.scrollParams) {
 						const { direction, speedFactor } = y.scrollParams;
-						y.animator.animate(direction, speedFactor * maxSpeed);
+						y.animator.animate(direction, speedFactor * maxScrollSpeed);
 					} else {
 						y.animator.stop();
 					}

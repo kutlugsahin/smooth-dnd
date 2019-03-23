@@ -89,6 +89,10 @@ export interface IContainer {
 }
 
 export interface GhostInfo {
+  topLeft: {
+    x: number;
+    y: number;
+  }
   ghost: HTMLElement;
   centerDelta: Position;
   positionDelta: { left: number; top: number };

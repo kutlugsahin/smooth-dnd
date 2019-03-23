@@ -84,8 +84,11 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   ghost.style.zIndex = '1000';
   ghost.style.boxSizing = 'border-box';
   ghost.style.position = 'fixed';
-  ghost.style.left = left + 'px';
-  ghost.style.top = top + 'px';
+  // ghost.style.left = left + 'px';
+  // ghost.style.top = top + 'px';
+  ghost.style.top = '0px';
+  ghost.style.left = '0px';
+  ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`
   ghost.style.width = right - left + 'px';
   ghost.style.height = bottom - top + 'px';
   ghost.style.overflow = 'visible';
@@ -110,6 +113,10 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
     ghost: ghost,
     centerDelta: { x: midX - x, y: midY - y },
     positionDelta: { left: left - x, top: top - y },
+    topLeft: {
+      x: left,
+      y: top
+    }
   };
 }
 
@@ -151,8 +158,9 @@ function handleDropAnimation(callback: Function) {
       Utils.addClass(ghostInfo.ghost.firstElementChild, dropClass);
     }
     ghostInfo.ghost.style.transitionDuration = duration + 'ms';
-    ghostInfo.ghost.style.left = left + 'px';
-    ghostInfo.ghost.style.top = top + 'px';
+    ghostInfo.topLeft.x = left;
+    ghostInfo.topLeft.y = top;
+    translateGhost();
     setTimeout(function() {
       endDrop();
     }, duration + 20);
@@ -477,6 +485,11 @@ function initiateDrag(position: MousePosition, cursor: string) {
   }
 }
 
+function translateGhost() {
+  const { ghost, topLeft: {x, y} } = ghostInfo;
+  ghost.style.transform = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`
+}
+
 function onMouseMove(event: MouseEvent & TouchEvent) {
   event.preventDefault();
   const e = getPointerEvent(event);
@@ -492,7 +505,7 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
         const endBoundary = beginEnd.end - (draggableInfo.size.offsetHeight / 2);
         const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientY + ghostInfo.positionDelta.top)));
 
-        ghostInfo.ghost.style.top = `${positionInBoundary}px`;
+        ghostInfo.topLeft.y = positionInBoundary;
         draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
         draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
       } else {
@@ -500,28 +513,30 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
         const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
         const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
 
-        ghostInfo.ghost.style.left = `${positionInBoundary}px`;
+        ghostInfo.topLeft.x = positionInBoundary;
         draggableInfo.position.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientX + ghostInfo.centerDelta.x)));
         draggableInfo.mousePosition.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientX));
       }
     } else if (sourceContainerLockAxis) {
       if (sourceContainerLockAxis === 'y') {
-        ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
+        ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
         draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
         draggableInfo.mousePosition.y = e.clientY;
       } else if (sourceContainerLockAxis === 'x') {
-        ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
+        ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
         draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
         draggableInfo.mousePosition.x = e.clientX;
       }
     } else {
-      ghostInfo.ghost.style.left = `${e.clientX + ghostInfo.positionDelta.left}px`;
-      ghostInfo.ghost.style.top = `${e.clientY + ghostInfo.positionDelta.top}px`;
+      ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
+      ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
       draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
       draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
       draggableInfo.mousePosition.x = e.clientX;
       draggableInfo.mousePosition.y = e.clientY;
     }
+
+    translateGhost();
 
     handleDrag(draggableInfo);
   }

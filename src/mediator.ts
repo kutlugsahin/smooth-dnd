@@ -88,7 +88,7 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   // ghost.style.top = top + 'px';
   ghost.style.top = '0px';
   ghost.style.left = '0px';
-  ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`
+  ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`;
   ghost.style.width = right - left + 'px';
   ghost.style.height = bottom - top + 'px';
   ghost.style.overflow = 'visible';
@@ -487,7 +487,7 @@ function initiateDrag(position: MousePosition, cursor: string) {
 
 function translateGhost() {
   const { ghost, topLeft: {x, y} } = ghostInfo;
-  ghost.style.transform = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`
+  ghost.style.transform = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`;
 }
 
 function onMouseMove(event: MouseEvent & TouchEvent) {

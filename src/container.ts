@@ -1,13 +1,11 @@
-import { animationClass, containerClass, containerInstance, stretcherElementClass, stretcherElementInstance, translationValue, wrapperClass } from './constants';
+import { animationClass, containerClass, containerInstance, dropPlaceholderFlexContainerClass, dropPlaceholderInnerClass, dropPlaceholderWrapperClass, stretcherElementClass, stretcherElementInstance, translationValue, wrapperClass, dropPlaceholderDefaultClass } from './constants';
 import { defaultOptions } from './defaults';
 import { domDropHandler } from './dropHandlers';
+import { ContainerOptions, SmoothDnD, SmoothDnDCreator } from './exportTypes';
 import { ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer } from './interfaces';
 import layoutManager from './layoutManager';
 import Mediator from './mediator';
-import { addClass, getParent, getParentRelevantContainerElement, hasClass, removeClass, listenScrollParent } from './utils';
-import { ContainerOptions, SmoothDnDCreator, SmoothDnD } from './exportTypes';
-
-
+import { addClass, getParent, getParentRelevantContainerElement, hasClass, listenScrollParent, removeClass } from './utils';
 
 function setAnimation(element: HTMLElement, add: boolean, animationDuration = defaultOptions.animationDuration) {
   if (add) {
@@ -17,10 +15,6 @@ function setAnimation(element: HTMLElement, add: boolean, animationDuration = de
     removeClass(element, animationClass);
     element.style.removeProperty('transition-duration');
   }
-}
-
-function getContainer(element: ElementX) {
-  return element ? element[containerInstance] : null;
 }
 
 function initOptions(props = defaultOptions): ContainerOptions {
@@ -298,6 +292,62 @@ function getShadowBeginEndForDropZone({ draggables, layout }: ContainerProps) {
   };
 }
 
+function drawDropPreview({ layout, element, options }: ContainerProps) {
+  let prevAddedIndex: number | null = null;
+  return ({ dragResult: {elementSize, shadowBeginEnd, addedIndex, dropPlaceholderContainer }}: DragInfo) => {
+    if (options.dropPlaceholder) {
+      const { animationDuration, className, showOnTop } = typeof options.dropPlaceholder === 'boolean' ? {} as any : options.dropPlaceholder;
+      if (addedIndex !== null) {
+        if (!dropPlaceholderContainer) {
+          const innerElement = document.createElement('div');
+          const flex = document.createElement('div');
+          flex.className = dropPlaceholderFlexContainerClass;
+          innerElement.className = `${dropPlaceholderInnerClass} ${className || dropPlaceholderDefaultClass}`
+          dropPlaceholderContainer = document.createElement('div') as HTMLDivElement;
+          dropPlaceholderContainer.className = `${dropPlaceholderWrapperClass}`;
+          dropPlaceholderContainer.style.position = 'absolute';
+
+          if (animationDuration !== undefined) {
+            dropPlaceholderContainer.style.transition = `all ${animationDuration}ms ease`;
+          }
+
+          dropPlaceholderContainer.appendChild(flex);
+          flex.appendChild(innerElement);
+          layout.setSize(dropPlaceholderContainer.style, elementSize + 'px');
+
+          dropPlaceholderContainer.style.pointerEvents = 'none';
+
+          if (showOnTop) {
+            element.appendChild(dropPlaceholderContainer);
+          } else {
+            element.insertBefore(dropPlaceholderContainer, element.firstElementChild);
+          }
+        }
+
+        if (prevAddedIndex !== addedIndex && shadowBeginEnd.dropArea) {
+           layout.setBegin(dropPlaceholderContainer.style, (shadowBeginEnd.dropArea.begin) - layout.getBeginEndOfContainer().begin + 'px');
+        }
+        prevAddedIndex = addedIndex;
+
+        return {
+          dropPlaceholderContainer
+        }
+      } else {
+        if (dropPlaceholderContainer && prevAddedIndex !== null) {
+          element.removeChild(dropPlaceholderContainer!);
+        }
+        prevAddedIndex = null;
+
+        return {
+          dropPlaceholderContainer: undefined
+        }
+      }
+    }
+
+    return null;
+  }
+}
+
 function invalidateShadowBeginEndIfNeeded(params: ContainerProps) {
   const shadowBoundsGetter = getShadowBeginEnd(params);
   return ({ draggableInfo, dragResult }: DragInfo) => {
@@ -415,9 +465,11 @@ function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
     const { addedIndex, removedIndex, elementSize, pos, shadowBeginEnd } = dragResult;
     if (pos !== null) {
       if (addedIndex !== null && (draggableInfo.invalidateShadow || addedIndex !== prevAddedIndex)) {
-        if (prevAddedIndex) prevAddedIndex = addedIndex;
+        // if (prevAddedIndex) prevAddedIndex = addedIndex;
         let beforeIndex = addedIndex - 1;
         let begin = 0;
+        let dropAreaBegin = 0;
+        let dropAreaEnd = 0;
         let afterBounds = null;
         let beforeBounds = null;
         if (beforeIndex === removedIndex) {
@@ -432,8 +484,10 @@ function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
           } else {
             begin = beforeBounds.end;
           }
+          dropAreaBegin = beforeBounds.end;
         } else {
           beforeBounds = { end: layout.getBeginEndOfContainer().begin };
+          dropAreaBegin = layout.getBeginEndOfContainer().begin;
         }
 
         let end = 10000;
@@ -451,20 +505,28 @@ function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
           } else {
             end = afterBounds.begin;
           }
+          dropAreaEnd = afterBounds.begin;
         } else {
           afterBounds = { begin: layout.getContainerRectangles().rect.end };
+          dropAreaEnd = layout.getContainerRectangles().rect.end - layout.getContainerRectangles().rect.begin;
         }
 
         const shadowRectTopLeft = beforeBounds && afterBounds ? layout.getTopLeftOfElementBegin(beforeBounds.end) : null;
 
+        prevAddedIndex = addedIndex;
         return {
           shadowBeginEnd: {
+            dropArea: {
+              begin: dropAreaBegin,
+              end: dropAreaEnd,
+            },
             begin,
             end,
             rect: shadowRectTopLeft,
             beginAdjustment: shadowBeginEnd ? shadowBeginEnd.beginAdjustment : 0,
           },
         };
+
       } else {
         return null;
       }
@@ -562,6 +624,7 @@ function getDragHandler(params: any) {
       handleInsertionSizeChange,
       calculateTranslations,
       getShadowBeginEnd,
+      drawDropPreview,
       handleFirstInsertShadowAdjustment,
       fireDragEnterLeaveEvents,
       fireOnDropReady
@@ -667,6 +730,9 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       },
       handleDrop(draggableInfo: DraggableInfo) {
         scrollListener.stop();
+        if (dragResult && dragResult.dropPlaceholderContainer) {
+          element.removeChild(dragResult.dropPlaceholderContainer);
+        }
         lastDraggableInfo = null;
         dragHandler = getDragHandler(props);
         dropHandler(draggableInfo, dragResult!);

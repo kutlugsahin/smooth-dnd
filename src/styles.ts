@@ -1,4 +1,4 @@
-import * as constants from './constants';
+import { containerClass, disbaleTouchActions, dropPlaceholderFlexContainerClass, dropPlaceholderInnerClass, dropPlaceholderWrapperClass, ghostClass, noUserSelectClass, stretcherElementClass, wrapperClass, dropPlaceholderDefaultClass } from './constants';
 import { Dictionary } from './interfaces';
 declare const global: any;
 
@@ -18,42 +18,67 @@ const stretcherElementHorizontalClass = {
 }
 
 const css = {
-	[`.${constants.containerClass}`]: {
+	[`.${containerClass}`]: {
 		'position': 'relative',
 		'min-height': '30px',
 		'min-width': '30px'
 	},
-	[`.${constants.containerClass}.horizontal`]: {
+	[`.${containerClass}.horizontal`]: {
 		'display': 'table',
 	},
-	[`.${constants.containerClass}.horizontal > .${constants.stretcherElementClass}`]: stretcherElementHorizontalClass,
-	[`.${constants.containerClass}.horizontal > .${constants.wrapperClass}`]: horizontalWrapperClass,
-	[`.${constants.containerClass}.vertical > .${constants.wrapperClass}`]: verticalWrapperClass,
-	[`.${constants.wrapperClass}`]: {
+	[`.${containerClass}.horizontal > .${stretcherElementClass}`]: stretcherElementHorizontalClass,
+	[`.${containerClass}.horizontal > .${wrapperClass}`]: horizontalWrapperClass,
+	[`.${containerClass}.vertical > .${wrapperClass}`]: verticalWrapperClass,
+	[`.${wrapperClass}`]: {
 		'box-sizing': 'border-box'
 	},
-	[`.${constants.wrapperClass}.horizontal`]: horizontalWrapperClass, 
-	[`.${constants.wrapperClass}.vertical`]: verticalWrapperClass, 
-	[`.${constants.wrapperClass}.animated`]: {
-		'transition': 'transform ease'
+	[`.${wrapperClass}.horizontal`]: horizontalWrapperClass,
+	[`.${wrapperClass}.vertical`]: verticalWrapperClass,
+	[`.${wrapperClass}.animated`]: {
+		'transition': 'transform ease',
 	},
-	[`.${constants.ghostClass}.animated`]: {
+	[`.${ghostClass}.animated`]: {
 		'transition': 'all ease-in-out'
 	},
-	[`.${constants.ghostClass} *`]: {
+	[`.${ghostClass} *`]: {
 		'pointer-events': 'none'
 	},
-	[`.${constants.disbaleTouchActions} *`]: {
+	[`.${disbaleTouchActions} *`]: {
 		'touch-actions': 'none',
 		'-ms-touch-actions': 'none'
 	},
-	[`.${constants.noUserSelectClass}`]: {
+	[`.${noUserSelectClass}`]: {
 		'-webkit-touch-callout': 'none',
 		'-webkit-user-select': 'none',
 		'-khtml-user-select': 'none',
 		'-moz-user-select': 'none',
 		'-ms-user-select': 'none',
 		'user-select': 'none'
+	},
+	[`.${dropPlaceholderInnerClass}`]: {
+		'flex': '1'
+	},
+	[`.${containerClass}.horizontal > .${dropPlaceholderWrapperClass}`]: {
+		'height': '100%',
+		'overflow': 'hidden',
+		'display': 'table-cell',
+		'vertical-align': 'top',
+	},
+	[`.${containerClass}.vertical > .${dropPlaceholderWrapperClass}`]: {
+		'overflow': 'hidden',
+		'display': 'block',
+		'width': '100%',
+	},
+	[`.${dropPlaceholderFlexContainerClass}`]: {
+		'width': '100%',
+		'height': '100%',
+		'display': 'flex',
+		'justify-content': 'stretch',
+		'align-items': 'stretch'
+	},
+	[`.${dropPlaceholderDefaultClass}`]: {
+		'background-color': 'rgba(150, 150, 150, 0.1)',
+  	'border': '1px solid #ccc',
 	}
 };
 
@@ -115,8 +140,5 @@ function removeStyle(styleElement: HTMLStyleElement) {
 	}
 }
 
-export {
-	addStyleToHead,
-	addCursorStyleToBody,
-	removeStyle
-};
+export { addStyleToHead, addCursorStyleToBody, removeStyle };
+

@@ -43,9 +43,10 @@ export interface DragResult {
   addedIndex: number | null;
   removedIndex: number | null;
   elementSize: number;
-  shadowBeginEnd: Boundary & { beginAdjustment: number; rect?: TopLeft };
+  shadowBeginEnd: Boundary & { beginAdjustment: number; rect?: TopLeft, dropArea?: Boundary };
   dragLeft?: boolean;
-	containerBoxChanged?: boolean;
+  containerBoxChanged?: boolean;
+  dropPlaceholderContainer?: HTMLDivElement;
 }
 
 export interface DraggableInfo {

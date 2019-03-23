@@ -14,6 +14,12 @@ export interface DropResult {
 	element?: HTMLElement;
 }
 
+export interface DropPreviewOptions {
+	className?: string;
+	animationDuration?: string;
+	showOnTop?: boolean;
+}
+
 export type DragStartEndCallback = (info: { isSource: boolean; payload: any; willAcceptDrop: boolean }) => void;
 export type DropCallback = (dropResult: DropResult) => void;
 
@@ -40,4 +46,5 @@ export interface ContainerOptions {
 	removeOnDropOut?: boolean;
 	getGhostParent?: () => HTMLElement;
 	onDragEnd?: DragStartEndCallback;
+	dropPlaceholder?: DropPreviewOptions | boolean;	
 }

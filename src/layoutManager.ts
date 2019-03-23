@@ -1,6 +1,6 @@
+import { extraSizeForInsertion, translationValue, visibilityValue } from './constants';
+import { Dictionary, ElementX, OffsetSize, Orientation, Position, Rect } from './interfaces';
 import * as Utils from './utils';
-import { translationValue, visibilityValue, extraSizeForInsertion } from './constants';
-import { Orientation, ElementX, Rect, Dictionary, Position, IContainer, OffsetSize } from './interfaces';
 
 export interface PropMap {
 	[key: string]: any;
@@ -240,9 +240,12 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		invalidateContainerRectangles(containerElement);
 	}
 
+	function setBegin(style: CSSStyleDeclaration, value: string) {
+		propMapper.set(style, 'begin', value);
+	}
+
 	return {
 		getSize,
-		//getDistanceToContainerBegining,
 		getContainerRectangles,
 		getBeginEndOfDOMRect,
 		getBeginEndOfContainer,
@@ -262,5 +265,6 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		invalidate,
 		invalidateRects,
 		getPosition,
+		setBegin,
 	};
 }

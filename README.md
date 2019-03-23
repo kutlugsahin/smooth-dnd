@@ -58,7 +58,7 @@ var container = SmoothDnD(containerElement, options);
 | Property | Type | Default | Description |
 |-|:-:|:-:|-|
 | orientation |string|`vertical` | Orientation of the container. Can be **horizontal** or **vertical**.|
-|behaviour|string|`move`| Property to describe weather the dragging item will be moved or copied to target container. Can be **move** or **copy**.|
+|behaviour|string|`move`| Property to describe weather the dragging item will be moved or copied to target container. Can be **move** or **copy** or **drop-zone** or **contain**.|
 |groupName|string|`undefined`|Draggables can be moved between the containers having the same group names. If not set container will not accept drags from outside. This behaviour can be overriden by shouldAcceptDrop function. See below.
 |lockAxis|string|`undefined`|Locks the movement axis of the dragging. Possible values are **x**, **y** or **undefined**.
 |dragHandleSelector|string|`undefined`|Css selector to test for enabling dragging. If not given item can be grabbed from anywhere in its boundaries.|
@@ -69,6 +69,7 @@ var container = SmoothDnD(containerElement, options);
 |dragClass|string|`undefined`|Class to be added to the ghost item being dragged. The class will be added after it's added to the DOM so any transition in the class will be applied as intended.
 |dropClass|string|`undefined`|Class to be added to the ghost item just before the drop animation begins.|
 |removeOnDropOut|boolean|`undefined`|When set true onDrop will be called with a removedIndex if you drop element out of any relevant container|
+|dropPlaceholder|boolean,object|`undefined`|Options for drop placeholder. **className**, **animationDuration**, **showOnTop**|
 |onDragStart|function|`undefined`|*See descriptions below*|
 |onDragEnd|function|`undefined`|*See descriptions below*|
 |onDropReady|function|`undefined`|*See descriptions below*|

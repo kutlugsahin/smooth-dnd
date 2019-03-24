@@ -41,16 +41,14 @@ const verticalMap: PropMap = {
 };
 
 function orientationDependentProps(map: PropMap) {
-	function get(obj: Dictionary, prop:string) {
+	function get(obj: Dictionary, prop: string) {
 		const mappedProp = map[prop];
 		return obj[mappedProp || prop];
 	}
 
 	function set(obj: Dictionary, prop: string, value: any) {
-        requestAnimationFrame(() => {
-            obj[map[prop]] = map.setters[prop] ? map.setters[prop](value) : value;
-        });
-    }
+		obj[map[prop]] = map.setters[prop] ? map.setters[prop](value) : value;
+	}
 
 	return { get, set };
 }
@@ -59,28 +57,20 @@ function orientationDependentProps(map: PropMap) {
 
 export default function layoutManager(containerElement: ElementX, orientation: Orientation, _animationDuration: number) {
 	containerElement[extraSizeForInsertion] = 0;
-	const animationDuration = _animationDuration;
 	const map = orientation === 'horizontal' ? horizontalMap : verticalMap;
 	const propMapper = orientationDependentProps(map);
 	const values: Dictionary = {
 		translation: 0
 	};
-	let registeredScrollListener: Function | null = null;
 
-	global.addEventListener('resize', function() {
+	global.addEventListener('resize', function () {
 		invalidateContainerRectangles(containerElement);
-		// invalidateContainerScale(containerElement);
 	});
 
 	setTimeout(() => {
 		invalidate();
 	}, 10);
-	// invalidate();
 
-	const scrollListener = Utils.listenScrollParent(containerElement, function() {
-		invalidateContainerRectangles(containerElement);
-		registeredScrollListener && registeredScrollListener();
-	});
 	function invalidate() {
 		invalidateContainerRectangles(containerElement);
 		invalidateContainerScale(containerElement);
@@ -228,7 +218,7 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		return propMapper.get(element, 'scrollValue');
 	}
 
-	function setScrollValue(element:HTMLElement, val: number) {
+	function setScrollValue(element: HTMLElement, val: number) {
 		return propMapper.set(element, 'scrollValue', val);
 	}
 

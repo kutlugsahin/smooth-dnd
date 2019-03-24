@@ -24,8 +24,6 @@ let sourceContainerLockAxis: Axis | null = null;
 let cursorStyleElement: HTMLStyleElement | null = null;
 const containerRectableWatcher = watchRectangles();
 
-// Utils.addClass(document.body, 'clearfix');
-
 const isMobile = Utils.isMobile();
 
 function listenEvents() {
@@ -157,11 +155,11 @@ function handleDropAnimation(callback: Function) {
     if (dropClass) {
       Utils.addClass(ghostInfo.ghost.firstElementChild, dropClass);
     }
-    ghostInfo.ghost.style.transitionDuration = duration + 'ms';
+
     ghostInfo.topLeft.x = left;
     ghostInfo.topLeft.y = top;
-    translateGhost();
-    setTimeout(function() {
+    translateGhost(duration);
+    setTimeout(function () {
       endDrop();
     }, duration + 20);
   }
@@ -174,9 +172,10 @@ function handleDropAnimation(callback: Function) {
 
   function disappearAnimation(duration: number, clb: Function) {
     Utils.addClass(ghostInfo.ghost, 'animated');
-    ghostInfo.ghost.style.transitionDuration = duration + 'ms';
-    ghostInfo.ghost.style.opacity = '0';
-    ghostInfo.ghost.style.transform = 'scale(0.90)';
+    translateGhost(duration, 0.9, true);
+    // ghostInfo.ghost.style.transitionDuration = duration + 'ms';
+    // ghostInfo.ghost.style.opacity = '0';
+    // ghostInfo.ghost.style.transform = 'scale(0.90)';
     setTimeout(function () {
       clb();
     }, duration);
@@ -308,7 +307,7 @@ const handleDragStartConditions = (function handleDragStartConditions() {
     clb();
   }
 
-  return function(_startEvent: MouseEvent & TouchEvent, _delay: number, _clb: Function) {
+  return function (_startEvent: MouseEvent & TouchEvent, _delay: number, _clb: Function) {
     startEvent = getPointerEvent(_startEvent);
     delay = typeof _delay === 'number' ? _delay : isMobile ? 200 : 0;
     clb = _clb;
@@ -376,7 +375,7 @@ function onMouseUp() {
       isDragging = false;
       fireOnDragStartEnd(false);
       const containers = dragListeningContainers || [];
-      
+
       let containerToCallDrop = containers.shift();
       while (containerToCallDrop !== undefined) {
         containerToCallDrop.handleDrop(draggableInfo);
@@ -399,23 +398,30 @@ function getPointerEvent(e: TouchEvent & MouseEvent): MouseEvent & TouchEvent {
 
 function dragHandler(dragListeningContainers: IContainer[]) {
   let targetContainers = dragListeningContainers;
-  return function(draggableInfo: DraggableInfo) {
-    let containerBoxChanged = false;
-    targetContainers.forEach((p: IContainer) => {
-      const dragResult = p.handleDrag(draggableInfo)!;
-      containerBoxChanged = !!dragResult.containerBoxChanged || false;
-      dragResult.containerBoxChanged = false;
-    });
-    handleScroll({ draggableInfo });
-
-    if (containerBoxChanged) {
-      containerBoxChanged = false;
-      setTimeout(() => {
-        containers.forEach(p => {
-          p.layout.invalidateRects();
-          p.onTranslated();
+  let animationFrame: number | null = null;
+  return function (draggableInfo: DraggableInfo) {
+    if (animationFrame === null) {
+      animationFrame = requestAnimationFrame(() => {
+        let containerBoxChanged = false;
+        targetContainers.forEach((p: IContainer) => {
+          const dragResult = p.handleDrag(draggableInfo)!;
+          containerBoxChanged = !!dragResult.containerBoxChanged || false;
+          dragResult.containerBoxChanged = false;
         });
-      }, 10);
+        handleScroll({ draggableInfo });
+
+        if (containerBoxChanged) {
+          containerBoxChanged = false;
+          setTimeout(() => {
+            containers.forEach(p => {
+              p.layout.invalidateRects();
+              p.onTranslated();
+            });
+          }, 10);
+        }
+
+        animationFrame = null;
+      })
     }
   };
 }
@@ -485,9 +491,35 @@ function initiateDrag(position: MousePosition, cursor: string) {
   }
 }
 
-function translateGhost() {
-  const { ghost, topLeft: {x, y} } = ghostInfo;
-  ghost.style.transform = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`;
+let ghostAnimationFrame: number | null = null;
+function translateGhost(translateDuration = 0, scale = 1, fadeOut = false) {
+  const { ghost, topLeft: { x, y } } = ghostInfo;
+  let transformString = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`;
+  if (scale !== 1) {
+    transformString = `${transformString} scale(${scale})`;
+  }
+
+  if (translateDuration > 0) {
+    ghostInfo.ghost.style.transitionDuration = translateDuration + 'ms';
+    requestAnimationFrame(() => {
+      ghost.style.transform = transformString;
+      ghostAnimationFrame = null;
+      if (fadeOut) {
+        ghost.style.opacity = '0';
+      }
+    })
+    return;
+  }
+
+  if (ghostAnimationFrame === null) {
+    ghostAnimationFrame = requestAnimationFrame(() => {
+      ghost.style.transform = transformString;
+      ghostAnimationFrame = null;
+      if (fadeOut) {
+        ghost.style.opacity = '0';
+      }
+    });
+  }
 }
 
 function onMouseMove(event: MouseEvent & TouchEvent) {
@@ -586,11 +618,12 @@ function unregisterContainer(container: IContainer) {
 
 function watchRectangles() {
   let animationHandle: number | null = null;
-  function start() {
+  let isStarted = false;
+  function _start() {
     animationHandle = requestAnimationFrame(() => {
       dragListeningContainers.forEach(p => p.layout.invalidateRects());
       setTimeout(() => {
-        if (animationHandle !== null) start();
+        if (animationHandle !== null) _start();
       }, 50);
     });
   }
@@ -600,10 +633,16 @@ function watchRectangles() {
       cancelAnimationFrame(animationHandle);
       animationHandle = null;
     }
+    isStarted = false;
   }
 
   return {
-    start,
+    start: () => {
+      if (!isStarted) {
+        isStarted = true;
+        _start();
+      }
+    },
     stop
   }
 }

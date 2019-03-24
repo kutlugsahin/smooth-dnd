@@ -63,7 +63,7 @@ export default function layoutManager(containerElement: ElementX, orientation: O
 		translation: 0
 	};
 
-	global.addEventListener('resize', function () {
+	window.addEventListener('resize', function () {
 		invalidateContainerRectangles(containerElement);
 	});
 

@@ -34,31 +34,31 @@ function listenEvents() {
 
 function addGrabListeners() {
   grabEvents.forEach(e => {
-    global.document.addEventListener(e, onMouseDown, { passive: false });
+    window.document.addEventListener(e, onMouseDown as any, { passive: false } as any);
   });
 }
 
 function addMoveListeners() {
   moveEvents.forEach(e => {
-    global.document.addEventListener(e, onMouseMove, { passive: false });
+    window.document.addEventListener(e, onMouseMove as any, { passive: false } as any);
   });
 }
 
 function removeMoveListeners() {
   moveEvents.forEach(e => {
-    global.document.removeEventListener(e, onMouseMove, { passive: false });
+    window.document.removeEventListener(e, onMouseMove as any, { passive: false } as any);
   });
 }
 
 function addReleaseListeners() {
   releaseEvents.forEach(e => {
-    global.document.addEventListener(e, onMouseUp, { passive: false });
+    window.document.addEventListener(e, onMouseUp, { passive: false });
   });
 }
 
 function removeReleaseListeners() {
   releaseEvents.forEach(e => {
-    global.document.removeEventListener(e, onMouseUp, { passive: false });
+    window.document.removeEventListener(e, onMouseUp as any, { passive: false } as any);
   });
 }
 
@@ -68,9 +68,9 @@ function getGhostParent() {
   }
 
   if (grabbedElement) {
-    return grabbedElement.parentElement || global.document.body;
+    return grabbedElement.parentElement || window.document.body;
   } else {
-    return global.document.body;
+    return window.document.body;
   }
 }
 
@@ -98,8 +98,8 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   if (container.getOptions().dragClass) {
     setTimeout(() => {
       Utils.addClass(ghost.firstElementChild as HTMLElement, container.getOptions().dragClass!);
-      const dragCursor = global.getComputedStyle(ghost.firstElementChild).cursor;
-      cursorStyleElement = addCursorStyleToBody(dragCursor);
+      const dragCursor = window.getComputedStyle(ghost.firstElementChild!).cursor;
+      cursorStyleElement = addCursorStyleToBody(dragCursor!);
     });
   } else {
     cursorStyleElement = addCursorStyleToBody(cursor);
@@ -277,28 +277,28 @@ const handleDragStartConditions = (function handleDragStartConditions() {
       timer = setTimeout(callCallback, delay);
     }
 
-    moveEvents.forEach(e => global.document.addEventListener(e, onMove), {
+    moveEvents.forEach(e => window.document.addEventListener(e, onMove as any), {
       passive: false,
     });
-    releaseEvents.forEach(e => global.document.addEventListener(e, onUp), {
+    releaseEvents.forEach(e => window.document.addEventListener(e, onUp), {
       passive: false,
     });
-    global.document.addEventListener('drag', onHTMLDrag, {
+    window.document.addEventListener('drag', onHTMLDrag, {
       passive: false,
     });
   }
 
   function deregisterEvent() {
     clearTimeout(timer);
-    moveEvents.forEach(e => global.document.removeEventListener(e, onMove), {
+    moveEvents.forEach(e => window.document.removeEventListener(e, onMove as any), {
       passive: false,
     });
-    releaseEvents.forEach(e => global.document.removeEventListener(e, onUp), {
+    releaseEvents.forEach(e => window.document.removeEventListener(e, onUp), {
       passive: false,
     });
-    global.document.removeEventListener('drag', onHTMLDrag, {
+    window.document.removeEventListener('drag', onHTMLDrag, {
       passive: false,
-    });
+    } as any);
   }
 
   function callCallback() {
@@ -336,22 +336,22 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
       }
 
       if (startDrag) {
-        Utils.addClass(global.document.body, constants.disbaleTouchActions);
-        Utils.addClass(global.document.body, constants.noUserSelectClass);
+        Utils.addClass(window.document.body, constants.disbaleTouchActions);
+        Utils.addClass(window.document.body, constants.noUserSelectClass);
 
         const onMouseUp = () => {
-          Utils.removeClass(global.document.body, constants.disbaleTouchActions);
-          Utils.removeClass(global.document.body, constants.noUserSelectClass);
-          global.document.removeEventListener('mouseup', onMouseUp);
+          Utils.removeClass(window.document.body, constants.disbaleTouchActions);
+          Utils.removeClass(window.document.body, constants.noUserSelectClass);
+          window.document.removeEventListener('mouseup', onMouseUp);
         }
 
-        global.document.addEventListener('mouseup', onMouseUp);
+        window.document.addEventListener('mouseup', onMouseUp);
       }
 
       if (startDrag) {
         handleDragStartConditions(e, container.getOptions().dragBeginDelay!, () => {
           Utils.clearSelection();
-          initiateDrag(e, Utils.getElementCursor(event.target as Element));
+          initiateDrag(e, Utils.getElementCursor(event.target as Element)!);
           addMoveListeners();
           addReleaseListeners();
         });
@@ -526,7 +526,7 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
   event.preventDefault();
   const e = getPointerEvent(event);
   if (!draggableInfo) {
-    initiateDrag(e, Utils.getElementCursor(event.target as Element));
+    initiateDrag(e, Utils.getElementCursor(event.target as Element)!);
   } else {
     const containerOptions = draggableInfo.container.getOptions();
     const isContainDrag = containerOptions.behaviour === 'contain';
@@ -659,6 +659,8 @@ function Mediator() {
   };
 }
 
-addStyleToHead();
+if (typeof window !== undefined) {
+  addStyleToHead();
+}
 
 export default Mediator();

@@ -5,7 +5,6 @@ import {
 import { ContainerProps } from './interfaces';
 import { DropCallback, DropResult } from './exportTypes';
 
-
 export function domDropHandler({ element, draggables }: ContainerProps) {
 	return (dropResult: DropResult, onDrop: DropCallback) => {
 		const { removedIndex, addedIndex, droppedElement } = dropResult as any;
@@ -16,7 +15,7 @@ export function domDropHandler({ element, draggables }: ContainerProps) {
 		}
 
 		if (addedIndex !== null) {
-			const wrapper = global.document.createElement('div');
+			const wrapper = window.document.createElement('div');
 			wrapper.className = `${wrapperClass}`;
 			wrapper.appendChild(removedWrapper && removedWrapper.firstElementChild ? removedWrapper.firstElementChild : droppedElement);
 			addChildAt(element, wrapper, addedIndex);

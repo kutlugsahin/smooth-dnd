@@ -1,6 +1,5 @@
 import { containerClass, disbaleTouchActions, dropPlaceholderFlexContainerClass, dropPlaceholderInnerClass, dropPlaceholderWrapperClass, ghostClass, noUserSelectClass, stretcherElementClass, wrapperClass, dropPlaceholderDefaultClass } from './constants';
 import { Dictionary } from './interfaces';
-declare const global: any;
 
 const verticalWrapperClass = {
 	'overflow': 'hidden',
@@ -94,15 +93,15 @@ function convertToCssString(css: Dictionary): string {
 
 function addStyleToHead() {
 	if (typeof (window) !== 'undefined') {
-		const head = global.document.head || global.document.getElementsByTagName("head")[0];
-		const style = global.document.createElement("style");
+		const head = window.document.head || window.document.getElementsByTagName("head")[0];
+		const style = window.document.createElement("style") as any;
 		style.id = 'smooth-dnd-style-definitions';
 		const cssString = convertToCssString(css);
 		style.type = 'text/css';
 		if (style.styleSheet) {
 			style.styleSheet.cssText = cssString;
 		} else {
-			style.appendChild(global.document.createTextNode(cssString));
+			style.appendChild(window.document.createTextNode(cssString));
 		}
 
 		head.appendChild(style);
@@ -111,8 +110,8 @@ function addStyleToHead() {
 
 function addCursorStyleToBody(cursor: string) {
 	if (cursor && typeof (window) !== 'undefined') {
-		const head = global.document.head || global.document.getElementsByTagName("head")[0];
-		const style = global.document.createElement("style");
+		const head = window.document.head || window.document.getElementsByTagName("head")[0];
+		const style = window.document.createElement("style") as any;
 		const cssString = convertToCssString({
 			'body *': {
 				cursor: `${cursor} !important`
@@ -122,7 +121,7 @@ function addCursorStyleToBody(cursor: string) {
 		if (style.styleSheet) {
 			style.styleSheet.cssText = cssString;
 		} else {
-			style.appendChild(global.document.createTextNode(cssString));
+			style.appendChild(window.document.createTextNode(cssString));
 		}
 
 		head.appendChild(style);
@@ -135,7 +134,7 @@ function addCursorStyleToBody(cursor: string) {
 
 function removeStyle(styleElement: HTMLStyleElement) {
 	if (styleElement && typeof (window) !== 'undefined') {
-		const head = global.document.head || global.document.getElementsByTagName("head")[0];
+		const head = window.document.head || window.document.getElementsByTagName("head")[0];
 		head.removeChild(styleElement);
 	}
 }

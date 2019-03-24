@@ -43,7 +43,7 @@ function isDragRelevant({ element, options }: ContainerProps) {
 
 function wrapChild(child: HTMLElement) {
   if (smoothDnD.wrapChild) {
-    const div = global.document.createElement('div');
+    const div = window.document.createElement('div');
     div.className = `${wrapperClass}`;
     child.parentElement!.insertBefore(div, child);
     div.appendChild(child);
@@ -406,7 +406,7 @@ function handleInsertionSizeChange({ element, draggables, layout, options }: Con
               ? layout.getBeginEnd(draggables[draggables.length - 1]).end - draggables[draggables.length - 1][translationValue]
               : containerBeginEnd.begin;
           if (lastDraggableEnd + elementSize > containerEnd) {
-            strectherElement = global.document.createElement('div') as HTMLElement;
+            strectherElement = window.document.createElement('div') as HTMLElement;
             strectherElement.className = stretcherElementClass + ' ' + options.orientation;
             const stretcherSize = draggables.length > 0 ? elementSize + lastDraggableEnd - containerEnd : elementSize;
             layout.setSize(strectherElement.style, `${stretcherSize}px`);

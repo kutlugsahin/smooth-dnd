@@ -12,7 +12,7 @@ module.exports = {
     format: 'umd',
     sourcemap: false,
     name: 'SmoothDnD',
-    exports: 'named'
+    exports: 'named',
   },
 	plugins: [
     babel({

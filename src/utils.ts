@@ -1,8 +1,6 @@
 import { Rect, Axis, ElementX, ScrollAxis, IContainer } from './interfaces';
 import { containerInstance } from './constants';
 
-declare const global: any;
-
 export const getIntersection = (rect1: Rect, rect2: Rect) => {
   return {
     left: Math.max(rect1.left, rect2.left),
@@ -53,13 +51,13 @@ export const getContainerRect = (element: HTMLElement): Rect => {
 };
 
 export const getScrollingAxis = (element: HTMLElement): ScrollAxis | null => {
-  const style = global.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
   const overflow = style['overflow'];
   const general = overflow === 'auto' || overflow === 'scroll';
   if (general) return ScrollAxis.xy;
-  const overFlowX = style[`overflow-x`];
+  const overFlowX = style[`overflow-x` as any];
   const xScroll = overFlowX === 'auto' || overFlowX === 'scroll';
-  const overFlowY = style[`overflow-y`];
+  const overFlowY = style[`overflow-y` as any];
   const yScroll = overFlowY === 'auto' || overFlowY === 'scroll';
 
   if (xScroll && yScroll) return ScrollAxis.xy;
@@ -69,18 +67,18 @@ export const getScrollingAxis = (element: HTMLElement): ScrollAxis | null => {
 };
 
 export const isScrolling = (element: HTMLElement, axis: Axis) => {
-  const style = global.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
   const overflow = style['overflow'];
-  const overFlowAxis = style[`overflow-${axis}`];
+  const overFlowAxis = style[`overflow-${axis}` as any];
   const general = overflow === 'auto' || overflow === 'scroll';
   const dimensionScroll = overFlowAxis === 'auto' || overFlowAxis === 'scroll';
   return general || dimensionScroll;
 };
 
 export const isScrollingOrHidden = (element: HTMLElement, axis: Axis) => {
-  const style = global.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
   const overflow = style['overflow'];
-  const overFlowAxis = style[`overflow-${axis}`];
+  const overFlowAxis = style[`overflow-${axis}` as any];
   const general = overflow === 'auto' || overflow === 'scroll' || overflow === 'hidden';
   const dimensionScroll = overFlowAxis === 'auto' || overFlowAxis === 'scroll' || overFlowAxis === 'hidden';
   return general || dimensionScroll;
@@ -156,14 +154,14 @@ export const listenScrollParent = (element: HTMLElement, clb: () => void) => {
   function start() {
     if (scrollers) {
       scrollers.forEach(p => p.addEventListener('scroll', clb));
-      global.addEventListener('scroll', clb);
+      window.addEventListener('scroll', clb);
     }
   }
 
   function stop() {
     if (scrollers) {
       scrollers.forEach(p => p.removeEventListener('scroll', clb));
-      global.removeEventListener('scroll', clb);
+      window.removeEventListener('scroll', clb);
     }
   }
 
@@ -255,13 +253,13 @@ export const addChildAt = (parent: HTMLElement, child: HTMLElement, index: numbe
 export const isMobile = () => {
   if (typeof window !== 'undefined') {
     if (
-      global.navigator.userAgent.match(/Android/i) ||
-      global.navigator.userAgent.match(/webOS/i) ||
-      global.navigator.userAgent.match(/iPhone/i) ||
-      global.navigator.userAgent.match(/iPad/i) ||
-      global.navigator.userAgent.match(/iPod/i) ||
-      global.navigator.userAgent.match(/BlackBerry/i) ||
-      global.navigator.userAgent.match(/Windows Phone/i)
+      window.navigator.userAgent.match(/Android/i) ||
+      window.navigator.userAgent.match(/webOS/i) ||
+      window.navigator.userAgent.match(/iPhone/i) ||
+      window.navigator.userAgent.match(/iPad/i) ||
+      window.navigator.userAgent.match(/iPod/i) ||
+      window.navigator.userAgent.match(/BlackBerry/i) ||
+      window.navigator.userAgent.match(/Windows Phone/i)
     ) {
       return true;
     } else {
@@ -272,23 +270,23 @@ export const isMobile = () => {
 };
 
 export const clearSelection = () => {
-  if (global.getSelection) {
-    if (global.getSelection().empty) {
+  if (window.getSelection) {
+    if (window.getSelection().empty) {
       // Chrome
-      global.getSelection().empty();
-    } else if (global.getSelection().removeAllRanges) {
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {
       // Firefox
-      global.getSelection().removeAllRanges();
+      window.getSelection().removeAllRanges();
     }
-  } else if (global.document.selection) {
+  } else if ((window.document as any).selection) {
     // IE?
-    global.document.selection.empty();
+    (window.document as any).selection.empty();
   }
 };
 
 export const getElementCursor = (element: Element | null) => {
   if (element) {
-    const style = global.getComputedStyle(element);
+    const style = window.getComputedStyle(element);
     if (style) {
       return style.cursor;
     }

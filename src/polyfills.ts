@@ -71,6 +71,6 @@ function applyPolyfills() {
   }
 }
 
-if (typeof window !== undefined) {
+if (typeof window !== 'undefined') {
   applyPolyfills();
 }

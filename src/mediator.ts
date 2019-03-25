@@ -659,7 +659,7 @@ function Mediator() {
   };
 }
 
-if (typeof window !== undefined) {
+if (typeof window !== 'undefined') {
   addStyleToHead();
 }
 

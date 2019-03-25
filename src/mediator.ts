@@ -82,13 +82,11 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   ghost.style.zIndex = '1000';
   ghost.style.boxSizing = 'border-box';
   ghost.style.position = 'fixed';
-  // ghost.style.left = left + 'px';
-  // ghost.style.top = top + 'px';
   ghost.style.top = '0px';
   ghost.style.left = '0px';
   ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-  ghost.style.width = right - left + 'px';
-  ghost.style.height = bottom - top + 'px';
+  ghost.style.width = (right - left) + 'px';
+  ghost.style.height = (bottom - top) + 'px';
   ghost.style.overflow = 'visible';
   ghost.style.transition = null!;
   ghost.style.removeProperty('transition');

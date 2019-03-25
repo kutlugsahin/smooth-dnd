@@ -66,7 +66,7 @@ export interface DraggableInfo {
 export interface ContainerProps {
   element: ElementX;
   draggables: ElementX[];
-  options: ContainerOptions;
+  getOptions: () => ContainerOptions;
   layout: LayoutManager;
 }
 

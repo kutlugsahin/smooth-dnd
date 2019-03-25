@@ -1,4 +1,3 @@
-import layoutManager from './layoutManager';
 import { ContainerOptions } from './exportTypes';
 
 export type Position = { x: number; y: number };
@@ -68,13 +67,13 @@ export interface ContainerProps {
   element: ElementX;
   draggables: ElementX[];
   options: ContainerOptions;
-  layout: ReturnType<typeof layoutManager>;
+  layout: LayoutManager;
 }
 
 export interface IContainer {
   element: HTMLElement;
   draggables: HTMLElement[];
-  layout: ReturnType<typeof layoutManager>;
+  layout: LayoutManager;
   isDragRelevant: (sourceContainer: IContainer, payload: any) => boolean;
   dispose: (container: IContainer) => void;
   prepareDrag: (container: IContainer, relevantContainer: IContainer[]) => void;
@@ -87,6 +86,7 @@ export interface IContainer {
   setDraggables: () => void;
   fireRemoveElement: () => void;
   getScrollMaxSpeed: () => number | undefined;
+  setOptions: (options: ContainerOptions) => void;
 }
 
 export interface GhostInfo {
@@ -97,4 +97,47 @@ export interface GhostInfo {
   ghost: HTMLElement;
   centerDelta: Position;
   positionDelta: { left: number; top: number };
+}
+
+export interface LayoutManager {
+  getSize: (element: HTMLElement | OffsetSize) => number;
+  getContainerRectangles: () => {
+    rect: any;
+    visibleRect: any;
+    lastVisibleRect: any;
+  };
+  getBeginEndOfDOMRect: (rect: Rect) => {
+    begin: any;
+    end: any;
+  };
+  getBeginEndOfContainer: () => {
+    begin: any;
+    end: any;
+  };
+  getBeginEndOfContainerVisibleRect: () => {
+    begin: any;
+    end: any;
+  };
+  getBeginEnd: (element: HTMLElement) => {
+    begin: number;
+    end: number;
+  };
+  getAxisValue: (position: Position) => Axis;
+  setTranslation: (element: ElementX, translation: number) => void;
+  getTranslation: (element: ElementX) => number;
+  setVisibility: (element: ElementX, isVisible: boolean) => void;
+  isVisible: (element: ElementX) => boolean;
+  isInVisibleRect: (x: number, y: number) => boolean;
+  setSize: (element: HTMLElement | CSSStyleDeclaration, size: string) => void;
+  getTopLeftOfElementBegin: (begin: number) => {
+    top: number;
+    left: number;
+  }
+  getScrollSize: (element: HTMLElement) => number;
+  getScrollValue: (element: HTMLElement) => number;
+  setScrollValue: (element: HTMLElement, val: number) => void;
+  invalidate: () => void;
+  invalidateRects: () => void;
+  getPosition: (position: Position) => Rect;
+  setBegin: (style: CSSStyleDeclaration, value: string) => void;
 }

@@ -1,5 +1,6 @@
 export interface SmoothDnD {
 	dispose: () => void;
+	setOptions: (options: ContainerOptions) => void;	
 }
 
 export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
@@ -7,6 +8,8 @@ export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOption
 	wrapChild?: boolean;
 	maxScrollSpeed?: number;
 };
+
+type Callback<T> = (params: T) => void;
 
 export interface DropResult {
 	removedIndex: number | null;
@@ -21,8 +24,14 @@ export interface DropPreviewOptions {
 	showOnTop?: boolean;
 }
 
-export type DragStartEndCallback = (info: { isSource: boolean; payload: any; willAcceptDrop: boolean }) => void;
-export type DropCallback = (dropResult: DropResult) => void;
+export interface DragStartParams { isSource: boolean; payload: any; willAcceptDrop: boolean }
+export interface DragEndParams { isSource: boolean; payload: any; willAcceptDrop: boolean }
+
+export type DragStartCallback = Callback<DragStartParams>;
+export type DragEndCallback = Callback<DragEndParams>;
+export type OnDropCallback = Callback<DropResult>;
+export type OnDropReadyCallback = Callback<DropResult>;
+
 
 export interface ContainerOptions {
 	behaviour?: 'move' | 'copy' | 'drop-zone' | 'contain';
@@ -36,16 +45,16 @@ export interface ContainerOptions {
 	lockAxis?: 'x' | 'y';
 	dragClass?: string;
 	dropClass?: string;
-	onDragStart?: DragStartEndCallback;
-	onDrop?: DropCallback;
+	onDragStart?: DragStartCallback;
+	onDrop?: OnDropCallback;
 	getChildPayload?: (index: number) => any;
 	shouldAnimateDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
 	shouldAcceptDrop?: (sourceContainerOptions: ContainerOptions, payload: any) => boolean;
 	onDragEnter?: () => void;
 	onDragLeave?: () => void;
-	onDropReady?: DropCallback;
+	onDropReady?: OnDropReadyCallback;
 	removeOnDropOut?: boolean;
 	getGhostParent?: () => HTMLElement;
-	onDragEnd?: DragStartEndCallback;
+	onDragEnd?: DragEndCallback;
 	dropPlaceholder?: DropPreviewOptions | boolean;	
 }

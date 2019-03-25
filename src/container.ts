@@ -2,7 +2,7 @@ import { animationClass, containerClass, containerInstance, dropPlaceholderFlexC
 import { defaultOptions } from './defaults';
 import { domDropHandler } from './dropHandlers';
 import { ContainerOptions, SmoothDnD, SmoothDnDCreator } from './exportTypes';
-import { ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer } from './interfaces';
+import { ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer, LayoutManager } from './interfaces';
 import layoutManager from './layoutManager';
 import Mediator from './mediator';
 import { addClass, getParent, getParentRelevantContainerElement, hasClass, listenScrollParent, removeClass } from './utils';
@@ -83,7 +83,7 @@ function unwrapChildren(element: HTMLElement) {
   }
 }
 
-function findDraggebleAtPos({ layout }: { layout: ReturnType<typeof layoutManager> }) {
+function findDraggebleAtPos({ layout }: { layout: LayoutManager }) {
   const find = (
     draggables: HTMLElement[],
     pos: number,
@@ -661,8 +661,8 @@ function compose(params: any) {
 }
 
 // Container definition begin
-function Container(element: HTMLElement): (options?: ContainerOptions) => any {
-  return function (options?: ContainerOptions) {
+function Container(element: HTMLElement): (options?: ContainerOptions) => IContainer {
+  return function (options?: ContainerOptions): IContainer {
     let dragResult: DragResult | null = null;
     let lastDraggableInfo: DraggableInfo | null = null;
     const props = getContainerProps(element, options);
@@ -738,7 +738,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
         if (dragResult && dragResult.dropPlaceholderContainer) {
           element.removeChild(dragResult.dropPlaceholderContainer);
         }
-        lastDraggableInfo = null;
+        lastDraggableInfo = null;       
         dragHandler = getDragHandler(props);
         dropHandler(draggableInfo, dragResult!);
         dragResult = null;
@@ -763,34 +763,16 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => any {
       },
       getScrollMaxSpeed() {
         return smoothDnD.maxScrollSpeed;
+      },
+      setOptions(options: ContainerOptions) {
+        props.options = Object.assign({}, defaultOptions, props.options, options);
+        dragHandler = getDragHandler(props);
       }
     };
 
     return container;
   };
 }
-
-// const options: ContainerOptions = {
-//   behaviour: 'move',
-//   groupName: 'bla bla', // if not defined => container will not interfere with other containers
-//   orientation: 'vertical',
-//   dragHandleSelector: undefined,
-//   nonDragAreaSelector: 'some selector',
-//   dragBeginDelay: 0,
-//   animationDuration: 180,
-//   autoScrollEnabled: true,
-//   lockAxis: 'x',
-//   dragClass: undefined,
-//   dropClass: undefined,
-//   onDragStart: (index, payload) => {},
-//   onDrop: ({ removedIndex, addedIndex, payload, element }) => {},
-//   getChildPayload: index => null,
-//   shouldAnimateDrop: (sourceContainerOptions, payload) => true,
-//   shouldAcceptDrop: (sourceContainerOptions, payload) => true,
-//   onDragEnter: () => {},
-//   onDragLeave: () => { },
-//   onDropReady: ({ removedIndex, addedIndex, payload, element }) => { },
-// };
 
 // exported part of container
 const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: ContainerOptions): SmoothDnD {
@@ -803,6 +785,9 @@ const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: Co
       Mediator.unregister(container);
       container.dispose(container);
     },
+    setOptions(options: ContainerOptions) {
+      container.setOptions(options);
+    }
   };
 };
 

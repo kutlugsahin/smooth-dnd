@@ -3,10 +3,10 @@ import {
 	wrapperClass,
 } from './constants';
 import { ContainerProps } from './interfaces';
-import { DropCallback, DropResult } from './exportTypes';
+import { DropResult, OnDropCallback } from './exportTypes';
 
 export function domDropHandler({ element, draggables }: ContainerProps) {
-	return (dropResult: DropResult, onDrop: DropCallback) => {
+	return (dropResult: DropResult, onDrop: OnDropCallback ) => {
 		const { removedIndex, addedIndex, droppedElement } = dropResult as any;
 		let removedWrapper = null;
 		if (removedIndex !== null) {
@@ -34,7 +34,7 @@ export function domDropHandler({ element, draggables }: ContainerProps) {
 
 export function reactDropHandler() {
 	const handler = () => {
-		return (dropResult: DropResult, onDrop: DropCallback) => {
+		return (dropResult: DropResult, onDrop: OnDropCallback) => {
 			if (onDrop) {
 				onDrop(dropResult);
 			}

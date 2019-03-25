@@ -1,5 +1,5 @@
 import { extraSizeForInsertion, translationValue, visibilityValue } from './constants';
-import { Dictionary, ElementX, OffsetSize, Orientation, Position, Rect } from './interfaces';
+import { Dictionary, ElementX, OffsetSize, Orientation, Position, Rect, LayoutManager } from './interfaces';
 import * as Utils from './utils';
 
 export interface PropMap {
@@ -55,7 +55,7 @@ function orientationDependentProps(map: PropMap) {
 
 
 
-export default function layoutManager(containerElement: ElementX, orientation: Orientation, _animationDuration: number) {
+export default function layoutManager(containerElement: ElementX, orientation: Orientation, _animationDuration: number): LayoutManager {
 	containerElement[extraSizeForInsertion] = 0;
 	const map = orientation === 'horizontal' ? horizontalMap : verticalMap;
 	const propMapper = orientationDependentProps(map);

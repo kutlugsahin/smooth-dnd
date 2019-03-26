@@ -17,11 +17,15 @@ let ghostInfo: GhostInfo = null!;
 let draggableInfo: DraggableInfo = null!;
 let containers: IContainer[] = [];
 let isDragging = false;
+let dropAnimationStarted = false;
+let missedDrag = false;
+let missedDragProcessTimeout: any;
 
-let handleDrag: (info: DraggableInfo) => void = null!;
+let handleDrag: (info: DraggableInfo) => boolean = null!;
 let handleScroll: (props: { draggableInfo?: DraggableInfo; reset?: boolean }) => void = null!;
 let sourceContainerLockAxis: Axis | null = null;
 let cursorStyleElement: HTMLStyleElement | null = null;
+
 const containerRectableWatcher = watchRectangles();
 
 const isMobile = Utils.isMobile();
@@ -358,69 +362,154 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
   }
 }
 
+function onMouseMove(event: MouseEvent & TouchEvent) {
+  event.preventDefault();
+  const e = getPointerEvent(event);
+  if (!draggableInfo) {
+    initiateDrag(e, Utils.getElementCursor(event.target as Element)!);
+  } else {
+    const containerOptions = draggableInfo.container.getOptions();
+    const isContainDrag = containerOptions.behaviour === 'contain';
+    if (isContainDrag) {
+      const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
+      if (containerOptions.orientation === 'vertical') {
+        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetHeight / 2);
+        const endBoundary = beginEnd.end - (draggableInfo.size.offsetHeight / 2);
+        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientY + ghostInfo.positionDelta.top)));
+
+        ghostInfo.topLeft.y = positionInBoundary;
+        draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
+        draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
+      } else {
+        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
+        const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
+        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
+
+        ghostInfo.topLeft.x = positionInBoundary;
+        draggableInfo.position.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientX + ghostInfo.centerDelta.x)));
+        draggableInfo.mousePosition.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientX));
+      }
+    } else if (sourceContainerLockAxis) {
+      if (sourceContainerLockAxis === 'y') {
+        ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
+        draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
+        draggableInfo.mousePosition.y = e.clientY;
+      } else if (sourceContainerLockAxis === 'x') {
+        ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
+        draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
+        draggableInfo.mousePosition.x = e.clientX;
+      }
+    } else {
+      ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
+      ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
+      draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
+      draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
+      draggableInfo.mousePosition.x = e.clientX;
+      draggableInfo.mousePosition.y = e.clientY;
+    }
+
+    translateGhost();
+
+    if (!handleDrag(draggableInfo)) {
+      missedDrag = true;
+    } else {
+      missedDrag = false;
+    }
+
+    if (missedDrag) {
+      debouncedHandleMissedDragFrame();
+    }
+  }
+}
+
+var debouncedHandleMissedDragFrame = Utils.debounce(handleMissedDragFrame, 20, false);
+
+function handleMissedDragFrame() {
+  if (missedDrag) {
+    missedDrag = false;
+    handleDragImmediate(draggableInfo, dragListeningContainers);
+  }
+}
+
 function onMouseUp() {
   removeMoveListeners();
   removeReleaseListeners();
-  handleScroll({ reset: true });
+    handleScroll({ reset: true });
 
-  if (cursorStyleElement) {
-    removeStyle(cursorStyleElement);
-    cursorStyleElement = null;
-  }
-  if (draggableInfo) {
-    containerRectableWatcher.stop();
-    handleDropAnimation(() => {
-      isDragging = false;
-      fireOnDragStartEnd(false);
-      const containers = dragListeningContainers || [];
+    if (cursorStyleElement) {
+      removeStyle(cursorStyleElement);
+      cursorStyleElement = null;
+    }
+    if (draggableInfo) {
+      containerRectableWatcher.stop();
+      handleMissedDragFrame();
+      dropAnimationStarted = true;
+      handleDropAnimation(() => {
+        isDragging = false; // 
+        fireOnDragStartEnd(false);
+        const containers = dragListeningContainers || [];
 
-      let containerToCallDrop = containers.shift();
-      while (containerToCallDrop !== undefined) {
-        containerToCallDrop.handleDrop(draggableInfo);
-        containerToCallDrop = containers.shift();
-      }
+        let containerToCallDrop = containers.shift();
+        while (containerToCallDrop !== undefined) {
+          containerToCallDrop.handleDrop(draggableInfo);
+          containerToCallDrop = containers.shift();
+        }
 
-      dragListeningContainers = null!;
-      grabbedElement = null;
-      ghostInfo = null!;
-      draggableInfo = null!;
-      sourceContainerLockAxis = null;
-      handleDrag = null!;
-    });
-  }
+        dragListeningContainers = null!;
+        grabbedElement = null;
+        ghostInfo = null!;
+        draggableInfo = null!;
+        sourceContainerLockAxis = null;
+        handleDrag = null!;
+        dropAnimationStarted = false;
+      });
+    }
 }
 
 function getPointerEvent(e: TouchEvent & MouseEvent): MouseEvent & TouchEvent {
   return e.touches ? e.touches[0] : e as any;
 }
 
-function dragHandler(dragListeningContainers: IContainer[]) {
+function handleDragImmediate(draggableInfo: DraggableInfo, dragListeningContainers: IContainer[]) {
+  let containerBoxChanged = false;
+  dragListeningContainers.forEach((p: IContainer) => {
+    const dragResult = p.handleDrag(draggableInfo)!;
+    containerBoxChanged = !!dragResult.containerBoxChanged || false;
+    dragResult.containerBoxChanged = false;
+  });
+  handleScroll({ draggableInfo });
+
+  if (containerBoxChanged) {
+    containerBoxChanged = false;
+    requestAnimationFrame(() => {
+      containers.forEach(p => {
+        p.layout.invalidateRects();
+        p.onTranslated();
+      });
+    });
+  }
+}
+
+function dragHandler(dragListeningContainers: IContainer[]): (draggableInfo: DraggableInfo) => boolean {
   let targetContainers = dragListeningContainers;
   let animationFrame: number | null = null;
-  return function (draggableInfo: DraggableInfo) {
-    if (animationFrame === null) {
-      animationFrame = requestAnimationFrame(() => {
-        let containerBoxChanged = false;
-        targetContainers.forEach((p: IContainer) => {
-          const dragResult = p.handleDrag(draggableInfo)!;
-          containerBoxChanged = !!dragResult.containerBoxChanged || false;
-          dragResult.containerBoxChanged = false;
-        });
-        handleScroll({ draggableInfo });
-
-        if (containerBoxChanged) {
-          containerBoxChanged = false;
-          setTimeout(() => {
-            containers.forEach(p => {
-              p.layout.invalidateRects();
-              p.onTranslated();
-            });
-          }, 10);
+  return function (draggableInfo: DraggableInfo, isImmediate = false): boolean {
+    if (animationFrame === null && isDragging && !dropAnimationStarted) {
+      if (isImmediate) {
+        if (isDragging && !dropAnimationStarted) {
+          handleDragImmediate(draggableInfo, targetContainers);
+          return true;
         }
-
+      }
+      animationFrame = requestAnimationFrame(() => {
+        if (isDragging && !dropAnimationStarted) {
+          handleDragImmediate(draggableInfo, targetContainers);
+        }
         animationFrame = null;
       })
+      return true;
     }
+    return false;
   };
 }
 
@@ -517,58 +606,6 @@ function translateGhost(translateDuration = 0, scale = 1, fadeOut = false) {
         ghost.style.opacity = '0';
       }
     });
-  }
-}
-
-function onMouseMove(event: MouseEvent & TouchEvent) {
-  event.preventDefault();
-  const e = getPointerEvent(event);
-  if (!draggableInfo) {
-    initiateDrag(e, Utils.getElementCursor(event.target as Element)!);
-  } else {
-    const containerOptions = draggableInfo.container.getOptions();
-    const isContainDrag = containerOptions.behaviour === 'contain';
-    if (isContainDrag) {
-      const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
-      if (containerOptions.orientation === 'vertical') {
-        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetHeight / 2);
-        const endBoundary = beginEnd.end - (draggableInfo.size.offsetHeight / 2);
-        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientY + ghostInfo.positionDelta.top)));
-
-        ghostInfo.topLeft.y = positionInBoundary;
-        draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
-        draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
-      } else {
-        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
-        const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
-        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
-
-        ghostInfo.topLeft.x = positionInBoundary;
-        draggableInfo.position.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientX + ghostInfo.centerDelta.x)));
-        draggableInfo.mousePosition.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientX));
-      }
-    } else if (sourceContainerLockAxis) {
-      if (sourceContainerLockAxis === 'y') {
-        ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
-        draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
-        draggableInfo.mousePosition.y = e.clientY;
-      } else if (sourceContainerLockAxis === 'x') {
-        ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
-        draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
-        draggableInfo.mousePosition.x = e.clientX;
-      }
-    } else {
-      ghostInfo.topLeft.x = e.clientX + ghostInfo.positionDelta.left;
-      ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
-      draggableInfo.position.x = e.clientX + ghostInfo.centerDelta.x;
-      draggableInfo.position.y = e.clientY + ghostInfo.centerDelta.y;
-      draggableInfo.mousePosition.x = e.clientX;
-      draggableInfo.mousePosition.y = e.clientY;
-    }
-
-    translateGhost();
-
-    handleDrag(draggableInfo);
   }
 }
 

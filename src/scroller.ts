@@ -62,7 +62,6 @@ function getScrollParams(position: Position, axis: Axis, rect: Rect): ScrollPara
 			speedFactor: (moveDistance - (end - pos)) / moveDistance
 		};
 	} else if (pos - begin < moveDistance) {
-		// console.log(pos - begin);
 		return {
 			direction: 'begin',
 			speedFactor: (moveDistance - (pos - begin)) / moveDistance

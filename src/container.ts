@@ -101,15 +101,15 @@ function findDraggebleAtPos({ layout }: { layout: LayoutManager }) {
       let { begin, end } = layout.getBeginEnd(draggables[startIndex]);
       // mouse pos is inside draggable
       // now decide which index to return
-      if (pos > begin && pos <= end) {
+      // if (pos > begin && pos <= end) {
         if (withRespectToMiddlePoints) {
           return pos < (end + begin) / 2 ? startIndex : startIndex + 1;
         } else {
           return startIndex;
         }
-      } else {
-        return null;
-      }
+      // } else {
+      //   return null;
+      // }
     } else {
       const middleIndex = Math.floor((endIndex + startIndex) / 2);
       const { begin, end } = layout.getBeginEnd(draggables[middleIndex]);
@@ -575,9 +575,6 @@ function fireDragEnterLeaveEvents({ getOptions }: ContainerProps) {
         options.onDragEnter && options.onDragEnter();
       } else {
         options.onDragLeave && options.onDragLeave();
-        return {
-          dragLeft: true,
-        };
       }
     }
 
@@ -709,17 +706,6 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
       processLastDraggableInfo();
     };
 
-    function handleDragLeftDeferedTranslation() {
-      if (dragResult && dragResult.dragLeft && getOptions().behaviour !== 'drop-zone') {
-        dragResult.dragLeft = false;
-        setTimeout(() => {
-          if (dragResult) {
-            calculateTranslations(props)({ dragResult });
-          }
-        }, 20);
-      }
-    }
-
     function dispose(container: IContainer) {
       scrollListener.dispose();
       unwrapChildren(container.element);
@@ -743,7 +729,6 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
       handleDrag(draggableInfo: DraggableInfo) {
         lastDraggableInfo = draggableInfo;
         dragResult = dragHandler(draggableInfo);
-        handleDragLeftDeferedTranslation();
         return dragResult;
       },
       handleDrop(draggableInfo: DraggableInfo) {

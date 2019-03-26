@@ -43,7 +43,6 @@ export interface DragResult {
   removedIndex: number | null;
   elementSize: number;
   shadowBeginEnd: Boundary & { beginAdjustment: number; rect?: TopLeft, dropArea?: Boundary };
-  dragLeft?: boolean;
   containerBoxChanged?: boolean;
   dropPlaceholderContainer?: HTMLDivElement;
 }

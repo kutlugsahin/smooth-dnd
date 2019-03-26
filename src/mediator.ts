@@ -493,14 +493,8 @@ function handleDragImmediate(draggableInfo: DraggableInfo, dragListeningContaine
 function dragHandler(dragListeningContainers: IContainer[]): (draggableInfo: DraggableInfo) => boolean {
   let targetContainers = dragListeningContainers;
   let animationFrame: number | null = null;
-  return function (draggableInfo: DraggableInfo, isImmediate = false): boolean {
+  return function (draggableInfo: DraggableInfo): boolean {
     if (animationFrame === null && isDragging && !dropAnimationStarted) {
-      if (isImmediate) {
-        if (isDragging && !dropAnimationStarted) {
-          handleDragImmediate(draggableInfo, targetContainers);
-          return true;
-        }
-      }
       animationFrame = requestAnimationFrame(() => {
         if (isDragging && !dropAnimationStarted) {
           handleDragImmediate(draggableInfo, targetContainers);

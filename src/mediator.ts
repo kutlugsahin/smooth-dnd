@@ -434,36 +434,36 @@ function handleMissedDragFrame() {
 function onMouseUp() {
   removeMoveListeners();
   removeReleaseListeners();
-    handleScroll({ reset: true });
+  handleScroll({ reset: true });
 
-    if (cursorStyleElement) {
-      removeStyle(cursorStyleElement);
-      cursorStyleElement = null;
-    }
-    if (draggableInfo) {
-      containerRectableWatcher.stop();
-      handleMissedDragFrame();
-      dropAnimationStarted = true;
-      handleDropAnimation(() => {
-        isDragging = false; // 
-        fireOnDragStartEnd(false);
-        const containers = dragListeningContainers || [];
+  if (cursorStyleElement) {
+    removeStyle(cursorStyleElement);
+    cursorStyleElement = null;
+  }
+  if (draggableInfo) {
+    containerRectableWatcher.stop();
+    handleMissedDragFrame();
+    dropAnimationStarted = true;
+    handleDropAnimation(() => {
+      isDragging = false; // 
+      fireOnDragStartEnd(false);
+      const containers = dragListeningContainers || [];
 
-        let containerToCallDrop = containers.shift();
-        while (containerToCallDrop !== undefined) {
-          containerToCallDrop.handleDrop(draggableInfo);
-          containerToCallDrop = containers.shift();
-        }
+      let containerToCallDrop = containers.shift();
+      while (containerToCallDrop !== undefined) {
+        containerToCallDrop.handleDrop(draggableInfo);
+        containerToCallDrop = containers.shift();
+      }
 
-        dragListeningContainers = null!;
-        grabbedElement = null;
-        ghostInfo = null!;
-        draggableInfo = null!;
-        sourceContainerLockAxis = null;
-        handleDrag = null!;
-        dropAnimationStarted = false;
-      });
-    }
+      dragListeningContainers = null!;
+      grabbedElement = null;
+      ghostInfo = null!;
+      draggableInfo = null!;
+      sourceContainerLockAxis = null;
+      handleDrag = null!;
+      dropAnimationStarted = false;
+    });
+  }
 }
 
 function getPointerEvent(e: TouchEvent & MouseEvent): MouseEvent & TouchEvent {
@@ -477,7 +477,6 @@ function handleDragImmediate(draggableInfo: DraggableInfo, dragListeningContaine
     containerBoxChanged = !!dragResult.containerBoxChanged || false;
     dragResult.containerBoxChanged = false;
   });
-  handleScroll({ draggableInfo });
 
   if (containerBoxChanged) {
     containerBoxChanged = false;
@@ -498,6 +497,7 @@ function dragHandler(dragListeningContainers: IContainer[]): (draggableInfo: Dra
       animationFrame = requestAnimationFrame(() => {
         if (isDragging && !dropAnimationStarted) {
           handleDragImmediate(draggableInfo, targetContainers);
+          handleScroll({ draggableInfo });
         }
         animationFrame = null;
       })

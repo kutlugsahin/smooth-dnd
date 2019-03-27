@@ -90,7 +90,6 @@ function addScrollValue(element: HTMLElement | Window, axis: Axis, value: number
 }
 
 const createAnimator = (element: HTMLElement, axis: Axis = 'y'): Animator => {
-	let isAnimating = false;
 	let request: number | null = null;
 	let startTime: number | null = null;
 	let direction: Direction | null = null;
@@ -99,10 +98,7 @@ const createAnimator = (element: HTMLElement, axis: Axis = 'y'): Animator => {
 	function animate(_direction: Direction, _speed: number) {
 		direction = _direction;
 		speed = _speed;
-		isAnimating = true;
-		if (isAnimating) {
-			start();
-		}
+		start();
 	}
 
 	function start() {
@@ -121,12 +117,11 @@ const createAnimator = (element: HTMLElement, axis: Axis = 'y'): Animator => {
 	}
 
 	function stop() {
-		if (isAnimating) {
-			cancelAnimationFrame(request!);
-			isAnimating = false;
-			startTime = null;
+		if (request !== null) {
+			cancelAnimationFrame(request);
 			request = null;
 		}
+		startTime = null;
 	}
 
 	return {
@@ -204,9 +199,9 @@ function setScrollParams(animatorInfos: ScrollerAnimator[], position: Position) 
 	});
 }
 
-function getTopmostScrollAnimator(animatorInfos: ScrollerAnimator[], position: Position): ScrollerAnimator | null{
+function getTopmostScrollAnimator(animatorInfos: ScrollerAnimator[], position: Position): ScrollerAnimator | null {
 	let current = document.elementFromPoint(position.x, position.y);
-	
+
 	while (current) {
 		const scrollAnimator = animatorInfos.find(p => p.scrollerElement === current);
 		if (scrollAnimator) {

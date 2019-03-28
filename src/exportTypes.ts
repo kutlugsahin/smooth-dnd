@@ -1,6 +1,6 @@
 export interface SmoothDnD {
 	dispose: () => void;
-	setOptions: (options: ContainerOptions) => void;	
+	setOptions: (options: ContainerOptions, merge?: boolean) => void;	
 }
 
 export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {

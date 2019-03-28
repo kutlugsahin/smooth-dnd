@@ -711,8 +711,12 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
       unwrapChildren(container.element);
     }
 
-    function setOptions(options: ContainerOptions) {
-      containerOptions = Object.assign({}, defaultOptions, containerOptions, options);
+    function setOptions(options: ContainerOptions, merge = true) {
+      if (merge === false) {
+        containerOptions = Object.assign({}, defaultOptions, options);
+      } else {
+        containerOptions = Object.assign({}, defaultOptions, containerOptions, options);
+      }
     }
 
     function getOptions(): ContainerOptions {

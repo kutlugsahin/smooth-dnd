@@ -36,6 +36,11 @@ const css = {
 	[`.${wrapperClass}.animated`]: {
 		'transition': 'transform ease',
 	},
+	[`.${ghostClass}`]: {
+		'box-sizing': 'border-box',
+		// 'background-color': 'transparent',
+		// '-webkit-font-smoothing': 'subpixel-antialiased'
+	},
 	[`.${ghostClass}.animated`]: {
 		'transition': 'all ease-in-out'
 	},

@@ -765,6 +765,9 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
       getScrollMaxSpeed() {
         return smoothDnD.maxScrollSpeed;
       },
+      shouldUseTransformForGhost() {
+        return smoothDnD.useTransformForGhost === true;
+      },
       getOptions,
       setOptions,
     };

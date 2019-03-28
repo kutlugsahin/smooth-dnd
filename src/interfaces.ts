@@ -86,6 +86,7 @@ export interface IContainer {
   fireRemoveElement: () => void;
   getScrollMaxSpeed: () => number | undefined;
   setOptions: (options: ContainerOptions) => void;
+  shouldUseTransformForGhost: () => boolean;
 }
 
 export interface GhostInfo {

@@ -1,7 +1,7 @@
 import * as constants from './constants';
 import { defaultOptions } from './defaults';
 import dragScroller from './scroller';
-import { Axis, DraggableInfo, ElementX, GhostInfo, IContainer, MousePosition, Position, TopLeft } from './interfaces';
+import { Axis, DraggableInfo, ElementX, GhostInfo, IContainer, MousePosition, Position, TopLeft, Orientation } from './interfaces';
 import './polyfills';
 import { addCursorStyleToBody, addStyleToHead, removeStyle } from './styles';
 import * as Utils from './utils';
@@ -19,8 +19,6 @@ let containers: IContainer[] = [];
 let isDragging = false;
 let dropAnimationStarted = false;
 let missedDrag = false;
-let missedDragProcessTimeout: any;
-
 let handleDrag: (info: DraggableInfo) => boolean = null!;
 let handleScroll: (props: { draggableInfo?: DraggableInfo; reset?: boolean }) => void = null!;
 let sourceContainerLockAxis: Axis | null = null;
@@ -88,7 +86,16 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   ghost.style.position = 'fixed';
   ghost.style.top = '0px';
   ghost.style.left = '0px';
-  ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+  ghost.style.transform = null;
+  ghost.style.removeProperty('transform');
+
+  if (container.shouldUseTransformForGhost()) {
+    ghost.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+  } else {
+    ghost.style.top = `${top}px`;
+    ghost.style.left = `${left}px`;
+  }
+
   ghost.style.width = (right - left) + 'px';
   ghost.style.height = (bottom - top) + 'px';
   ghost.style.overflow = 'visible';
@@ -180,7 +187,7 @@ function handleDropAnimation(callback: Function) {
     // ghostInfo.ghost.style.transform = 'scale(0.90)';
     setTimeout(function () {
       clb();
-    }, duration);
+    }, duration + 20);
   }
 
   if (draggableInfo.targetElement) {
@@ -199,7 +206,7 @@ function handleDropAnimation(callback: Function) {
     const container = containers.filter(p => p === draggableInfo.container)[0];
     if (container) {
       const { behaviour, removeOnDropOut } = container.getOptions();
-      if (behaviour === 'move' && !removeOnDropOut && container.getDragResult()) {
+      if ((behaviour === 'move' || behaviour === 'copy') && !removeOnDropOut && container.getDragResult()) {
         const rectangles = container.layout.getContainerRectangles();
 
         // container is hidden somehow
@@ -362,6 +369,42 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
   }
 }
 
+function handleMouseMoveForContainer({clientX, clientY}: MouseEvent & TouchEvent, orientation: Orientation = 'vertical') {
+  const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
+  let mousePos;
+  let axis: 'x' | 'y';
+  let leftTop: 'left' | 'top';
+  let size;
+
+  if (orientation === 'vertical') {
+    mousePos = clientY;
+    axis = 'y';
+    leftTop = 'top';
+    size = draggableInfo.size.offsetHeight;
+  } else {
+    mousePos = clientX;
+    axis = 'x';
+    leftTop = 'left';
+    size = draggableInfo.size.offsetWidth;
+  }
+
+  const beginBoundary = beginEnd.begin;
+  const endBoundary = beginEnd.end - size;
+  const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (mousePos + ghostInfo.positionDelta[leftTop])));
+
+  ghostInfo.topLeft[axis] = positionInBoundary;
+  draggableInfo.position[axis] = Math.max(beginEnd.begin, Math.min(beginEnd.end, (mousePos + ghostInfo.centerDelta[axis])));
+  draggableInfo.mousePosition[axis] = Math.max(beginEnd.begin, Math.min(beginEnd.end, mousePos));
+
+  if (draggableInfo.position[axis] < (beginEnd.begin + (size / 2))) {
+    draggableInfo.position[axis] = beginEnd.begin + 2;
+  }
+
+  if (draggableInfo.position[axis] > (beginEnd.end - (size / 2))) {
+    draggableInfo.position[axis] = beginEnd.end - 2;
+  }
+}
+
 function onMouseMove(event: MouseEvent & TouchEvent) {
   event.preventDefault();
   const e = getPointerEvent(event);
@@ -371,24 +414,7 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
     const containerOptions = draggableInfo.container.getOptions();
     const isContainDrag = containerOptions.behaviour === 'contain';
     if (isContainDrag) {
-      const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
-      if (containerOptions.orientation === 'vertical') {
-        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetHeight / 2);
-        const endBoundary = beginEnd.end - (draggableInfo.size.offsetHeight / 2);
-        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientY + ghostInfo.positionDelta.top)));
-
-        ghostInfo.topLeft.y = positionInBoundary;
-        draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
-        draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
-      } else {
-        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
-        const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
-        const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
-
-        ghostInfo.topLeft.x = positionInBoundary;
-        draggableInfo.position.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientX + ghostInfo.centerDelta.x)));
-        draggableInfo.mousePosition.x = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientX));
-      }
+      handleMouseMoveForContainer(e, containerOptions.orientation);
     } else if (sourceContainerLockAxis) {
       if (sourceContainerLockAxis === 'y') {
         ghostInfo.topLeft.y = e.clientY + ghostInfo.positionDelta.top;
@@ -575,15 +601,22 @@ function initiateDrag(position: MousePosition, cursor: string) {
 let ghostAnimationFrame: number | null = null;
 function translateGhost(translateDuration = 0, scale = 1, fadeOut = false) {
   const { ghost, topLeft: { x, y } } = ghostInfo;
-  let transformString = `translate3d(${x.toFixed()}px,${y.toFixed()}px, 0)`;
+  const useTransform = draggableInfo.container ? draggableInfo.container.shouldUseTransformForGhost() : true;
+
+  let transformString = useTransform ? `translate3d(${x}px,${y}px, 0)` : null;
+
   if (scale !== 1) {
-    transformString = `${transformString} scale(${scale})`;
+    transformString = transformString ? `${transformString} scale(${scale})` : `scale(${scale})`;
   }
 
   if (translateDuration > 0) {
     ghostInfo.ghost.style.transitionDuration = translateDuration + 'ms';
     requestAnimationFrame(() => {
-      ghost.style.transform = transformString;
+      transformString && (ghost.style.transform = transformString);
+      if (!useTransform) {
+        ghost.style.left = x + 'px';
+        ghost.style.top = y + 'px';
+      }
       ghostAnimationFrame = null;
       if (fadeOut) {
         ghost.style.opacity = '0';
@@ -594,7 +627,11 @@ function translateGhost(translateDuration = 0, scale = 1, fadeOut = false) {
 
   if (ghostAnimationFrame === null) {
     ghostAnimationFrame = requestAnimationFrame(() => {
-      ghost.style.transform = transformString;
+      transformString && (ghost.style.transform = transformString);
+      if (!useTransform) {
+        ghost.style.left = x + 'px';
+        ghost.style.top = y + 'px';
+      }
       ghostAnimationFrame = null;
       if (fadeOut) {
         ghost.style.opacity = '0';

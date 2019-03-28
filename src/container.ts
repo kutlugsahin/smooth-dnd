@@ -475,7 +475,7 @@ function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
       if (addedIndex !== null && (draggableInfo.invalidateShadow || addedIndex !== prevAddedIndex)) {
         // if (prevAddedIndex) prevAddedIndex = addedIndex;
         let beforeIndex = addedIndex - 1;
-        let begin = 0;
+        let begin = Number.MIN_SAFE_INTEGER;
         let dropAreaBegin = 0;
         let dropAreaEnd = 0;
         let afterBounds = null;
@@ -498,7 +498,7 @@ function getShadowBeginEnd({ draggables, layout }: ContainerProps) {
           dropAreaBegin = layout.getBeginEndOfContainer().begin;
         }
 
-        let end = 10000;
+        let end = Number.MAX_SAFE_INTEGER;
         let afterIndex = addedIndex;
         if (afterIndex === removedIndex) {
           afterIndex++;

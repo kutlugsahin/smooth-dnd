@@ -381,10 +381,8 @@ function onMouseMove(event: MouseEvent & TouchEvent) {
         draggableInfo.position.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, (e.clientY + ghostInfo.centerDelta.y)));
         draggableInfo.mousePosition.y = Math.max(beginEnd.begin + 1, Math.min(beginEnd.end - 1, e.clientY));
       } else {
-        // const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
-        // const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
-        const beginBoundary = beginEnd.begin;
-        const endBoundary = beginEnd.end - draggableInfo.size.offsetWidth;
+        const beginBoundary = beginEnd.begin - (draggableInfo.size.offsetWidth / 2);
+        const endBoundary = beginEnd.end - (draggableInfo.size.offsetWidth / 2);
         const positionInBoundary = Math.max(beginBoundary, Math.min(endBoundary, (e.clientX + ghostInfo.positionDelta.left)));
 
         ghostInfo.topLeft.x = positionInBoundary;

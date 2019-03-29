@@ -163,16 +163,18 @@ function handleDrop({ element, draggables, layout, getOptions }: ContainerProps)
   return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult, forDispose: boolean = false) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
-    if (draggableInfo.targetElement || getOptions().removeOnDropOut || forDispose) {
-      let actualAddIndex =
-        addedIndex !== null ? (removedIndex !== null && removedIndex < addedIndex ? addedIndex - 1 : addedIndex) : null;
-      const dropHandlerParams = {
-        removedIndex,
-        addedIndex: actualAddIndex,
-        payload: draggableInfo.payload,
-        // droppedElement: draggableInfo.element.firstElementChild,
-      };
-      dropHandler(dropHandlerParams, getOptions().onDrop);
+    if (!draggableInfo.cancelDrop) {
+      if (draggableInfo.targetElement || getOptions().removeOnDropOut || forDispose) {
+        let actualAddIndex =
+          addedIndex !== null ? (removedIndex !== null && removedIndex < addedIndex ? addedIndex - 1 : addedIndex) : null;
+        const dropHandlerParams = {
+          removedIndex,
+          addedIndex: actualAddIndex,
+          payload: draggableInfo.payload,
+          // droppedElement: draggableInfo.element.firstElementChild,
+        };
+        dropHandler(dropHandlerParams, getOptions().onDrop);
+      }
     }
   };
 }

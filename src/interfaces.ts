@@ -60,6 +60,7 @@ export interface DraggableInfo {
   groupName?: string;
   ghostParent: HTMLElement | null;
   relevantContainers: IContainer[];
+  cancelDrop?: boolean;
 }
 
 export interface ContainerProps {

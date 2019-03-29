@@ -17,6 +17,7 @@ let ghostInfo: GhostInfo = null!;
 let draggableInfo: DraggableInfo = null!;
 let containers: IContainer[] = [];
 let isDragging = false;
+let isCanceling = false;
 let dropAnimationStarted = false;
 let missedDrag = false;
 let handleDrag: (info: DraggableInfo) => boolean = null!;
@@ -206,7 +207,7 @@ function handleDropAnimation(callback: Function) {
     const container = containers.filter(p => p === draggableInfo.container)[0];
     if (container) {
       const { behaviour, removeOnDropOut } = container.getOptions();
-      if ((behaviour === 'move' || behaviour === 'copy') && !removeOnDropOut && container.getDragResult()) {
+      if ((behaviour === 'move' || behaviour === 'contain') && (isCanceling || !removeOnDropOut) && container.getDragResult()) {
         const rectangles = container.layout.getContainerRectangles();
 
         // container is hidden somehow
@@ -714,9 +715,25 @@ function watchRectangles() {
 }
 
 function cancelDrag() {
-  if (isDragging) {
+  if (isDragging && !isCanceling && !dropAnimationStarted) {
+    isCanceling = true;
+    missedDrag = false;
+    
+    const outOfBoundsDraggableInfo: DraggableInfo = Object.assign({}, draggableInfo, {
+      targetElement: null,
+      position: { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER },
+      mousePosition: { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER },
+    });
+    
+    dragListeningContainers.forEach(container => {
+      container.handleDrag(outOfBoundsDraggableInfo);
+    });
+
     draggableInfo.targetElement = null;
+    draggableInfo.cancelDrop = true;
+
     onMouseUp();
+    isCanceling = false;
   }
 }
 

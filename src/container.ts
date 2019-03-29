@@ -796,5 +796,8 @@ const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: Co
 // wrap all draggables by default 
 // in react,vue,angular this value will be set to false
 smoothDnD.wrapChild = true;
+smoothDnD.cancelDrag = function () {
+  Mediator.cancelDrag();
+}
 
 export default smoothDnD;

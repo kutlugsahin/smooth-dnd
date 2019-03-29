@@ -713,6 +713,13 @@ function watchRectangles() {
   }
 }
 
+function cancelDrag() {
+  if (isDragging) {
+    draggableInfo.targetElement = null;
+    onMouseUp();
+  }
+}
+
 function Mediator() {
   listenEvents();
   return {
@@ -722,6 +729,7 @@ function Mediator() {
     unregister: function (container: IContainer) {
       unregisterContainer(container);
     },
+    cancelDrag,
   };
 }
 

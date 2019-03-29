@@ -12,18 +12,28 @@ export {
     dropHandlers,
 };
 
+function delegateProperty(from: any, to:any, propName: string) {
+    Object.defineProperty(from, propName, {
+        set: (val?: boolean) => {
+            to[propName] = val;
+        },
+        get: () => to[propName]
+    })
+}
+    
 const deprecetedDefaultExport: SmoothDnDCreator = function(element: ElementX, options?: ContainerOptions) {
     console.warn('default export is deprecated. please use named export "smoothDnD"');
-
-    if (deprecetedDefaultExport.dropHandler !== undefined) {
-        container.dropHandler = deprecetedDefaultExport.dropHandler;
-    }
-
-    if (deprecetedDefaultExport.wrapChild !== undefined) {
-        container.wrapChild = deprecetedDefaultExport.wrapChild;
-    }
-
     return container(element, options);
 };
+
+deprecetedDefaultExport.cancelDrag = function () {
+    container.cancelDrag();
+}
+
+delegateProperty(deprecetedDefaultExport, container, 'useTransformForGhost');
+delegateProperty(deprecetedDefaultExport, container, 'maxScrollSpeed');
+delegateProperty(deprecetedDefaultExport, container, 'wrapChild');
+delegateProperty(deprecetedDefaultExport, container, 'dropHandler');
+
 
 export default deprecetedDefaultExport;

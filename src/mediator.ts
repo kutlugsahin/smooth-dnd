@@ -370,7 +370,7 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
   }
 }
 
-function handleMouseMoveForContainer({clientX, clientY}: MouseEvent & TouchEvent, orientation: Orientation = 'vertical') {
+function handleMouseMoveForContainer({ clientX, clientY }: MouseEvent & TouchEvent, orientation: Orientation = 'vertical') {
   const beginEnd = draggableInfo.container.layout.getBeginEndOfContainerVisibleRect();
   let mousePos;
   let axis: 'x' | 'y';
@@ -718,13 +718,13 @@ function cancelDrag() {
   if (isDragging && !isCanceling && !dropAnimationStarted) {
     isCanceling = true;
     missedDrag = false;
-    
+
     const outOfBoundsDraggableInfo: DraggableInfo = Object.assign({}, draggableInfo, {
       targetElement: null,
       position: { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER },
       mousePosition: { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER },
     });
-    
+
     dragListeningContainers.forEach(container => {
       container.handleDrag(outOfBoundsDraggableInfo);
     });
@@ -745,6 +745,9 @@ function Mediator() {
     },
     unregister: function (container: IContainer) {
       unregisterContainer(container);
+    },
+    isDragging: function () {
+      return isDragging;
     },
     cancelDrag,
   };

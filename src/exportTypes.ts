@@ -9,6 +9,7 @@ export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOption
 	maxScrollSpeed?: number;
 	useTransformForGhost?: boolean;
 	cancelDrag: () => void;
+	isDragging: () => boolean;
 };
 
 type Callback<T> = (params: T) => void;

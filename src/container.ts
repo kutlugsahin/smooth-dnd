@@ -802,4 +802,8 @@ smoothDnD.cancelDrag = function () {
   Mediator.cancelDrag();
 }
 
+smoothDnD.isDragging = function () {
+  return Mediator.isDragging();
+}
+
 export default smoothDnD;

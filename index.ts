@@ -30,6 +30,10 @@ deprecetedDefaultExport.cancelDrag = function () {
     container.cancelDrag();
 }
 
+deprecetedDefaultExport.isDragging = function () {
+    return container.isDragging();
+}
+
 delegateProperty(deprecetedDefaultExport, container, 'useTransformForGhost');
 delegateProperty(deprecetedDefaultExport, container, 'maxScrollSpeed');
 delegateProperty(deprecetedDefaultExport, container, 'wrapChild');

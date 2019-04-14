@@ -21,7 +21,7 @@ export interface DropResult {
 	element?: HTMLElement;
 }
 
-export interface DropPreviewOptions {
+export interface DropPlaceholderOptions {
 	className?: string;
 	animationDuration?: number;
 	showOnTop?: boolean;
@@ -59,5 +59,5 @@ export interface ContainerOptions {
 	removeOnDropOut?: boolean;
 	getGhostParent?: () => HTMLElement;
 	onDragEnd?: DragEndCallback;
-	dropPlaceholder?: DropPreviewOptions | boolean;	
+	dropPlaceholder?: DropPlaceholderOptions | boolean;	
 }

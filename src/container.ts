@@ -1,7 +1,7 @@
 import { animationClass, containerClass, containerInstance, dropPlaceholderFlexContainerClass, dropPlaceholderInnerClass, dropPlaceholderWrapperClass, stretcherElementClass, stretcherElementInstance, translationValue, wrapperClass, dropPlaceholderDefaultClass } from './constants';
 import { defaultOptions } from './defaults';
 import { domDropHandler } from './dropHandlers';
-import { ContainerOptions, SmoothDnD, SmoothDnDCreator } from './exportTypes';
+import { ContainerOptions, SmoothDnD, SmoothDnDCreator, DropPlaceholderOptions } from './exportTypes';
 import { ContainerProps, DraggableInfo, DragInfo, DragResult, ElementX, IContainer, LayoutManager } from './interfaces';
 import layoutManager from './layoutManager';
 import Mediator from './mediator';
@@ -15,10 +15,6 @@ function setAnimation(element: HTMLElement, add: boolean, animationDuration = de
     removeClass(element, animationClass);
     element.style.removeProperty('transition-duration');
   }
-}
-
-function initOptions(props = defaultOptions): ContainerOptions {
-  return Object.assign({}, defaultOptions, props);
 }
 
 function isDragRelevant({ element, getOptions }: ContainerProps) {
@@ -301,12 +297,12 @@ function getShadowBeginEndForDropZone({ layout }: ContainerProps) {
   };
 }
 
-function drawDropPreview({ layout, element, getOptions }: ContainerProps) {
+function drawDropPlaceholder({ layout, element, getOptions }: ContainerProps) {
   let prevAddedIndex: number | null = null;
   return ({ dragResult: { elementSize, shadowBeginEnd, addedIndex, dropPlaceholderContainer } }: DragInfo) => {
     const options = getOptions();    
     if (options.dropPlaceholder) {
-      const { animationDuration, className, showOnTop } = typeof options.dropPlaceholder === 'boolean' ? {} as any : options.dropPlaceholder;
+      const { animationDuration, className, showOnTop } = typeof options.dropPlaceholder === 'boolean' ? {} as any as DropPlaceholderOptions : options.dropPlaceholder as DropPlaceholderOptions;
       if (addedIndex !== null) {
         if (!dropPlaceholderContainer) {
           const innerElement = document.createElement('div');
@@ -633,7 +629,7 @@ function getDragHandler(params: ContainerProps) {
       handleInsertionSizeChange,
       calculateTranslations,
       getShadowBeginEnd,
-      drawDropPreview,
+      drawDropPlaceholder,
       handleFirstInsertShadowAdjustment,
       fireDragEnterLeaveEvents,
       fireOnDropReady
@@ -789,8 +785,8 @@ const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: Co
       Mediator.unregister(container);
       container.dispose(container);
     },
-    setOptions(options: ContainerOptions) {
-      container.setOptions(options);
+    setOptions(options: ContainerOptions, merge?: boolean) {
+      container.setOptions(options, merge);
     }
   };
 };

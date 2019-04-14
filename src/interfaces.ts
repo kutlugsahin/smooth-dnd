@@ -86,7 +86,7 @@ export interface IContainer {
   setDraggables: () => void;
   fireRemoveElement: () => void;
   getScrollMaxSpeed: () => number | undefined;
-  setOptions: (options: ContainerOptions) => void;
+  setOptions: (options: ContainerOptions, merge?: boolean) => void;
   shouldUseTransformForGhost: () => boolean;
 }
 

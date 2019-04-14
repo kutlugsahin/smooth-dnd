@@ -23,7 +23,7 @@ export interface DropResult {
 
 export interface DropPreviewOptions {
 	className?: string;
-	animationDuration?: string;
+	animationDuration?: number;
 	showOnTop?: boolean;
 }
 

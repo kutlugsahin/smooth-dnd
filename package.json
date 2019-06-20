@@ -2,15 +2,19 @@
   "name": "smooth-dnd",
   "version": "0.12.0",
   "description": "Drag and Drop library",
-  "main": "./dist/index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
   "scripts": {
     "bundle": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
-    "tsc": "tsc --emitDeclarationOnly --outDir dist",
-    "build": "npm run tsc && npm run bundle"
+    "build:es": "tsc --outDir es",
+    "build:commonjs": "tsc -p ./tsconfig.lib.json --outDir lib",
+    "build": "npm run build:es & npm run build:commonjs & npm run bundle"
   },
-  "types": "./dist/index.d.ts",
+  "types": "typings/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "es",
+    "lib"
   ],
   "keywords": [
     "sortable",

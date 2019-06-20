@@ -1,27 +1,27 @@
 {
-	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"lib": [
-			"dom",
-			"es2017"
-		],
-		"module": "esnext",
-		"moduleResolution": "node",
-		// "noEmit": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"preserveConstEnums": true,
-		"removeComments": false,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"target": "es5",
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"strictFunctionTypes": true,
-		"declaration": true,
-		"declarationDir": "dist",
-		"strictNullChecks": true,
-		"noImplicitThis": false,
-	}
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "lib": ["dom", "es2017"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    // "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es5",
+    "rootDir": "src",
+    "declarationDir": "typings",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "strictFunctionTypes": true,
+    "declaration": true,
+    "strictNullChecks": true,
+    "noImplicitThis": false
+  },
+  "include": ["src"],
+  "exclude": ["dist", "es", "lib"]
 }

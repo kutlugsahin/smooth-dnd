@@ -14,7 +14,8 @@
   "files": [
     "dist",
     "es",
-    "lib"
+    "lib",
+    "typings"
   ],
   "keywords": [
     "sortable",

@@ -1,5 +1,5 @@
 {
-  "name": "smooth-dnd",
+  "name": "@cisdi/smooth-dnd",
   "version": "0.12.0",
   "description": "Drag and Drop library",
   "main": "lib/index.js",
@@ -26,22 +26,36 @@
     "dnd"
   ],
   "author": {
-    "name": "Kutlu Sahin",
-    "email": "kutlugsahin@gmail.com"
+    "name": "kagawa",
+    "email": "kingsongao1221@gmail.com"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kutlugsahin/smooth-dnd.git"
+    "url": "https://github.com/kagawagao/smooth-dnd.git"
   },
   "devDependencies": {
-    "@babel/core": "7.3.4",
-    "@babel/preset-env": "7.3.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@babel/preset-typescript": "7.3.3",
-    "rollup": "1.4.0",
-    "rollup-plugin-babel": "4.3.2",
-    "rollup-plugin-commonjs": "^9.2.1",
+    "husky": "^2.4.1",
+    "lint-staged": "^8.2.1",
+    "prettier": "^1.18.2",
+    "rollup": "^1.16.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-uglify": "6.0.2",
-    "typescript": "3.3.3333"
+    "typescript": "^3.5.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,js,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }

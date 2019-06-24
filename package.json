@@ -1,6 +1,6 @@
 {
   "name": "@cisdi/smooth-dnd",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Drag and Drop library",
   "main": "lib/index.js",
   "module": "es/index.js",

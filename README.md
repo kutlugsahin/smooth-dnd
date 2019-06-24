@@ -16,8 +16,8 @@ For **Vue.js** components and usage follow <a href="https://github.com/kutlugsah
 
 ### Installation
 
-```shell
-npm i smooth-dnd
+```bash
+npm i @cisdi/smooth-dnd
 ```
 
 ## Usage

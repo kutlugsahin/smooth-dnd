@@ -350,7 +350,7 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
       }
 
       if (startDrag) {
-        container.layout.invalidate()
+        container.layout.invalidate();
         Utils.addClass(window.document.body, constants.disbaleTouchActions);
         Utils.addClass(window.document.body, constants.noUserSelectClass);
 

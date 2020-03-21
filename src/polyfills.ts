@@ -15,7 +15,7 @@ function applyPolyfills() {
           return i > -1;
         };
     }
-  })(Node || Element);
+  })(Element);
 
   // Overwrites native 'firstElementChild' prototype.
   // Adds Document & DocumentFragment support for IE9 & Safari.

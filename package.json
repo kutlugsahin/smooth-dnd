@@ -1,5 +1,5 @@
 {
-  "name": "@richardrout/smooth-dnd",
+  "name": "smooth-dnd",
   "version": "0.13.0",
   "description": "Drag and Drop library",
   "main": "./dist/index.js",

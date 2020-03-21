@@ -48,8 +48,8 @@ const css = {
 		'pointer-events': 'none'
 	},
 	[`.${disbaleTouchActions} *`]: {
-		'touch-actions': 'none',
-		'-ms-touch-actions': 'none'
+		'touch-action': 'none',
+		'-ms-touch-action': 'none'
 	},
 	[`.${noUserSelectClass}`]: {
 		'-webkit-touch-callout': 'none',

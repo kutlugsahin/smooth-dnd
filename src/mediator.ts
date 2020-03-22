@@ -576,7 +576,6 @@ function initiateDrag(position: MousePosition, cursor: string) {
       draggableInfo.container,
       cursor
     );
-    console.log(ghostInfo.centerDelta.x);
     draggableInfo.position = {
       x: position.clientX + ghostInfo.centerDelta.x,
       y: position.clientY + ghostInfo.centerDelta.y,

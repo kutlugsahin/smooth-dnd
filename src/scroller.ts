@@ -214,7 +214,7 @@ function getTopmostScrollAnimator(animatorInfos: ScrollerAnimator[], position: P
 	return null;
 }
 
-export default (containers: IContainer[], maxScrollSpeed = maxSpeed) => {
+export default (containers: IContainer[], maxScrollSpeed = maxSpeed, disableOverlapDetection = false) => {
 	const animatorInfos = containers.reduce((acc: ScrollerAnimator[], container: IContainer) => {
 		const filteredAnimators = getScrollerAnimator(container).filter(p => {
 			return !acc.find(q => q.scrollerElement === p.scrollerElement);
@@ -256,18 +256,20 @@ export default (containers: IContainer[], maxScrollSpeed = maxSpeed) => {
 				}
 			});
 
-			const overlappingAnimators = animatorInfos.filter(p => p.cachedRect);
-			if (overlappingAnimators.length && overlappingAnimators.length > 1) {
-				// stop animations except topmost
-				const topScrollerAnimator = getTopmostScrollAnimator(overlappingAnimators, draggableInfo.mousePosition);
+			if (disableOverlapDetection !== true) {
+				const overlappingAnimators = animatorInfos.filter(p => p.cachedRect);
+				if (overlappingAnimators.length && overlappingAnimators.length > 1) {
+					// stop animations except topmost
+					const topScrollerAnimator = getTopmostScrollAnimator(overlappingAnimators, draggableInfo.mousePosition);
 
-				if (topScrollerAnimator) {
-					overlappingAnimators.forEach(p => {
-						if (p !== topScrollerAnimator) {
-							p.axisAnimations.x && p.axisAnimations.x.animator.stop();
-							p.axisAnimations.y && p.axisAnimations.y.animator.stop();
-						}
-					})
+					if (topScrollerAnimator) {
+						overlappingAnimators.forEach(p => {
+							if (p !== topScrollerAnimator) {
+								p.axisAnimations.x && p.axisAnimations.x.animator.stop();
+								p.axisAnimations.y && p.axisAnimations.y.animator.stop();
+							}
+						})
+					}
 				}
 			}
 		}

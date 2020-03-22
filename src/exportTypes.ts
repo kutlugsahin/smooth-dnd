@@ -7,6 +7,7 @@ export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOption
 	dropHandler?: any;
 	wrapChild?: boolean;
 	maxScrollSpeed?: number;
+	disableScrollOverlapDetection?: boolean;
 	useTransformForGhost?: boolean;
 	cancelDrag: () => void;
 	isDragging: () => boolean;
@@ -45,6 +46,7 @@ export interface ContainerOptions {
 	dragBeginDelay?: number;
 	animationDuration?: number;
 	autoScrollEnabled?: boolean;
+	disableScrollOverlapDetection?: boolean;
 	lockAxis?: 'x' | 'y';
 	dragClass?: string;
 	dropClass?: string;

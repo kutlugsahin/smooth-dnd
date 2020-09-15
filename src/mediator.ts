@@ -354,13 +354,23 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
         Utils.addClass(window.document.body, constants.disbaleTouchActions);
         Utils.addClass(window.document.body, constants.noUserSelectClass);
 
-        const onMouseUp = () => {
+        const onDragEndAction = () => {
           Utils.removeClass(window.document.body, constants.disbaleTouchActions);
           Utils.removeClass(window.document.body, constants.noUserSelectClass);
+        }
+
+        const onMouseUp = () => {
+          onDragEndAction();
           window.document.removeEventListener('mouseup', onMouseUp);
         }
 
+        const onTouchEnd = () => {
+          onDragEndAction();
+          window.document.removeEventListener('touchend', onTouchEnd);
+        }
+
         window.document.addEventListener('mouseup', onMouseUp);
+        window.document.addEventListener('touchend', onTouchEnd);
       }
 
       if (startDrag) {

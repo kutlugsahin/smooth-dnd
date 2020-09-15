@@ -33,10 +33,10 @@ interface ScrollerAnimator {
 	cachedRect?: Rect;
 }
 
-function getScrollParams(position: Position, axis: Axis, rect: Rect): ScrollParams | null {
+function getScrollParams(position: Position, axis: Axis, rect: Rect, autoScrollOutsideContainerEnabled: boolean): ScrollParams | null {
 	const { left, right, top, bottom } = rect;
 	const { x, y } = position;
-	if (x < left || x > right || y < top || y > bottom) {
+	if (!autoScrollOutsideContainerEnabled && (x < left || x > right || y < top || y > bottom)) {
 		return null;
 	}
 
@@ -183,17 +183,17 @@ function getScrollerAnimator(container: IContainer): ScrollerAnimator[] {
 	return scrollerAnimators;
 }
 
-function setScrollParams(animatorInfos: ScrollerAnimator[], position: Position) {
+function setScrollParams(animatorInfos: ScrollerAnimator[], position: Position, autoScrollOutsideContainerEnabled: boolean) {
 	animatorInfos.forEach((animator: ScrollerAnimator) => {
 		const { axisAnimations, getRect } = animator;
 		const rect = getRect();
 		if (axisAnimations.x) {
-			axisAnimations.x.scrollParams = getScrollParams(position, 'x', rect)
+			axisAnimations.x.scrollParams = getScrollParams(position, 'x', rect, autoScrollOutsideContainerEnabled)
 			animator.cachedRect = rect;
 		}
 
 		if (axisAnimations.y) {
-			axisAnimations.y.scrollParams = getScrollParams(position, 'y', rect)
+			axisAnimations.y.scrollParams = getScrollParams(position, 'y', rect, autoScrollOutsideContainerEnabled)
 			animator.cachedRect = rect;
 		}
 	});
@@ -214,7 +214,7 @@ function getTopmostScrollAnimator(animatorInfos: ScrollerAnimator[], position: P
 	return null;
 }
 
-export default (containers: IContainer[], maxScrollSpeed = maxSpeed) => {
+export default (containers: IContainer[], maxScrollSpeed = maxSpeed, autoScrollOutsideContainerEnabled: boolean) => {
 	const animatorInfos = containers.reduce((acc: ScrollerAnimator[], container: IContainer) => {
 		const filteredAnimators = getScrollerAnimator(container).filter(p => {
 			return !acc.find(q => q.scrollerElement === p.scrollerElement);
@@ -233,7 +233,7 @@ export default (containers: IContainer[], maxScrollSpeed = maxSpeed) => {
 		}
 
 		if (draggableInfo) {
-			setScrollParams(animatorInfos, draggableInfo.mousePosition);
+			setScrollParams(animatorInfos, draggableInfo.mousePosition, autoScrollOutsideContainerEnabled);
 
 			animatorInfos.forEach(animator => {
 				const { x, y } = animator.axisAnimations;

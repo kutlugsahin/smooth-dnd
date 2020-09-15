@@ -45,6 +45,7 @@ export interface ContainerOptions {
 	dragBeginDelay?: number;
 	animationDuration?: number;
 	autoScrollEnabled?: boolean;
+	autoScrollOutsideContainerEnabled?: boolean;
 	lockAxis?: 'x' | 'y';
 	dragClass?: string;
 	dropClass?: string;

@@ -551,7 +551,7 @@ function dragHandler(dragListeningContainers: IContainer[]): (draggableInfo: Dra
 
 function getScrollHandler(container: IContainer, dragListeningContainers: IContainer[]) {
   if (container.getOptions().autoScrollEnabled) {
-    return dragScroller(dragListeningContainers, container.getScrollMaxSpeed());
+    return dragScroller(dragListeningContainers, container.getScrollMaxSpeed(), container.getOptions().autoScrollOutsideContainerEnabled!);
   } else {
     return (props: { draggableInfo?: DraggableInfo; reset?: boolean }) => null;
   }

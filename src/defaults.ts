@@ -7,6 +7,7 @@ export const defaultOptions: ContainerOptions = {
 	getChildPayload: undefined,
 	animationDuration: 250,
 	autoScrollEnabled: true,
+	autoScrollOutsideContainerEnabled: false,
 	shouldAcceptDrop: undefined,
 	shouldAnimateDrop: undefined,
 };

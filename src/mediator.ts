@@ -360,7 +360,9 @@ function onMouseDown(event: MouseEvent & TouchEvent) {
           window.document.removeEventListener('mouseup', onMouseUp);
         }
 
-        window.document.addEventListener('mouseup', onMouseUp);
+        releaseEvents.forEach(e => {
+          window.document.addEventListener(e, onMouseUp, { passive: false });
+        });
       }
 
       if (startDrag) {

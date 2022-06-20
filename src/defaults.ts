@@ -9,4 +9,6 @@ export const defaultOptions: ContainerOptions = {
 	autoScrollEnabled: true,
 	shouldAcceptDrop: undefined,
 	shouldAnimateDrop: undefined,
+	dropHandler: undefined,
+	wrapChild: undefined,
 };

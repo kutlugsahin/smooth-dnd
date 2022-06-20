@@ -1,6 +1,6 @@
 export interface SmoothDnD {
 	dispose: () => void;
-	setOptions: (options: ContainerOptions, merge?: boolean) => void;	
+	setOptions: (options: ContainerOptions, merge?: boolean) => void;
 }
 
 export type SmoothDnDCreator = ((element: HTMLElement, options?: ContainerOptions) => SmoothDnD) & {
@@ -59,5 +59,7 @@ export interface ContainerOptions {
 	removeOnDropOut?: boolean;
 	getGhostParent?: () => HTMLElement;
 	onDragEnd?: DragEndCallback;
-	dropPlaceholder?: DropPlaceholderOptions | boolean;	
+	dropPlaceholder?: DropPlaceholderOptions | boolean;
+	dropHandler?: string;
+	wrapChild?: boolean;
 }

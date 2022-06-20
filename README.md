@@ -2,11 +2,11 @@
 
 A fast and lightweight drag&drop, sortable library for with many configuration options covering many d&d scenarios. There is no external dependencies. It uses css transitions for animations so it's hardware accelerated whenever possible.
 
-For **React** components and usage follow <a href="https://github.com/kutlugsahin/react-smooth-dnd/">link</a> 
+For **React** components and usage follow <a href="https://github.com/kutlugsahin/react-smooth-dnd/">link</a>
 
-For **Angular** components and usage follow <a href="https://github.com/kutlugsahin/ngx-smooth-dnd/">link</a>  
+For **Angular** components and usage follow <a href="https://github.com/kutlugsahin/ngx-smooth-dnd/">link</a>
 
-For **Vue.js** components and usage follow <a href="https://github.com/kutlugsahin/vue-smooth-dnd/">link</a>  
+For **Vue.js** components and usage follow <a href="https://github.com/kutlugsahin/vue-smooth-dnd/">link</a>
 
 **Show, don't tell !**
 ### <a href="https://kutlugsahin.github.io/smooth-dnd-demo/">Demo page</a>
@@ -79,6 +79,8 @@ var container = SmoothDnD(containerElement, options);
 |shouldAcceptDrop|function|`undefined`|*See descriptions below*|
 |onDragEnter|function|`undefined`|*See descriptions below*|
 |onDragLeave|function|`undefined`|*See descriptions below*|
+|dropHandler|function|`undefined`|Use this to override the global dropHandler setting|
+|wrapChild|boolean|`depends on whether vue-/react-smooth-dnd has been loaded`|Use this to override the global wrapChild setting|
 
 ---
 
@@ -119,10 +121,10 @@ function onDropReady(dropResult) {
 ```
 #### Parameters
 - **dropResult** : `object`
-	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
-	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
+	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed.
+	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added.
 	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
-	- **element** : `DOMElement` : the DOM element that is moved 
+	- **element** : `DOMElement` : the DOM element that is moved
 
 ### onDrop
 
@@ -135,10 +137,10 @@ function onDrop(dropResult) {
 ```
 #### Parameters
 - **dropResult** : `object`
-	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed. 
-	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added. 
+	- **removedIndex** : `number` : index of the removed children. Will be `null` if no item is removed.
+	- **addedIndex** : `number` : index to add droppped item. Will be `null` if no item is added.
 	- **payload** : `object` : the payload object retrieved by calling *getChildPayload* function.
-	- **element** : `DOMElement` : the DOM element that is moved 
+	- **element** : `DOMElement` : the DOM element that is moved
 
 ### getChildPayload
 
@@ -158,7 +160,7 @@ function getChildPayload(index) {
 ### getGhostParent
 
 The function to be called to get the element that the dragged ghost will be appended. Default parent element is the container itself.
-The ghost element is positioned as 'fixed' and appended to given parent element. 
+The ghost element is positioned as 'fixed' and appended to given parent element.
 But if any anchestor of container has a transform property, ghost element will be positioned relative to that element which breaks the calculations. Thats why if you have any transformed parent element of Containers you should set this property so that it returns any element that has not transformed parent element.
 ```js
 function getGhostParent() {

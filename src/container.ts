@@ -39,8 +39,8 @@ function isDragRelevant({ element, getOptions }: ContainerProps) {
   };
 }
 
-function wrapChild(child: HTMLElement) {
-  if (smoothDnD.wrapChild) {
+function wrapChild(child: HTMLElement, wrapChildOverride?: boolean) {
+  if (wrapChildOverride || smoothDnD.wrapChild) {
     const div = window.document.createElement('div');
     div.className = `${wrapperClass}`;
     child.parentElement!.insertBefore(div, child);
@@ -51,13 +51,13 @@ function wrapChild(child: HTMLElement) {
   return child;
 }
 
-function wrapChildren(element: HTMLElement) {
+function wrapChildren(element: HTMLElement, wrapChildOverride?: boolean) {
   const draggables: ElementX[] = [];
   Array.prototype.forEach.call(element.children, (child: ElementX) => {
     if (child.nodeType === Node.ELEMENT_NODE) {
       let wrapper = child;
       if (!hasClass(child, wrapperClass)) {
-        wrapper = wrapChild(child);
+        wrapper = wrapChild(child, wrapChildOverride);
       }
       wrapper[translationValue] = 0;
       draggables.push(wrapper);
@@ -68,8 +68,8 @@ function wrapChildren(element: HTMLElement) {
   return draggables;
 }
 
-function unwrapChildren(element: HTMLElement) {
-  if (smoothDnD.wrapChild) {
+function unwrapChildren(element: HTMLElement, wrapChildOverride?: boolean) {
+  if (wrapChildOverride || smoothDnD.wrapChild) {
     Array.prototype.forEach.call(element.children, (child: HTMLElement) => {
       if (child.nodeType === Node.ELEMENT_NODE) {
         if (hasClass(child, wrapperClass)) {
@@ -154,13 +154,14 @@ function setTargetContainer(draggableInfo: DraggableInfo, element: HTMLElement, 
 }
 
 function handleDrop({ element, draggables, layout, getOptions }: ContainerProps) {
+  const options = getOptions()
   const draggablesReset = resetDraggables({ element, draggables, layout, getOptions });
-  const dropHandler = (smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, getOptions });
+  const dropHandler = (options.dropHandler || smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, getOptions });
   return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult, forDispose: boolean = false) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()
     if (!draggableInfo.cancelDrop) {
-      if (draggableInfo.targetElement || getOptions().removeOnDropOut || forDispose) {
+      if (draggableInfo.targetElement || options.removeOnDropOut || forDispose) {
         let actualAddIndex =
           addedIndex !== null ? (removedIndex !== null && removedIndex < addedIndex ? addedIndex - 1 : addedIndex) : null;
         const dropHandlerParams = {
@@ -169,15 +170,15 @@ function handleDrop({ element, draggables, layout, getOptions }: ContainerProps)
           payload: draggableInfo.payload,
           // droppedElement: draggableInfo.element.firstElementChild,
         };
-        dropHandler(dropHandlerParams, getOptions().onDrop);
+        dropHandler(dropHandlerParams, options.onDrop);
       }
     }
   };
 }
 
 function getContainerProps(element: HTMLElement, getOptions: () => ContainerOptions): ContainerProps {
-  const draggables = wrapChildren(element);
   const options = getOptions();
+  const draggables = wrapChildren(element, options.wrapChild);
   // set flex classes before layout is inited for scroll listener
   addClass(element, `${containerClass} ${options.orientation}`);
   const layout = layoutManager(element, options.orientation!, options.animationDuration!);
@@ -300,7 +301,7 @@ function getShadowBeginEndForDropZone({ layout }: ContainerProps) {
 function drawDropPlaceholder({ layout, element, getOptions }: ContainerProps) {
   let prevAddedIndex: number | null = null;
   return ({ dragResult: { elementSize, shadowBeginEnd, addedIndex, dropPlaceholderContainer } }: DragInfo) => {
-    const options = getOptions();    
+    const options = getOptions();
     if (options.dropPlaceholder) {
       const { animationDuration, className, showOnTop } = typeof options.dropPlaceholder === 'boolean' ? {} as any as DropPlaceholderOptions : options.dropPlaceholder as DropPlaceholderOptions;
       if (addedIndex !== null) {
@@ -680,7 +681,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
     }
 
     function setDraggables(draggables: HTMLElement[], element: HTMLElement) {
-      const newDraggables = wrapChildren(element);
+      const newDraggables = wrapChildren(element, props.getOptions().wrapChild);
       for (let i = 0; i < newDraggables.length; i++) {
         draggables[i] = newDraggables[i];
       }
@@ -706,7 +707,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
 
     function dispose(container: IContainer) {
       scrollListener.dispose();
-      unwrapChildren(container.element);
+      unwrapChildren(container.element,  props.getOptions().wrapChild);
     }
 
     function setOptions(options: ContainerOptions, merge = true) {
@@ -738,7 +739,7 @@ function Container(element: HTMLElement): (options?: ContainerOptions) => IConta
         if (dragResult && dragResult.dropPlaceholderContainer) {
           element.removeChild(dragResult.dropPlaceholderContainer);
         }
-        lastDraggableInfo = null;       
+        lastDraggableInfo = null;
         dragHandler = getDragHandler(props);
         dropHandler(draggableInfo, dragResult!);
         dragResult = null;
@@ -791,7 +792,7 @@ const smoothDnD: SmoothDnDCreator = function (element: HTMLElement, options?: Co
   };
 };
 
-// wrap all draggables by default 
+// wrap all draggables by default
 // in react,vue,angular this value will be set to false
 smoothDnD.wrapChild = true;
 smoothDnD.cancelDrag = function () {

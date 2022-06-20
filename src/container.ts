@@ -157,6 +157,7 @@ function handleDrop({ element, draggables, layout, getOptions }: ContainerProps)
   const options = getOptions()
   const draggablesReset = resetDraggables({ element, draggables, layout, getOptions });
   const dropHandler = (options.dropHandler || smoothDnD.dropHandler || domDropHandler)({ element, draggables, layout, getOptions });
+console.log('handleDrop', options.dropHandler, smoothDnD.dropHandler, domDropHandler)
   return function (draggableInfo: DraggableInfo, { addedIndex, removedIndex }: DragResult, forDispose: boolean = false) {
     draggablesReset();
     // if drop zone is valid => complete drag else do nothing everything will be reverted by draggablesReset()

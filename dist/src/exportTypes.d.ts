@@ -60,7 +60,7 @@ export interface ContainerOptions {
     getGhostParent?: () => HTMLElement;
     onDragEnd?: DragEndCallback;
     dropPlaceholder?: DropPlaceholderOptions | boolean;
-    dropHandler?: string;
+    dropHandler?: any;
     wrapChild?: boolean;
 }
 export {};

@@ -24,16 +24,16 @@ function applyPolyfills() {
     if (
       constructor &&
       constructor.prototype &&
-      constructor.prototype.firstElementChild == null
+      !constructor.prototype.hasOwnProperty('firstElementChild')
     ) {
       Object.defineProperty(constructor.prototype, "firstElementChild", {
         get: function () {
-          var node,
-            nodes = this.childNodes,
-            i = 0;
-          while ((node = nodes[i++])) {
-            if (node.nodeType === 1) {
-              return node;
+          if(this !== constructor.prototype) {
+            var node, nodes = this.childNodes, i = 0;
+            while ((node = nodes[i++])) {
+              if (node.nodeType === 1) {
+                return node;
+              }
             }
           }
           return null;

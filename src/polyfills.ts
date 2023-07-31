@@ -26,8 +26,9 @@ function applyPolyfills() {
       constructor.prototype &&
       (
         // Fix an error when getting Node.prototype.childNodes in the get method of the first polyfill join triggered by calling Node.prototype.firstElementChild when loading smooth-dnd multiple times.
-        (Object.getOwnPropertyNames && !Object.getOwnPropertyNames(constructor.prototype).includes('firstElementChild')) || 
-        constructor.prototype.firstElementChild == null
+        Object.getOwnPropertyNames ?
+          !Object.getOwnPropertyNames(constructor.prototype).includes('firstElementChild')): 
+          constructor.prototype.firstElementChild == null
       )
     ) {
       Object.defineProperty(constructor.prototype, "firstElementChild", {

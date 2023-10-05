@@ -91,7 +91,7 @@ function getGhostElement(wrapperElement: HTMLElement, { x, y }: Position, contai
   ghost.style.position = 'fixed';
   ghost.style.top = '0px';
   ghost.style.left = '0px';
-  ghost.style.transform = null;
+  ghost.style.transform = null!;
   ghost.style.removeProperty('transform');
 
   if (container.shouldUseTransformForGhost()) {
@@ -159,8 +159,11 @@ function getDraggableInfo(draggableElement: HTMLElement): DraggableInfo {
 function handleDropAnimation(callback: Function) {
   function endDrop() {
     Utils.removeClass(ghostInfo.ghost, 'animated');
-    ghostInfo!.ghost.style.transitionDuration = null!;
-    getGhostParent().removeChild(ghostInfo.ghost);
+    ghostInfo.ghost.style.transitionDuration = null!;
+    const parent = getGhostParent()
+    if (ghostInfo.ghost.isConnected && parent && parent.isConnected) {
+      parent.removeChild(ghostInfo.ghost);
+    }
     callback();
   }
 

@@ -161,7 +161,7 @@ function handleDropAnimation(callback: Function) {
     Utils.removeClass(ghostInfo.ghost, 'animated');
     ghostInfo.ghost.style.transitionDuration = null!;
     const parent = getGhostParent()
-    if (ghostInfo.ghost.isConnected && parent?.isConnected) {
+    if (ghostInfo.ghost.isConnected && parent && parent.isConnected) {
       parent.removeChild(ghostInfo.ghost);
     }
     callback();
